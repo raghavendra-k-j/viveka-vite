@@ -1,0 +1,40 @@
+.micContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.micIcon {
+  width: 40px;
+  height: 40px;
+  color: var(--color-red-500);
+  z-index: 1;
+  transition: color 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.micContainer.listening {
+  background-color: var(--color-red-500);
+}
+
+.micIcon.listening {
+  color: var(--color-white);
+  animation: micPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes micPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.8);
+  }
+}

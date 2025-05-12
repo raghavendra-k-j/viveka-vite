@@ -1,0 +1,12 @@
+.appbar {
+  /* background-color: var(--color-brand-app-bar-bg); */
+  /* color: var(--color-brand-app-bar-text); */
+
+  /* background: linear-gradient(135deg, #234788, #2e67c9, #26a0da); */
+  background: linear-gradient(135deg, #234788, #2e67c9);
+  color: var(--color-on-primary);
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+}

@@ -1,0 +1,47 @@
+.btn {
+  --button-px: var(--dimen-button-md-px);
+  --button-py: var(--dimen-button-md-py);
+  --button-font-size: var(--dimen-button-md-font-size);
+  --button-min-height: var(--dimen-button-md-min-height);
+  --button-radius: var(--dimen-button-radius);
+  --button-bg-color: var(--color-primary);
+  --button-bg-color-hover: var(--color-primary-hover);
+  --button-text-color: var(--color-on-primary);
+  --button-text-color-hover: var(--color-on-primary-hover);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--button-py) var(--button-px);
+  border: none;
+  border-radius: var(--button-radius);
+  font-size: var(--button-font-size);
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  min-height: var(--button-min-height);
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+}
+
+.btn--primary {
+  --button-bg-color: var(--color-primary);
+  --button-bg-color-hover: var(--color-primary-hover);
+  --button-text-color: var(--color-on-primary);
+  --button-text-color-hover: var(--color-on-primary-hover);
+}
+
+.btn--primary:hover,
+.btn--primary:focus {
+  background-color: var(--button-bg-color-hover);
+  color: var(--button-text-color-hover);
+}
+
+.btn--md {
+  --button-px: var(--dimen-button-md-px);
+  --button-py: var(--dimen-button-md-py);
+  --button-font-size: var(--dimen-button-md-font-size);
+  --button-min-height: var(--dimen-button-md-min-height);
+}
