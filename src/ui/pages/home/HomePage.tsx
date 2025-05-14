@@ -28,6 +28,8 @@ export default function HomePage() {
                 onCancel: () => {
                     dialogManager.closeById('ai-voice-dialog');
                 },
+                allowAi: true,
+                enableAi: false,
             },
         });
     };

@@ -9,19 +9,22 @@ import { ContentsToHtmlService } from "~/domain/aistt/services/ContentsToHtmlSer
 import "katex/dist/katex.min.css";
 import { useEffect, useRef } from "react";
 import { reaction } from "mobx";
-import { Mic, MicOff } from "lucide-react";
+import { Loader, Mic, MicOff, X } from "lucide-react";
 import styles from "./styles.module.css";
 import OutlinedButton from "~/ui/widgets/button/OutlinedButton";
+import clsx from "clsx";
 
 export type AiSTTDialogProps = {
     stt: STT;
+    allowAi: boolean;
+    enableAi: boolean;
     onDone: (content: Content) => void;
     onCancel: () => void;
 }
 
 export function AiSTTDialog(props: AiSTTDialogProps) {
     return (
-        <AiSTTDialogProvider stt={props.stt} onDone={props.onDone} onCancel={props.onCancel}>
+        <AiSTTDialogProvider stt={props.stt} onDone={props.onDone} onCancel={props.onCancel} allowAi={props.allowAi} enableAi={props.enableAi}>
             <Body />
         </AiSTTDialogProvider>
     );
@@ -29,11 +32,12 @@ export function AiSTTDialog(props: AiSTTDialogProps) {
 
 
 function Body() {
+    const store = useAiSTTDialogStore();
     return (
-        <Dialog>
-            <DialogOverlay />
+        <Dialog onClose={() => store.onClickCancel()}>
+            <DialogOverlay onClick={() => store.onClickCancel()} />
             <DialogScaffold className="p-4">
-                <DialogContent className="w-full max-w-md max-h-[400px] flex flex-col">
+                <DialogContent className="w-full max-w-[400px] min-h-[300px] max-h-[400px] flex flex-col">
                     <DialogBody />
                     <DialogFooter />
                 </DialogContent>
@@ -46,24 +50,44 @@ function Body() {
 function DialogBody() {
     const store = useAiSTTDialogStore();
     return (
-        <div className="flex flex-col flex-1 p-4 gap-4 overflow-hidden">
+        <div className="flex flex-col flex-1 pb-4 pt-12 gap-4 overflow-hidden">
             <div className="flex flex-col justify-center items-center">
                 <Observer>
-                    {() => (
-                        <>
-                            <button
-                                className={`${styles.micButton} ${store.isListening ? styles.listening : ""}`}
-                                onClick={() =>
-                                    store.isListening ? store.stopListening() : store.startListening()
-                                }
-                            >
-                                {store.isListening ? <MicOff size={24} /> : <Mic size={24} />}
-                            </button>
-                            <div className="text-base-m text-secondary mt-4">
-                                {store.isListening ? "Listening..." : "Click to start listening"}
-                            </div>
-                        </>
-                    )}
+                    {() => {
+                        let Icon;
+                        let iconClassName;
+                        let buttonDisabled = false;
+                        if (store.aiState.isLoading) {
+                            Icon = Loader;
+                            iconClassName = clsx(styles.micButton, "animate-spin");
+                            buttonDisabled = true;
+                        } else if (store.isSttActive) {
+                            Icon = MicOff;
+                            iconClassName = clsx(styles.micButton, styles.listening);
+                        } else {
+                            Icon = Mic;
+                            iconClassName = styles.micButton;
+                        }
+                        return (
+                            <>
+                                <button
+                                    className={iconClassName}
+                                    onClick={() => store.isSttActive ? store.stopListening() : store.startListening()}
+                                    disabled={buttonDisabled}
+                                    aria-label={store.isSttActive ? "Stop listening" : "Start listening"}
+                                >
+                                    <Icon size={24} />
+                                </button>
+                                <div className="text-base-m text-secondary mt-4">
+                                    {store.aiState.isLoading
+                                        ? "Transcribing..."
+                                        : store.isSttActive
+                                            ? "Listening..."
+                                            : "Click to start listening"}
+                                </div>
+                            </>
+                        );
+                    }}
                 </Observer>
             </div>
             <AiOutputView />
@@ -90,14 +114,14 @@ function AiOutputView() {
     }, [store]);
 
     return (
-        <div ref={containerRef} className="flex-1 overflow-auto">
+        <div ref={containerRef} className="flex-1 overflow-auto px-6">
             <Observer>
                 {() => <ContentView content={store.content} />}
             </Observer>
             <Observer>
                 {() => (
                     <div
-                        className={`text-base-m text-secondary mt-2${!store.content ? " text-center" : ""}`}
+                        className={`text-base-m text-secondary mt-2${store.content.isEmpty ? " text-center" : ""}`}
                     >
                         {store.liveTranscription}
                     </div>
@@ -109,23 +133,30 @@ function AiOutputView() {
 
 
 
-function ContentView(props: { content?: Content }) {
-    if (!props.content) return null;
+function ContentView(props: { content: Content }) {
+    const store = useAiSTTDialogStore();
+    if (props.content.isEmpty) return null;
     return (
-        <div className="text-base-m text-default space-y-3">
+        <div className="text-base-m text-default space-y-2">
             {props.content.paragraphs.map((paragraph) => {
                 const html = ContentsToHtmlService.convertParagraph(paragraph);
                 return (
-                    <div key={paragraph.uuid}>
+                    <div
+                        key={paragraph.uuid}
+                        className="group relative hover:bg-gray-100 rounded transition-colors cursor-pointer"
+                    >
                         <p
                             dangerouslySetInnerHTML={{ __html: html }}
+                            className="pr-6"
                         />
-                        <p
-                            dangerouslySetInnerHTML={{ __html: html }}
-                        />
-                        <p
-                            dangerouslySetInnerHTML={{ __html: html }}
-                        />
+                        <button
+                            type="button"
+                            onClick={() => store.removeParagraph(paragraph)}
+                            className=" cursor-pointer text-red-500 hover:text-red-700 absolute top-1 right-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full bg-white/80 hover:bg-white shadow-md"
+                            aria-label="Delete paragraph"
+                        >
+                            <X size={16} strokeWidth={2.2} />
+                        </button>
                     </div>
                 );
             })}
@@ -137,27 +168,39 @@ function ContentView(props: { content?: Content }) {
 
 
 function DialogFooter() {
-
     const store = useAiSTTDialogStore();
+
     return (
-        <div className="flex justify-end gap-2 px-4 py-3 border-t border-slate-200">
-
-            <OutlinedButton
-                onClick={() => {
-                    store.onClickCancel();
-                }}
-            >
-                Cancel
-            </OutlinedButton>
-            <FilledButton
-                onClick={() => {
-                    store.onClickDone();
-                }}
-            >
-                Done
-            </FilledButton>
-        </div>
+        <Observer>
+            {() => (
+                <div className="flex flex-row gap-2 px-4 py-3 items-center justify-between">
+                    {store.allowAi ? (
+                        <div className="flex items-center">
+                            <input
+                                type="checkbox"
+                                id="enable-ai"
+                                checked={store.enableAi}
+                                onChange={() => store.toggleEnableAi()}
+                                className="mr-2"
+                            />
+                            <label htmlFor="enable-ai" className="text-base-m text-default select-none">
+                                Enable AI
+                            </label>
+                        </div>
+                    ) : (
+                        <div />
+                    )}
+                    <div className="flex justify-end gap-2">
+                        <OutlinedButton onClick={() => store.onClickCancel()}>
+                            Cancel
+                        </OutlinedButton>
+                        <FilledButton onClick={() => store.onClickDone()}>
+                            Done
+                        </FilledButton>
+                    </div>
+                </div>
+            )}
+        </Observer>
     );
-
 }
 

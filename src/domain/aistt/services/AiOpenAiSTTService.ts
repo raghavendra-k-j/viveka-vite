@@ -10,13 +10,16 @@ export class AiSTTServiceOpenAI {
 
     public async generateResponse(req: AiSTTReq): Promise<ResEither<AiSTTError, AiSTTRes>> {
         try {
-            // const payload = this.buildRequestPayload(req);
-            // const response = await this.sendRequest(payload);
-
-            const modelResponse = this.getCachedResponseForTest();
-
-            // Check if the response has valid content
-
+            const isTestMode = false;
+            let modelResponse;
+            if (isTestMode) {
+                modelResponse = this.getCachedResponseForTest();
+            }
+            else {
+                const payload = this.buildRequestPayload(req);
+                const response = await this.sendRequest(payload);
+                modelResponse = response.data;
+            }
             const rawContent = modelResponse.choices?.[0]?.message?.content;
             if (!rawContent) {
                 throw AiSTTError.fromDescription("Empty or invalid model response.");
@@ -45,7 +48,7 @@ export class AiSTTServiceOpenAI {
 You are an AI transcriber for mathematical and scientific speech. Your task is to convert user speech—captured via the Web Speech API—into clean Markdown output with embedded LaTeX for mathematical content.
 
 # Instructions:
-- **DO NOT** solve, expand, simplify, or evaluate expressions.
+- This is for exam, so **DO NOT** solve, expand, simplify, or evaluate expressions.
 - Reformat the spoken content clearly and cleanly.
 - Use normalization when needed based on the context (e.g., "A" → "a", "why" → "y") and standardize math phrases (e.g., "squared" → \`^2\`, "cubed" → \`^3\`, "to the power of n" → \`^n\`, "divided by" → \`/\`, "times" or "multiplied by" → \`\\times\`, "equals" → \`=\`). You can decide other normalizations based on the context of the speech, but not limited to these.
 - Punctuation is allowed but should be kept **outside** LaTeX where possible.
@@ -115,7 +118,7 @@ Keep formatting clean, readable, and true to the user's spoken input.
         });
     }
 
- 
+
 
     public getCachedResponseForTest() {
         return {

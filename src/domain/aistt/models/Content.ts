@@ -2,6 +2,7 @@ import { Paragraph } from "./Paragraph";
 import { TextRunType } from "./TextRunType";
 
 export class Content {
+
     paragraphs: Paragraph[];
 
     constructor({ paragraphs = [] }: { paragraphs?: Paragraph[] } = {}) {
@@ -14,6 +15,26 @@ export class Content {
 
     removeParagraph(uuid: string): void {
         this.paragraphs = this.paragraphs.filter(paragraph => paragraph.uuid !== uuid);
+    }
+
+    static empty() {
+        return new Content();
+    }
+
+    clear() {
+        this.paragraphs = [];
+    }
+
+    get isEmpty(): boolean {
+        return this.paragraphs.length === 0;
+    }
+
+    get isNotEmpty(): boolean {
+        return this.paragraphs.length > 0;
+    }
+
+    get length(): number {
+        return this.paragraphs.length;
     }
 
     toMarkdown(): string {

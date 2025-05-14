@@ -54,10 +54,10 @@ export type DialogScaffoldProps = {
     className?: string;
 };
 
-export function DialogScaffold(props: DialogScaffoldProps) {
+export function DialogScaffold({ children, className, ...rest }: DialogScaffoldProps & React.HTMLAttributes<HTMLDivElement>) {
     return (
-        <div className={clsx("dialog-scaffold", props.className)}>
-            {props.children}
+        <div className={clsx("dialog-scaffold", className)} {...rest}>
+            {children}
         </div>
     );
 }

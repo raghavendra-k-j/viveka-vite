@@ -10,13 +10,15 @@ export type AiSTTDialogProviderProps = {
     stt: STT;
     onDone: (content: Content) => void;
     onCancel: () => void;
+    allowAi: boolean;
+    enableAi: boolean;
 }
 
-export function AiSTTDialogProvider({ children, stt, onDone, onCancel }: AiSTTDialogProviderProps) {
+export function AiSTTDialogProvider({ children, stt, onDone, onCancel, allowAi, enableAi }: AiSTTDialogProviderProps) {
     const store = useMemo(() => {
         const aiService = new AiSTTServiceOpenAI();
-        return new AiSTTDialogStore({ stt, aiService, onDone, onCancel });
-    }, [stt, onDone, onCancel]);
+        return new AiSTTDialogStore({ stt, aiService, onDone, onCancel, allowAi, enableAi });
+    }, [stt, onDone, onCancel, allowAi, enableAi]);
 
     return (
         <AiSTTDialogContext.Provider value={store}>
