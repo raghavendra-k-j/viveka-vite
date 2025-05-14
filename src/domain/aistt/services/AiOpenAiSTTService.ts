@@ -5,7 +5,7 @@ import { AiSTTReq, AiSTTRes, TokenUsage } from "../models/AiSTTModels";
 import { ModelResponseParser } from "./ModelResponseParser";
 
 export class AiSTTServiceOpenAI {
-    private readonly API_KEY = "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";
+    private readonly API_KEY = "SAMPLE_API_KEY";
     private readonly MODEL = "gpt-4.1-nano";
 
     public async generateResponse(req: AiSTTReq): Promise<ResEither<AiSTTError, AiSTTRes>> {
