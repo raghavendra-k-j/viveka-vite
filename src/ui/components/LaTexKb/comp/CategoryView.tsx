@@ -8,6 +8,8 @@ import React from "react";
 import type { CategoryVm } from "../models/CategoryVm";
 import styles from "./../style.module.css";
 import { CategoryType } from "~/domain/latexkb/models/Category";
+import { AllCategoryVm } from "../models/AllCategoryVm";
+import { AllCategoryView } from "./AllCategoryView";
 
 const CategoryView = observer(() => {
     const store = useLaTexKbStore();
@@ -20,6 +22,7 @@ const CategoryView = observer(() => {
 const rendererMap: Record<CategoryType, (category: CategoryVm) => React.JSX.Element> = {
     [CategoryType.DIRECT]: (category) => <DirectCategoryView category={category as DirectCategoryVm} />,
     [CategoryType.SECTIONED]: (category) => <SectionedCategoryView category={category as SectionedCategoryVm} />,
+    [CategoryType.ALL]: (category) => <AllCategoryView category={category as AllCategoryVm} />,
 };
 
 

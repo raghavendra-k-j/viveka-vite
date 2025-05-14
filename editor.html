@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple WYSIWYG Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Add custom styles if needed, or rely purely on Tailwind */
+        body {
+            font-family: 'Inter', sans-serif; /* Use Inter font */
+        }
+        /* Style for the editable div */
+        #editor {
+            min-height: 200px; /* Ensure the editor has some height */
+            outline: none; /* Remove default focus outline */
+            border: 1px solid #d1d5db; /* Tailwind gray-300 */
+            padding: 1rem; /* Add padding */
+            border-radius: 0.375rem; /* rounded-md */
+            margin-top: 1rem; /* Add margin */
+        }
+        /* Style for active buttons (optional) */
+        .toolbar-button.active {
+            background-color: #d1d5db; /* Tailwind gray-300 */
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-4 text-center text-gray-700">Simple Editor</h1>
+
+        <div id="toolbar" class="flex space-x-2 p-2 bg-gray-200 rounded-md mb-4">
+            <button onclick="formatDoc('bold')" class="toolbar-button p-2 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Bold">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.293 1.293a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L8 3.414 2.707 8.707a1 1 0 01-1.414-1.414l6-6z" clip-rule="evenodd" transform="rotate(90 10 10) translate(0 2) scale(0.8)" />
+                   <path fill-rule="evenodd" d="M5 4.5C5 3.67157 5.67157 3 6.5 3H12c2.21 0 4 1.79 4 4s-1.79 4-4 4H7.5C6.67157 11 6 10.3284 6 9.5V4.5H5zm1.5 0V9.5a.5.5 0 00.5.5H12c1.105 0 2-.895 2-2s-.895-2-2-2H6.5z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <button onclick="formatDoc('italic')" class="toolbar-button p-2 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Italic">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.775 3.275A.75.75 0 007 4.05v11.9a.75.75 0 001.44.3l.06-.08 3.56-4.45a.75.75 0 00-.94-1.18l-2.9 3.625V4.05A.75.75 0 007.775 3.275zm4.755 1.03a.75.75 0 01.97.24l.05.08 3.5 4.375a.75.75 0 01-.97 1.18l-3.29-4.11V15.95a.75.75 0 01-1.5 0V4.05a.75.75 0 01.75-.75h.005z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <button onclick="formatDoc('underline')" class="toolbar-button p-2 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Underline">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M5 4.75a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-3.25V12a.75.75 0 01-1.5 0V5.5H5.75a.75.75 0 01-.75-.75z" />
+                  <path d="M4 14.5a.5.5 0 00.5.5h11a.5.5 0 000-1h-11a.5.5 0 00-.5.5z" />
+                </svg>
+            </button>
+             <button onclick="formatDoc('insertUnorderedList')" class="toolbar-button p-2 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Unordered List">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M2 5.75c0-.414.336-.75.75-.75H4.5a.75.75 0 010 1.5H2.75A.75.75 0 012 5.75zm0 4c0-.414.336-.75.75-.75H4.5a.75.75 0 010 1.5H2.75A.75.75 0 012 9.75zm0 4c0-.414.336-.75.75-.75H4.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm5.75-.75a.75.75 0 000 1.5h9.5a.75.75 0 000-1.5h-9.5zm0-4a.75.75 0 000 1.5h9.5a.75.75 0 000-1.5h-9.5zm0-4a.75.75 0 000 1.5h9.5a.75.75 0 000-1.5h-9.5z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="editor" contenteditable="true" class="bg-white">
+            Type your text here...
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Executes a formatting command on the selected text in the editor.
+         * @param {string} command - The command to execute (e.g., 'bold', 'italic').
+         * @param {string|null} value - Optional value for commands like 'forecolor'.
+         */
+        function formatDoc(command, value = null) {
+            // Ensure the editor has focus before executing the command
+            document.getElementById('editor').focus();
+            // Execute the command
+            document.execCommand(command, false, value);
+             // Re-focus the editor after command execution (helps maintain cursor position)
+            document.getElementById('editor').focus();
+        }
+
+        // Optional: Add visual feedback for active buttons
+        const editor = document.getElementById('editor');
+        const buttons = document.querySelectorAll('.toolbar-button');
+
+        editor.addEventListener('keyup', updateToolbar);
+        editor.addEventListener('mouseup', updateToolbar); // Update on selection change
+        editor.addEventListener('focus', updateToolbar);
+
+        function updateToolbar() {
+            buttons.forEach(button => {
+                const command = button.onclick.toString().match(/formatDoc\('([^']+)'/)[1];
+                if (document.queryCommandState(command)) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

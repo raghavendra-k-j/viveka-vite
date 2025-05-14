@@ -6,6 +6,7 @@ import { Section } from "./Section";
 export enum CategoryType {
     DIRECT = "direct",
     SECTIONED = "sectioned",
+    ALL = "all",
 }
 
 type CategoryProps = {

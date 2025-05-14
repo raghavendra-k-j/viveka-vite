@@ -13,7 +13,7 @@ interface BadgeProps {
 const Badge: React.FC<BadgeProps> = ({ text, bgColor, textColor }) => {
     return (
         <span
-            className={`inline-block px-3 py-1 text-xs font-semibold rounded-sm ${bgColor} ${textColor}`}
+            className={`inline-block text-truncate px-3 py-1 text-xs font-semibold rounded-sm ${bgColor} ${textColor}`}
         >
             {text}
         </span>

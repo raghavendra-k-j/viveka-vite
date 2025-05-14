@@ -3,17 +3,12 @@
   --button-py: var(--dimen-button-md-py);
   --button-font-size: var(--dimen-button-md-font-size);
   --button-min-height: var(--dimen-button-md-min-height);
-  --button-radius: var(--dimen-button-radius);
-  --button-bg-color: var(--color-primary);
-  --button-bg-color-hover: var(--color-primary-hover);
-  --button-text-color: var(--color-on-primary);
-  --button-text-color-hover: var(--color-on-primary-hover);
+  --button-radius: var(--dimen-button-radius, 0.5rem);
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: var(--button-py) var(--button-px);
-  border: none;
   border-radius: var(--button-radius);
   font-size: var(--button-font-size);
   font-weight: 500;
@@ -22,19 +17,28 @@
   text-decoration: none;
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   min-height: var(--button-min-height);
+}
+
+.btn-filled {
+  border: none;
   background-color: var(--button-bg-color);
   color: var(--button-text-color);
 }
 
-.btn--primary {
-  --button-bg-color: var(--color-primary);
-  --button-bg-color-hover: var(--color-primary-hover);
-  --button-text-color: var(--color-on-primary);
-  --button-text-color-hover: var(--color-on-primary-hover);
+.btn-filled:hover,
+.btn-filled:focus {
+  background-color: var(--button-bg-color-hover);
+  color: var(--button-text-color-hover);
 }
 
-.btn--primary:hover,
-.btn--primary:focus {
+.btn-outlined {
+  background-color: transparent;
+  border: 1px solid var(--button-border-color);
+  color: var(--button-text-color);
+}
+
+.btn-outlined:hover,
+.btn-outlined:focus {
   background-color: var(--button-bg-color-hover);
   color: var(--button-text-color-hover);
 }
@@ -44,4 +48,23 @@
   --button-py: var(--dimen-button-md-py);
   --button-font-size: var(--dimen-button-md-font-size);
   --button-min-height: var(--dimen-button-md-min-height);
+}
+
+.btn--primary {
+  --button-bg-color: var(--color-primary);
+  --button-bg-color-hover: var(--color-primary-hover, var(--color-primary-600));
+  --button-text-color: var(--color-on-primary);
+  --button-text-color-hover: var(
+    --color-on-primary-hover,
+    var(--color-on-primary)
+  );
+  --button-border-color: var(--color-primary);
+}
+
+.btn--neutral {
+  --button-bg-color: var(--color-white);
+  --button-bg-color-hover: var(--color-slate-100);
+  --button-text-color: var(--color-slate-700);
+  --button-text-color-hover: var(--color-slate-900);
+  --button-border-color: var(--color-slate-300);
 }

@@ -12,7 +12,7 @@ export function FooterView() {
                 <ActionButton icon={<Trash2 />} onClick={() => store.clear()} />
                 <ActionButton icon={<ChevronLeft />} onClick={() => store.navigateLeft()} />
                 <ActionButton icon={<ChevronRight />} onClick={() => store.navigateRight()} />
-                <ActionButton icon={<Delete />} onClick={() => store.onClickDone()} />
+                <ActionButton icon={<Delete />} onClick={() => store.backspace()} />
                 <DoneButton onClick={() => store.onClickDone()} />
             </div>
         </div>

@@ -7,14 +7,17 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "node ./postinstall.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.6",
     "@tinymce/tinymce-react": "^6.1.0",
+    "@types/tinymce": "^4.6.9",
     "axios": "^1.9.0",
     "clsx": "^2.1.1",
     "express": "^5.1.0",
+    "fs-extra": "^11.3.0",
     "js-cookie": "^3.0.5",
     "katex": "^0.16.22",
     "lucide-react": "^0.509.0",
@@ -25,7 +28,9 @@
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
     "react-router": "^7.6.0",
-    "tailwindcss": "^4.1.6"
+    "tailwindcss": "^4.1.6",
+    "tinymce": "^7.8.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

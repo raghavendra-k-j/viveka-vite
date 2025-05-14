@@ -37,6 +37,7 @@ const EditorComponent: React.FC = () => {
             statusbar: false,
             menubar: false,
             plugins: ['lists'],
+            toolbar_mode: 'wrap',
             extended_valid_elements: 'span[class|style|aria-hidden|contenteditable],span[class=katex-display]/span[class=katex]/span[class=katex-html]/span',
             content_css: [
               'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css',

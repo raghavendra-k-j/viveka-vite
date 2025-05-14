@@ -7,9 +7,9 @@ export const LeftPanel = () => {
     const { title, description } = store.vm.formDetail;
 
     return (
-        <div className="bg-surface max-w-[300px] border-r shadow-sm border-slate-200 p-4 flex flex-col gap-4">
+        <div className="bg-surface max-w-[300px] border-r shadow-sm border-slate-200 p-4 flex flex-col gap-4 h-full overflow-y-auto">
             <div className="flex flex-col gap-2">
-                <ReadMoreText text={title} className="text-base font-semibold text-default" />
+                <ReadMoreText text={title} className="text-10xs font-semibold text-default" />
                 {description && (
                     <ReadMoreText text={description || ""} className="text-sm text-secondary" />
                 )}
@@ -23,9 +23,6 @@ export const LeftPanel = () => {
                     Please answer all questions marked with <strong>*</strong>.
                 </span>
             </div>
-
-
-
         </div>
     );
 };

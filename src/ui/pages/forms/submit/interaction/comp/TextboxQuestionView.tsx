@@ -27,7 +27,7 @@ function TextInput({ vm }: { vm: TextboxQuestionVm }) {
             <Observer>
                 {() => (<input
                     type="text"
-                    className="text-sm flex-1 w-full px-3 py-1 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-primary text-default placeholder-gray-400"
+                    className="w-full border-1 border-gray-300 rounded-md p-2 focus:outline-none focus:border-blue-500"
                     placeholder="Type your answer here..."
                     value={vm.ansStr}
                     onChange={(e) => vm.onAnsStrChanged(e.target.value)}

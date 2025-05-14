@@ -1,6 +1,4 @@
-@import "tailwindcss";
-
 body {
-  font-family: var(--ff-app-sans);
+  @apply font-default;
   background-color: var(--color-background);
 }

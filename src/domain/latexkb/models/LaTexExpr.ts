@@ -1,6 +1,6 @@
 type LaTexExprProps = {
     latex: string;
-    isInline: boolean;
+    isInline?: boolean;
 }
 
 export class LaTexExpr {
@@ -9,6 +9,6 @@ export class LaTexExpr {
 
     constructor(props: LaTexExprProps) {
         this.latex = props.latex;
-        this.isInline = props.isInline;
+        this.isInline = props.isInline ?? false ;
     }
 }

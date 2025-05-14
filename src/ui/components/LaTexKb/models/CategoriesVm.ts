@@ -1,6 +1,7 @@
 import type { CategoriesRes } from "~/domain/latexkb/models/CategoryRes";
 import { CategoryVm } from "./CategoryVm";
 import { createCategoryVm } from "./CategoryFactory";
+import { AllCategoryVm } from "./AllCategoryVm";
 
 type CategoriesVmProps = {
     items: CategoryVm[];
@@ -15,8 +16,10 @@ class CategoriesVm {
     }
 
     static fromCategoriesRes(categories: CategoriesRes): CategoriesVm {
+        const items = categories.categories.map((cat) => createCategoryVm(cat));
+        items.unshift(AllCategoryVm.create());
         return new CategoriesVm({
-            items: categories.categories.map((cat) => createCategoryVm(cat))
+            items: items
         });
     }
 

@@ -17,7 +17,7 @@ export default function FilledButton<T extends React.ElementType = "button">({
     className,
     ...rest
 }: FilledButtonProps<T>) {
-    const classNameComputed = clsx("btn", `btn--${variant}`, className);
+    const classNameComputed = clsx("btn btn--md", "btn-filled", `btn--${variant}`, className);
     const Component = as || "button";
     return (
         <Component className={classNameComputed} {...rest}>

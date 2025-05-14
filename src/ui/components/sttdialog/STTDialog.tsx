@@ -46,7 +46,7 @@ function Body({ onClose }: { onClose: (transaction: string) => void }) {
 
     const handleStopListening = () => {
         store.stt.stop();
-        onClose(store.transcription);
+        onClose(store.liveTranscription);
     };
 
     return (
@@ -74,7 +74,7 @@ function Body({ onClose }: { onClose: (transaction: string) => void }) {
                             ) : (
                                 <>
                                     <div className="w-full h-auto max-h-[100px] overflow-y-auto text-default text-center">
-                                        {store.transcription.length > 0 ? store.transcription : "· · · "}
+                                        {store.liveTranscription.length > 0 ? store.liveTranscription : "· · · "}
                                     </div>
                                     <FilledButton className="mt-4 w-full" onClick={store.isListening ? handleStopListening : () => store.stt.start()}>
                                         {store.isListening ? "Stop" : "Start"}

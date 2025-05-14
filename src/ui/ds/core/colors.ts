@@ -3,21 +3,24 @@ const colors = {
     background: "#f2f4f7",
 
     primary50: "#eef4fd",
+    primary100: "#dce9f9",
+    primary200: "#c1daf5",
+    primary300: "#96c4ee",
+    primary400: "#64a2e4",
+    primary500: "#377bd9",
+    primary600: "#2f64c4",
+    primary700: "#3055aa",
+    primary800: "#2c468a",
+    primary900: "#293d6d",
+    primary950: "#1d2743",
     primary: "#377bd9",
-    primaryHover: "#2e6abc",
+
     onPrimary: "#ffffff",
-    onPrimaryHover: "#ffffff",
 
-    error: "#fb2c36",
-    errorHover: "#c52028",
-    onError: "#ffffff",
-    onErrorHover: "#ffffff",
-
-    brandAppBarBg: "#2a5298",
-    brandAppBarText: "#ffffff",
     textDefault: "#212529",
     textSecondary: "#6c757d",
     textTertiary: "#495057",
 };
+
 
 export { colors };

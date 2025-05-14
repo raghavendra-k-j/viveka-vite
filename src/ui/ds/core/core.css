@@ -1,10 +1,10 @@
-@import './_variables';
-@import './_base';
-@import './_colors';
-@import './_typography';
-
-@import './comp/_buttons';
+@import "./_variables";
+@import "./_tailwind";
+@import "./_base";
+@import "./_scrollbars";
+@import "./_colors";
+@import "./_typography";
+@import "./comp/_buttons";
+@import './comp/_input';
 @import './comp/_dialog';
-
-
 

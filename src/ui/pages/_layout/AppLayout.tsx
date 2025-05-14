@@ -2,12 +2,13 @@ import { AppProvider } from "./AppProvider";
 import { useAppBootstrap } from "./useAppBootstrap";
 import "./../../ds/core/core.css";
 import { Outlet } from "react-router";
+import { PageLoader } from "~/ui/components/loaders/PageLoader";
 
 export default function AppLayout() {
     const { appEnv, orgConfig, loadState } = useAppBootstrap();
 
     if (loadState.isInit || loadState.isLoading) {
-        return <div>Loading...</div>;
+        return <PageLoader />;
     }
 
     if (loadState.isError) {

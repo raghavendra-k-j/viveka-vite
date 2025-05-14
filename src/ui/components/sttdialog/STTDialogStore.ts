@@ -3,8 +3,8 @@ import { logger } from "~/core/utils/logger";
 import { STT, STTError, STTErrorCode } from "~/infra/utils/stt/STT";
 
 export class STTDialogStore {
-    fullText: string = "";
-    transcription: string = "";
+    transcriptionBuffer: string = "";
+    liveTranscription: string = "";
     isListening: boolean = false;
     stt: STT;
     sttError: STTError | null = null;
@@ -12,7 +12,7 @@ export class STTDialogStore {
     constructor({ stt }: { stt: STT }) {
         this.stt = stt;
         makeObservable(this, {
-            transcription: observable,
+            liveTranscription: observable,
             isListening: observable,
             sttError: observable,
         });
@@ -22,28 +22,30 @@ export class STTDialogStore {
     onStart = () => {
         runInAction(() => {
             this.isListening = true;
+            this.transcriptionBuffer = "";
+            this.liveTranscription = "";
         });
     };
 
     onEnd = () => {
         runInAction(() => {
             this.isListening = false;
+            this.transcriptionBuffer = "";
         });
     };
 
     onResult = (result: string) => {
         runInAction(() => {
-            this.fullText = result;
-            this.transcription = result;
+            this.liveTranscription = this.transcriptionBuffer = result;
         });
     };
 
     onPartialResult = (result: string) => {
         runInAction(() => {
-            if (this.fullText.length > 0) {
-                this.transcription = this.fullText + " " + result;
+            if (this.transcriptionBuffer.length > 0) {
+                this.liveTranscription = this.transcriptionBuffer + " " + result;
             } else {
-                this.transcription = result;
+                this.liveTranscription = result;
             }
         });
     };
@@ -60,18 +62,22 @@ export class STTDialogStore {
             this.stt.start();
         }
         catch (error) {
-            if (error instanceof STTError) {
-                runInAction(() => {
-                    this.sttError = error;
-                });
-            }
-            else {
-                runInAction(() => {
-                    this.sttError = new STTError(STTErrorCode.GENERAL_ERROR, "An unknown error occurred");
-                });
-            }
+            this.handleSTTStartError(error);
         }
     };
+
+    private handleSTTStartError(error: unknown) {
+        if (error instanceof STTError) {
+            runInAction(() => {
+                this.sttError = error;
+            });
+        }
+        else {
+            runInAction(() => {
+                this.sttError = new STTError(STTErrorCode.GENERAL_ERROR, "An unknown error occurred");
+            });
+        }
+    }
 
     stop = () => {
         this.stt.stop();
@@ -101,4 +107,15 @@ export class STTDialogStore {
         this.removeListeners();
         this.stt.abort();
     }
+
+    onClickRestart = () => {
+        if (this.isListening) {
+            this.stop();
+        }
+        this.liveTranscription = "";
+        this.transcriptionBuffer = "";
+        this.sttError = null;
+        this.start();
+    }
+
 }

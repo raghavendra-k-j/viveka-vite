@@ -13,6 +13,8 @@ type LaTexKbStoreProps = {
     latexKbService: LaTexKbService;
     expr?: LaTexExpr;
     onDone: (expr: LaTexExpr) => void;
+    onClose: () => void;
+    stt: STT;
 }
 
 export class LaTexKbStore {
@@ -21,14 +23,19 @@ export class LaTexKbStore {
     mf: MathfieldElement | null = null;
     rxSelectedCategory: CategoryVm | null = null;
     onDone: (expr: LaTexExpr) => void;
+    onClose: () => void;
     expr?: LaTexExpr;
+    stt: STT;
 
 
     constructor(props: LaTexKbStoreProps) {
         this.latexKbService = props.latexKbService;
         this.categoriesState = DataState.init<CategoriesVm>();
+        logger.debug("LaTexKbStore", "onClose", props.onClose);
         this.onDone = props.onDone;
+        this.onClose = props.onClose;
         this.expr = props.expr;
+        this.stt = props.stt;
         makeAutoObservable(this, {
             categoriesState: observable,
             rxSelectedCategory: observable,
@@ -116,11 +123,18 @@ export class LaTexKbStore {
     }
 
     onClickDone(): void {
-        logger.debug("onClickDone", this.mf?.getValue("latex"));
         if (!this.mf) return;
         const latex = this.mf.getValue("latex");
         const expr = new LaTexExpr({ latex: latex, isInline: true });
         this.onDone(expr);
+    }
+
+    onClickClose(): void {
+        if (typeof this.onClose === "function") {
+            this.onClose();
+        } else {
+            console.error("onClose is not a function:", this.onClose);
+        }
     }
 
 }

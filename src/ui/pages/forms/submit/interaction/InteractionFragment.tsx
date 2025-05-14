@@ -9,11 +9,10 @@ import { InteractionProvider } from "./InteractionProvider";
 import { useInteractionStore } from "./InteractionContext";
 import { PageLoader } from "~/ui/components/loaders/PageLoader";
 
-
 export function InteractionFragment() {
     return (
         <InteractionProvider>
-            <div>
+            <div className="flex flex-col h-screen">
                 <AppBarView />
                 <Body />
             </div>
@@ -21,23 +20,15 @@ export function InteractionFragment() {
     );
 }
 
-
 const AppBarView = observer(() => {
     const store = useInteractionStore();
-
     return (
         <AppBar
             leading={<AppBarLogo />}
-            trailing={
-                store.vmState.isLoaded && store.hasTimeLimit
-                    ? <TimerView />
-                    : null
-            }
+            trailing={store.vmState.isLoaded && store.hasTimeLimit ? <TimerView /> : null}
         />
     );
 });
-
-
 
 const Body = observer(() => {
     const store = useInteractionStore();
@@ -51,10 +42,14 @@ const Body = observer(() => {
     }
 
     return (
-        <div className="flex flex-row gap-4">
-            <LeftPanel />
+        <div className="flex flex-1 flex-row overflow-hidden">
+            <div className="hidden lg:block">
+                <LeftPanel />
+            </div>
             <QuestionListView />
-            <RightPanel />
+            <div className="hidden lg:block">
+                <RightPanel />
+            </div>
         </div>
     );
 });

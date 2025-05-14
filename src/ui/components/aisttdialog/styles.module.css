@@ -1,0 +1,37 @@
+.micButton {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  outline: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.micButton:hover {
+  background-color: var(--color-primary-600);
+}
+
+.listening,
+.listening:hover {
+  animation: pulse 1.5s infinite;
+  background-color: var(--color-red-500);
+  color: white;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(220, 38, 38, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+  }
+}

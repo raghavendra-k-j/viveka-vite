@@ -3,12 +3,19 @@ import React, { useEffect, useRef, useState } from "react";
 import type { MathfieldElement } from "mathlive";
 import "mathlive";
 import styles from "./../style.module.css";
+import { useCallback } from "react";
+import type { STT } from "~/infra/utils/stt/STT";
+import { STTDialog, type STTDialogProps } from "~/ui/components/sttdialog/STTDialog";
+import { useDialogManager, type DialogEntry } from "~/ui/widgets/dialogmanager";
+import { Mic } from "lucide-react";
+import { STTLaTexDialog, STTLaTexDialogProps } from "../../sttlatexdialog/STTLaTexDialog";
 
 type InputViewProps = {
+    stt: STT;
     onReady: (mf: MathfieldElement) => void;
 };
 
-function InputViewComponent({ onReady }: InputViewProps) {
+function InputViewComponent({ stt, onReady }: InputViewProps) {
     const [isDefined, setIsDefined] = useState(false);
     const mfRef = useRef<MathfieldElement | null>(null);
     const hasCalledReady = useRef(false);
@@ -42,8 +49,45 @@ function InputViewComponent({ onReady }: InputViewProps) {
                 className={styles.input}
                 ref={mfRef}
             ></math-field>
+            <LaTexKbListenButton stt={stt} onResult={(transcription) => { if (mfRef.current) { mfRef.current.value = transcription; } }} />
         </div>
     );
 }
 
 export const InputView = React.memo(InputViewComponent);
+
+
+
+type LaTexKbListenButtonProps = {
+    stt: STT;
+    onResult: (transaction: string) => void;
+};
+
+export function LaTexKbListenButton({ stt, onResult }: LaTexKbListenButtonProps) {
+    const dialogManager = useDialogManager();
+
+    const openVoiceDialog = useCallback(() => {
+        const dialogEntry: DialogEntry<STTLaTexDialogProps> = {
+            id: "voice-input-dialog",
+            component: STTLaTexDialog,
+            props: {
+                stt,
+                onClose: (result: string) => {
+                    onResult(result);
+                    dialogManager.pop();
+                }
+            }
+        };
+        dialogManager.show(dialogEntry);
+    }, [stt, onResult, dialogManager]);
+
+    return (
+        <button
+            onClick={openVoiceDialog}
+            className="p-2 cursor-pointer rounded-sm bg-surface hover:bg-primary-50 transition-colors duration-200"
+            aria-label="Start Voice Input"
+        >
+            <Mic size={20} className="text-default" />
+        </button>
+    );
+}

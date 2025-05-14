@@ -4,7 +4,10 @@ import { DsToken } from './../../src//ui/ds/core/tokens';
 import { dsLogger } from './ds';
 
 function camelToKebab(str: string): string {
-  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1-$2') // Handle camelCase to kebab-case
+    .replace(/([a-zA-Z])(\d+)/g, '$1-$2') // Handle letters followed by numbers
+    .toLowerCase();
 }
 
 // Generate CSS Custom Properties (variables) instead of SCSS variables
