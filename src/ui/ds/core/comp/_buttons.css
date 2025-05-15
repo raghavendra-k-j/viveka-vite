@@ -68,3 +68,24 @@
   --button-text-color-hover: var(--color-slate-900);
   --button-border-color: var(--color-slate-300);
 }
+
+.btn:disabled,
+.btn.is-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.btn-filled:disabled,
+.btn-filled.is-disabled {
+  background-color: var(--button-bg-color-disabled, var(--color-slate-300));
+  color: var(--button-text-color-disabled, var(--color-slate-500));
+}
+
+.btn-outlined:disabled,
+.btn-outlined.is-disabled {
+  border-color: var(--button-border-color-disabled, var(--color-slate-300));
+  color: var(--button-text-color-disabled, var(--color-slate-500));
+  background-color: transparent;
+}

@@ -3,6 +3,7 @@ import { DialogEntry, useDialogManager } from '~/ui/widgets/dialogmanager';
 import type { STT } from '~/infra/utils/stt/STT';
 import type { Editor as TinyMCEEditor } from 'tinymce';
 import { AiSTTDialog, AiSTTDialogProps } from '../aisttdialog/AiSTTDialog';
+import { ContentsToHtmlService } from '~/domain/aistt/services/ContentsToHtmlService';
 
 export function useAiListenDialog(stt: STT, editorRef: React.RefObject<TinyMCEEditor | null>) {
     const dialogManager = useDialogManager();
@@ -14,8 +15,8 @@ export function useAiListenDialog(stt: STT, editorRef: React.RefObject<TinyMCEEd
             props: {
                 stt,
                 onDone: (content) => {
-                    const markdown = content.toMarkdown();
-                    editorRef.current?.insertContent(markdown);
+                    const html = ContentsToHtmlService.toHtml(content);
+                    editorRef.current?.insertContent(html, { format: 'html' });
                     dialogManager.closeById('ai-voice-dialog');
                 },
                 onCancel: () => {

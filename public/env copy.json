@@ -1,0 +1,6 @@
+{
+    "tenant": "test",
+    "apiSchema": "http",
+    "apiHost": "localhost",
+    "apiPort": "2003"
+}

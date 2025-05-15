@@ -3,6 +3,7 @@
   padding: 0.5rem;
   border-radius: 0 0 var(--dimen-input-radius) var(--dimen-input-radius);
   color: var(--color-text-default);
+  min-height: 80px;
 }
 
 .mce-content-body:focus {

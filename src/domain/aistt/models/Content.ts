@@ -53,4 +53,12 @@ export class Content {
         return allParagraphsMarkdown.join("\n\n");
     }
 
+    toPlainText(): string {
+        return this.paragraphs
+            .map(paragraph => paragraph.runs.map(run => run.content).join(""))
+            .join("\n\n");
+    }
+
+
+
 }

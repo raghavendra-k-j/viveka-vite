@@ -9,6 +9,7 @@ import {
     ListOrdered,
     SquareRadical,
     Mic,
+    Code,
 } from 'lucide-react';
 import { useMathDialog, renderLatexElements } from './useMathDialog';
 import { useAiListenDialog } from './useAiListenDialog';
@@ -41,6 +42,7 @@ export function RichEditor({ stt }: { stt: STT }) {
             />
 
             <Editor
+                initialValue='<div><user email="16102000.raghu@gmail.com"/></div>'
                 tinymceScriptSrc="/packages/tinymce/tinymce.min.js"
                 licenseKey="gpl"
                 onInit={(_, editor) => {
@@ -55,36 +57,20 @@ export function RichEditor({ stt }: { stt: STT }) {
                             bullist: editor.queryCommandState('InsertUnorderedList'),
                             numlist: editor.queryCommandState('InsertOrderedList'),
                         });
-
-                        // Re-render KaTeX when content changes
-                        renderLatexElements(editor.getBody());
                     });
 
-                    // Click-to-edit <latex> tag
                     editor.on('click', (e) => {
                         const target = e.target as HTMLElement;
-                        const wrapper = target.closest('.latex');
-                        logger.debug('Click event target:', target);
-                        logger.debug('Closest .latex wrapper:', wrapper);
-
-                        if (wrapper && editor.getBody().contains(wrapper)) {
-                            const latex = wrapper.getAttribute('data-latex') || '';
-                            e.preventDefault();
-                            e.stopPropagation();
-                            openMathDialog(latex, wrapper);
-                        }
+                        logger.debug('Double clicked:', target);
                     });
-
-
-                    // Initial render of any existing <latex> tags
                     renderLatexElements(editor.getBody());
                 }}
                 init={{
                     height: 200,
                     menubar: false,
                     inline: true,
-                    toolbar: false,
-                    plugins: ['lists'],
+                    toolbar: ['math'],
+                    plugins: ['lists', 'code'],
                     statusbar: false,
                     extended_valid_elements: '*[*]',
                     valid_elements: '*[*]',
@@ -155,6 +141,14 @@ function RichEditorToolbar({
                 title="Speech Input"
             >
                 <Mic size={iconSize} />
+            </button>
+            <button
+                type="button"
+                className={styles.toolbarButton}
+                onClick={() => editorRef.current?.execCommand('mceCodeEditor')}
+                title="View Source Code"
+            >
+                <Code size={iconSize} />
             </button>
         </div>
     );

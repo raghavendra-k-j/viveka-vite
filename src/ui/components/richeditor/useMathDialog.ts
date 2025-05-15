@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import katex from 'katex';
+import katex, { render } from 'katex';
 import { LaTexExpr } from '~/domain/latexkb/models/LaTexExpr';
 import { DialogEntry, useDialogManager } from '~/ui/widgets/dialogmanager';
 import { LatexKb } from '../LaTexKb/LaTexKb';
@@ -14,6 +14,17 @@ export function useMathDialog(
     const dialogManager = useDialogManager();
 
     return useCallback((latex: string, targetNode?: Node) => {
+        if (true) {
+            let tempLatex = katex.renderToString("e=mc^2", {
+                throwOnError: false,
+                output: 'html',
+                displayMode: false,
+            });
+            const content = `<span data-latex="e=mc^2" contenteditable="false">${tempLatex}</span>`;
+            editorRef.current?.insertContent(content, { format: 'html' });
+            return;
+        }
+
         const dialogEntry: DialogEntry<LaTexKbProps> = {
             id: 'math-dialog',
             component: LatexKb,
@@ -44,16 +55,31 @@ export function useMathDialog(
 
 
 export function renderLatexElements(container: HTMLElement) {
-    const nodes = container.querySelectorAll('.latex');
+    const nodes = container.querySelectorAll('[data-latex]');
     nodes.forEach((node) => {
-        const latex = node.getAttribute('data-latex') || node.textContent || '';
-        try {
-            katex.render(latex, node as HTMLElement, {
-                throwOnError: false,
-                output: 'html',
-            });
-        } catch {
-            node.textContent = latex;
-        }
+        renderKaTexElement(node as HTMLElement);
     });
+}
+
+
+export function renderKaTexElement(element: HTMLElement) {
+    const latex = element.getAttribute('data-latex');
+    const isBlock = element.getAttribute('display-mode') === 'block';
+    if (!latex) {
+        element.textContent = '';
+        return;
+    }
+    try {
+        const htmlLaTex = katex.renderToString(latex, {
+            throwOnError: false,
+            output: 'html',
+            displayMode: isBlock,
+        });
+        element.innerHTML = htmlLaTex;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    catch (e) {
+        element.textContent = latex;
+        return;
+    }
 }

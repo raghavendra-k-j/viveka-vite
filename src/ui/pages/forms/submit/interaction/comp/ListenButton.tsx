@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import type { STT } from "~/infra/utils/stt/STT";
-import { STTDialog, type STTDialogProps } from "~/ui/components/sttdialog/STTDialog";
 import { useDialogManager, type DialogEntry } from "~/ui/widgets/dialogmanager";
 import { Mic } from "lucide-react";
+import { AiSTTDialog, AiSTTDialogProps } from "~/ui/components/aisttdialog/AiSTTDialog";
 
 type ListenButtonProps = {
     stt: STT;
@@ -13,19 +13,24 @@ export function ListenButton({ stt, onResult }: ListenButtonProps) {
     const dialogManager = useDialogManager();
 
     const openVoiceDialog = useCallback(() => {
-        const dialogEntry: DialogEntry<STTDialogProps> = {
+        const dialogEntry: DialogEntry<AiSTTDialogProps> = {
             id: "voice-input-dialog",
-            component: STTDialog,
+            component: AiSTTDialog,
             props: {
                 stt,
-                onClose: (result: string) => {
-                    onResult(result);
-                    dialogManager.pop();
-                }
+                allowAi: false,
+                enableAi: false,
+                onDone(content) {
+                    onResult(content.toPlainText());
+                    dialogManager.closeById("voice-input-dialog");
+                },
+                onCancel() {
+                    dialogManager.closeById("voice-input-dialog");
+                },
             }
         };
         dialogManager.show(dialogEntry);
-    }, [stt, onResult]);
+    }, [stt, onResult, dialogManager]);
 
     return (
         <button

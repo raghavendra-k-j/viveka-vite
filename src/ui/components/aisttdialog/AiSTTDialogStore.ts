@@ -4,29 +4,37 @@ import { AiSTTReq } from "~/domain/aistt/models/AiSTTModels";
 import { logger } from "~/core/utils/logger";
 import { STTDataState } from "../../utils/STTDataState";
 import { DataState } from "~/ui/utils/DataState";
-import { AiSTTServiceOpenAI } from "~/domain/aistt/services/AiOpenAiSTTService";
+import { AiSTTService } from "~/domain/aistt/services/AiSTTService";
 import { Content } from "~/domain/aistt/models/Content";
 import { AppError } from "~/core/error/AppError";
 import { Paragraph } from "~/domain/aistt/models/Paragraph";
 import { TextRun } from "~/domain/aistt/models/TextRun";
+import { OS } from "~/infra/utils/deviceinfo/DeviceInfo";
+import { DeviceInfoUtil } from "~/infra/utils/deviceinfo/DeviceInfoUtil";
 
 export class AiSTTDialogStore {
 
-
+    // Dependencies
     private _stt: STT;
-    private _aiService: AiSTTServiceOpenAI;
+    private _aiService: AiSTTService;
     private _onDone: (content: Content) => void;
     private _onCancel: () => void;
     public enableAi: boolean;
     public allowAi: boolean;
 
+    // Observable State Variables
     public content = Content.empty();
     public sttState = STTDataState.init();
-    public aiState = DataState.init<undefined>();
-
+    public processingState = DataState.init<undefined>();
     public transcriptionBuffer: string = "";
     public liveTranscription: string = "";
 
+    // Non Observable State Variables
+    public isAttemptingDone: boolean = false;
+    public currentProcessingTranscription: string = "";
+
+    // Computed Variables
+    public supportsContinuousSpeechInput: boolean;
 
     constructor({
         stt,
@@ -37,7 +45,7 @@ export class AiSTTDialogStore {
         allowAi,
     }: {
         stt: STT;
-        aiService: AiSTTServiceOpenAI;
+        aiService: AiSTTService;
         onDone: (content: Content) => void;
         onCancel: () => void;
         enableAi: boolean;
@@ -49,15 +57,28 @@ export class AiSTTDialogStore {
         this.allowAi = allowAi;
         this._onDone = onDone;
         this._onCancel = onCancel;
-        this.addSTTListeners();
+
+        // Check if the device supports continuous speech input
+        const deviceInfo = DeviceInfoUtil.getDeviceInfo();
+        if (deviceInfo.os === OS.Android) {
+            this.supportsContinuousSpeechInput = false;
+        }
+        else {
+            this.supportsContinuousSpeechInput = true;
+        }
+
+
         makeObservable(this, {
             sttState: observable,
-            aiState: observable,
+            processingState: observable,
             content: observable,
             enableAi: observable,
             transcriptionBuffer: observable,
             liveTranscription: observable,
+            isAttemptingDone: observable,
             isSttActive: computed,
+            isSomethingInProgress: computed,
+            isDoneButtonEnabled: computed,
         });
     }
 
@@ -65,60 +86,68 @@ export class AiSTTDialogStore {
         return this.sttState.isListening;
     }
 
-    toggleEnableAi(): void {
+    toggleEnableAi() {
         runInAction(() => {
             this.enableAi = !this.enableAi;
         });
     }
 
-
-
-    public async startListening() {
-        logger.debug("Start listening");
-        if (this._stt.isRecognizing()) {
-            this.abortListening();
+    public get isSomethingInProgress() {
+        if (this.sttState.isActive) {
+            return true;
         }
-        await this._stt.start();
+        if (this.processingState.isLoading) {
+            return true;
+        }
+        return false;
     }
 
-    public stopListening() {
-        logger.debug("Stop listening");
-        this._stt.stop();
-    }
-
-    public abortListening() {
-        logger.debug("Abort listening");
-        this._stt.abort();
+    onClickMainButton() {
+        logger.debug("onClickMainButton");
+        if (this.processingState.isLoading) {
+            // Ignore silently
+            logger.debug("onClickMainButton: processing is loading");
+            return;
+        }
+        if (this.sttState.isListening) {
+            // Stop STT
+            logger.debug("onClickMainButton: stopping stt");
+            runInAction(() => {
+                this.sttState = STTDataState.waitingToEnd();
+            });
+            this._stt.stop();
+        }
+        else if (!this.sttState.isWaiting) {
+            // If not waiting for any action, start STT
+            logger.debug("onClickMainButton: starting stt");
+            this.isAttemptingDone = false; // Reset the flag: Since explicitly starting the STT
+            runInAction(() => {
+                this.sttState = STTDataState.waitingToStart();
+            });
+            this._stt.start();
+        }
+        // Ignore rest of the cases
     }
 
     private onSTTStart = () => {
         logger.debug("STT started");
         runInAction(() => {
+            this.transcriptionBuffer = this.liveTranscription = "";
             this.sttState = STTDataState.listening();
-            this.transcriptionBuffer = "";
-            this.liveTranscription = "";
         });
     }
 
     private onEnd = () => {
         logger.debug("STT stopped");
         runInAction(() => {
-            runInAction(() => {
-                this.sttState = STTDataState.init();
-            });
             const trimmed = this.transcriptionBuffer.trim();
             if (!trimmed) {
-                this.liveTranscription = "";
-                this.transcriptionBuffer = "";
+                this.liveTranscription = this.transcriptionBuffer = "";
                 this.sttState = STTDataState.init();
                 return;
             }
-            if (this.enableAi) {
-                this.startAiTranscription(trimmed);
-            }
-            else {
-                this.addParagraphToContent(trimmed);
-            }
+            this.sttState = STTDataState.init();
+            this.startProcessing(trimmed);
         });
     }
 
@@ -147,7 +176,7 @@ export class AiSTTDialogStore {
         });
     };
 
-    private addSTTListeners() {
+    public addSTTListeners() {
         this._stt.onStart(this.onSTTStart);
         this._stt.onEnd(this.onEnd);
         this._stt.onError(this.onSTTError);
@@ -155,7 +184,7 @@ export class AiSTTDialogStore {
         this._stt.onPartialResult(this.onPartialResult);
     }
 
-    private removeListener() {
+    private removeListeners() {
         this._stt.offStart(this.onSTTStart);
         this._stt.offEnd(this.onEnd);
         this._stt.offError(this.onSTTError);
@@ -164,54 +193,123 @@ export class AiSTTDialogStore {
     }
 
 
-    public async startAiTranscription(text: string) {
+    public async startAiTranscription() {
         try {
             runInAction(() => {
-                this.aiState = DataState.loading();
+                this.processingState = DataState.loading();
             });
             const aiReq = new AiSTTReq({
                 previousContext: this.content.toMarkdown(),
-                transcription: text,
+                transcription: this.currentProcessingTranscription,
             });
             const data = (await this._aiService.generateResponse(aiReq)).getOrError();
             runInAction(() => {
                 this.content = data.content;
-                this.aiState = DataState.data(undefined);
+                this.processingState = DataState.data(undefined);
                 this.transcriptionBuffer = "";
                 this.liveTranscription = "";
             });
+            if (this.isAttemptingDone) {
+                this.returnCurrentResult();
+            }
         }
         catch (error) {
             logger.error("Error in AiSTTDialogStore", error);
             const aiError = AppError.fromAny(error);
             runInAction(() => {
-                this.aiState = DataState.error(aiError);
+                this.processingState = DataState.error(aiError);
             });
         }
+        finally {
+            this.isAttemptingDone = false;
+        }
     }
+
+    onClickCancelProcessing(): void {
+        logger.debug("onClickCancelProcessing");
+        runInAction(() => {
+            this.currentProcessingTranscription = "";
+            this.transcriptionBuffer = "";
+            this.liveTranscription = "";
+            this.processingState = DataState.init();
+        });
+    }
+
+    async startProcessing(text: string) {
+        this.currentProcessingTranscription = text;
+        if (this.enableAi) {
+            await this.startAiTranscription();
+        }
+        else {
+            await this.addParagraphToContent();
+        }
+        this.currentProcessingTranscription = "";
+    }
+
+
+    returnCurrentResult() {
+        if (this.content.isEmpty) {
+            this._onCancel();
+        }
+        else {
+            this._onDone(this.content);
+        }
+        this.resetState();
+    }
+
 
     public clearAiTranscription() {
         runInAction(() => {
             this.content = Content.empty();
-            this.aiState = DataState.init();
+            this.processingState = DataState.init();
         });
     }
 
     dispose() {
         this._stt.abort();
-        this.removeListener();
+        this.removeListeners();
+        this.resetState();
     }
 
+    resetState() {
+        runInAction(() => {
+            this.sttState = STTDataState.init();
+            this.processingState = DataState.init();
+            this.content = Content.empty();
+            this.transcriptionBuffer = "";
+            this.liveTranscription = "";
+            this.isAttemptingDone = false;
+            this.currentProcessingTranscription = "";
+        });
+    }
 
     public onClickCancel() {
+        runInAction(() => {
+            this.sttState = STTDataState.waitingToEnd();
+        });
+        this._stt.abort();
+        this.resetState();
         this._onCancel();
     }
 
+    public get isDoneButtonEnabled() {
+        return this.sttState.isListening || !this.processingState.isLoading;
+    }
+
+
     public onClickDone() {
-        if (this.content) {
-            this._onDone(this.content);
-        } else {
-            this._onCancel();
+        if (this.sttState.isListening) {
+            this.isAttemptingDone = true;
+            runInAction(() => {
+                this.sttState = STTDataState.waitingToEnd();
+            });
+            this._stt.stop();
+        }
+        else if (this.processingState.isLoading) {
+            this.isAttemptingDone = true;
+        }
+        else {
+            this.returnCurrentResult();
         }
     }
 
@@ -222,41 +320,56 @@ export class AiSTTDialogStore {
             this.liveTranscription = "";
             this.content = Content.empty();
             this.sttState = STTDataState.init();
-            this.aiState = DataState.init();
+            this.processingState = DataState.init();
         });
     }
 
 
-    addParagraphToContent(text: string) {
+    async addParagraphToContent() {
         runInAction(() => {
-            const lastParagraph = this.content.paragraphs.length > 0 ? this.content.paragraphs[this.content.paragraphs.length - 1] : null;
-            if (lastParagraph) {
-                const lastRun = lastParagraph.runs.length > 0 ? lastParagraph.runs[lastParagraph.runs.length - 1] : null;
-                const newRun = TextRun.fromText(text);
-                let updatedParagraphs;
-                if (lastRun) {
-                    // Create a new run with updated content
-                    const updatedRun = new TextRun({ ...lastRun, content: lastRun.content + " " + newRun.content });
-                    // Replace the last run in the paragraph
-                    const updatedRuns = [...lastParagraph.runs.slice(0, -1), updatedRun];
-                    const updatedParagraph = new Paragraph({ ...lastParagraph, runs: updatedRuns });
-                    updatedParagraphs = [...this.content.paragraphs.slice(0, -1), updatedParagraph];
-                } else {
-                    // Add new run to the last paragraph
-                    const updatedRuns = [...lastParagraph.runs, newRun];
-                    const updatedParagraph = new Paragraph({ ...lastParagraph, runs: updatedRuns });
-                    updatedParagraphs = [...this.content.paragraphs.slice(0, -1), updatedParagraph];
-                }
-                this.content = new Content({ paragraphs: updatedParagraphs });
-            }
-            else {
-                const newParagraph = Paragraph.fromText(text);
-                this.content = new Content({ paragraphs: [...this.content.paragraphs, newParagraph] });
-            }
+            this.processingState = DataState.loading();
+        });
+        const newContent = this.getNewContent(this.currentProcessingTranscription);
+        runInAction(() => {
+            this.content = newContent;
             this.transcriptionBuffer = "";
             this.liveTranscription = "";
+            this.processingState = DataState.data(undefined);
         });
+        if (this.isAttemptingDone) {
+            this.returnCurrentResult();
+        }
+        this.isAttemptingDone = false;
     }
+
+    getNewContent(text: string): Content {
+        const lastParagraph = this.content.paragraphs.length > 0 ? this.content.paragraphs[this.content.paragraphs.length - 1] : null;
+        if (lastParagraph) {
+            const lastRun = lastParagraph.runs.length > 0 ? lastParagraph.runs[lastParagraph.runs.length - 1] : null;
+            const newRun = TextRun.fromText(text);
+            let updatedParagraphs;
+            if (lastRun) {
+                // Create a new run with updated content
+                const updatedRun = new TextRun({ ...lastRun, content: lastRun.content + " " + newRun.content });
+                // Replace the last run in the paragraph
+                const updatedRuns = [...lastParagraph.runs.slice(0, -1), updatedRun];
+                const updatedParagraph = new Paragraph({ ...lastParagraph, runs: updatedRuns });
+                updatedParagraphs = [...this.content.paragraphs.slice(0, -1), updatedParagraph];
+            } else {
+                // Add new run to the last paragraph
+                const updatedRuns = [...lastParagraph.runs, newRun];
+                const updatedParagraph = new Paragraph({ ...lastParagraph, runs: updatedRuns });
+                updatedParagraphs = [...this.content.paragraphs.slice(0, -1), updatedParagraph];
+            }
+            return new Content({ paragraphs: updatedParagraphs });
+        }
+        else {
+            const newParagraph = Paragraph.fromText(text);
+            return new Content({ paragraphs: [...this.content.paragraphs, newParagraph] });
+        }
+    }
+
+
 
 
     removeParagraph(paragraph: Paragraph): void {

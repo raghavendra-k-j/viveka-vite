@@ -56,34 +56,50 @@ function DialogBody() {
                     {() => {
                         let Icon;
                         let iconClassName;
-                        let buttonDisabled = false;
-                        if (store.aiState.isLoading) {
-                            Icon = Loader;
-                            iconClassName = clsx(styles.micButton, "animate-spin");
-                            buttonDisabled = true;
-                        } else if (store.isSttActive) {
-                            Icon = MicOff;
+                        let buttonDisabled = true;
+                        let message = "";
+                        if (store.sttState.isListening) {
+                            message = "Listening...";
+                            buttonDisabled = false;
                             iconClassName = clsx(styles.micButton, styles.listening);
-                        } else {
-                            Icon = Mic;
-                            iconClassName = styles.micButton;
+                            Icon = MicOff;
                         }
+                        else if (store.sttState.isWaitingToStart) {
+                            message = "Starting...";
+                            buttonDisabled = true;
+                            iconClassName = clsx(styles.micButton, styles.waiting);
+                            Icon = MicOff;
+                        }
+                        else if (store.sttState.isWaitingToEnd) {
+                            message = "Stopping...";
+                            buttonDisabled = true;
+                            iconClassName = clsx(styles.micButton, styles.waiting);
+                            Icon = MicOff;
+                        }
+                        else if (store.processingState.isLoading) {
+                            message = "Processing...";
+                            buttonDisabled = true;
+                            iconClassName = clsx(styles.micButton, "animate-spin");
+                            Icon = Loader;
+                        }
+                        else {
+                            message = "Click to start";
+                            buttonDisabled = false;
+                            iconClassName = styles.micButton;
+                            Icon = Mic;
+                        }
+
                         return (
                             <>
                                 <button
                                     className={iconClassName}
-                                    onClick={() => store.isSttActive ? store.stopListening() : store.startListening()}
+                                    onClick={() => store.onClickMainButton()}
                                     disabled={buttonDisabled}
-                                    aria-label={store.isSttActive ? "Stop listening" : "Start listening"}
                                 >
                                     <Icon size={24} />
                                 </button>
                                 <div className="text-base-m text-secondary mt-4">
-                                    {store.aiState.isLoading
-                                        ? "Transcribing..."
-                                        : store.isSttActive
-                                            ? "Listening..."
-                                            : "Click to start listening"}
+                                    {message}
                                 </div>
                             </>
                         );
@@ -95,6 +111,8 @@ function DialogBody() {
     );
 }
 
+
+import { ErrorBanner } from "./ErrorBanner"; // adjust path as needed
 
 function AiOutputView() {
     const store = useAiSTTDialogStore();
@@ -118,18 +136,36 @@ function AiOutputView() {
             <Observer>
                 {() => <ContentView content={store.content} />}
             </Observer>
+
             <Observer>
-                {() => (
-                    <div
-                        className={`text-base-m text-secondary mt-2${store.content.isEmpty ? " text-center" : ""}`}
-                    >
-                        {store.liveTranscription}
-                    </div>
-                )}
+                {() => {
+                    const className = clsx(
+                        "text-base-m text-secondary mt-2",
+                        store.content.isEmpty && "text-center",
+                        store.processingState.isLoading && "animate-pulse"
+                    );
+
+                    if (store.processingState.isError) {
+                        return (
+                            <ErrorBanner
+                                message="Failed to process the speech."
+                                onRetry={() => store.startProcessing(store.currentProcessingTranscription)}
+                                onCancel={() => store.onClickCancelProcessing()}
+                            />
+                        );
+                    }
+
+                    return (
+                        <div className={className}>
+                            {store.liveTranscription}
+                        </div>
+                    );
+                }}
             </Observer>
         </div>
     );
 }
+
 
 
 
@@ -169,7 +205,6 @@ function ContentView(props: { content: Content }) {
 
 function DialogFooter() {
     const store = useAiSTTDialogStore();
-
     return (
         <Observer>
             {() => (
@@ -194,7 +229,7 @@ function DialogFooter() {
                         <OutlinedButton onClick={() => store.onClickCancel()}>
                             Cancel
                         </OutlinedButton>
-                        <FilledButton onClick={() => store.onClickDone()}>
+                        <FilledButton disabled={!store.isDoneButtonEnabled} onClick={() => store.onClickDone()}>
                             Done
                         </FilledButton>
                     </div>
