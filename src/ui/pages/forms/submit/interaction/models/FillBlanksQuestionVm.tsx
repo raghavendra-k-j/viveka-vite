@@ -3,6 +3,7 @@ import { QuestionVm, type QuestionVmProps, type QuestionRendererProps } from "./
 import type { JSX } from "react";
 import type { FillBlankInput, FillBlanksQExtras } from "~/domain/forms/models/question/QExtras";
 import { FillBlanksQuestionView } from "../comp/FillBlanksQuestionView";
+import { Answer, FillBlankInputAnswer, FillBlanksAnswer } from "~/domain/forms/models/answer/Answer";
 
 export class FillBlankItemVm {
     input: FillBlankInput;
@@ -60,4 +61,16 @@ export class FillBlanksQuestionVm extends QuestionVm {
     render(props: QuestionRendererProps): JSX.Element {
         return <FillBlanksQuestionView vm={this} parentVm={props.parentVm} />;
     }
+
+    getAnswer(): Answer | undefined {
+        if (!this.isAnswered) {
+            return undefined;
+        }
+        const answers = this.items.map(item => new FillBlankInputAnswer({
+            id: item.input.id,
+            answer: item.ansStr
+        }));
+        return new FillBlanksAnswer({ answers });
+    }
+
 }

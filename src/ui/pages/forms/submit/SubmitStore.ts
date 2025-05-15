@@ -13,6 +13,7 @@ export type SubmitStoreProps = {
 };
 
 export class SubmitStore {
+
     currentFragment: CurrentFragment = CurrentFragment.Loading;
     selectedLanguage: Language | null = null;
     formService: FormService;
@@ -72,4 +73,15 @@ export class SubmitStore {
         }
         return this.formDetailState.data!;
     }
+
+
+    get hasBackNavigation() {
+        return true;
+    }
+
+    get returnToHomeURL(): string {
+        return "https://vivekaa.in";
+    }
+
+
 }

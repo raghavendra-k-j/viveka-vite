@@ -2,6 +2,7 @@ import { logger } from "~/core/utils/logger";
 import { TextAreaQuestionView } from "../comp/TextAreaQuestionView";
 import { QuestionVm, type QuestionRendererProps, type QuestionVmProps } from "./QuestionVm";
 import { computed, makeObservable, observable, runInAction } from "mobx";
+import { Answer, TextAreaAnswer } from "~/domain/forms/models/answer/Answer";
 
 type TextAreaQuestionVmProps = QuestionVmProps & {};
 
@@ -35,7 +36,16 @@ export class TextAreaQuestionVm extends QuestionVm {
     }
 
     render(props: QuestionRendererProps): React.JSX.Element {
-        logger.debug("Rendering TextAreaQuestionVm with instance id: ", this.instanceId," and STT instance id: ", this.base.store.parentStore.stt.instanceId);
+        logger.debug("Rendering TextAreaQuestionVm with instance id: ", this.instanceId, " and STT instance id: ", this.base.store.parentStore.stt.instanceId);
         return <TextAreaQuestionView vm={this} parentVm={props.parentVm} />;
     }
+
+    getAnswer(): Answer | undefined {
+        if (!this.isAnswered) {
+            return undefined;
+        }
+        const ansString = this.ansStr.trim();
+        return new TextAreaAnswer({ answer: ansString });
+    }
+
 }

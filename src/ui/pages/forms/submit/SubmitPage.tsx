@@ -5,6 +5,7 @@ import { useSubmitStore } from './SubmitContext';
 import { CurrentFragment } from "./models/CurrentFragment";
 import { PreviewFragment } from './preview/PreviewFragment';
 import { InteractionFragment } from './interaction/InteractionFragment';
+import { SubmittedFragment } from './submitted/SubmittedFragment';
 
 export default function SubmitPage() {
   const urlParams = useParams();
@@ -32,7 +33,7 @@ const CurrentFragmentBody = observer(() => {
     case CurrentFragment.Interaction:
       return <InteractionFragment />;
     case CurrentFragment.AlreadySubmitted:
-      return <div>Already Submitted</div>;
+      return <SubmittedFragment />;
     default:
       return <div>Unknown Fragment</div>;
   }

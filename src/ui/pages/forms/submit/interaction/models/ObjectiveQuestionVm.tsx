@@ -2,6 +2,7 @@ import { makeObservable, observable, runInAction, computed } from "mobx";
 import { Choice, type CheckBoxesQExtras, type MultipleChoiceQExtras, type QExtras, type TrueFalseQExtras } from "~/domain/forms/models/question/QExtras";
 import { QuestionVm, type QuestionRendererProps, type QuestionVmProps } from "./QuestionVm";
 import { ObjectiveQuestionView } from "../comp/ObjectiveQuestionView";
+import { Answer, CheckBoxesAnswer, MultipleChoiceAnswer, TrueFalseAnswer } from "~/domain/forms/models/answer/Answer";
 
 type ObjectiveQuestionVmProps = QuestionVmProps & {}
 
@@ -82,4 +83,27 @@ export class ObjectiveQuestionVm extends QuestionVm {
     render(props: QuestionRendererProps): React.JSX.Element {
         return (<ObjectiveQuestionView vm={this} parentVm={props.parentVm} />);
     }
+
+    getAnswer(): Answer | undefined {
+        if (!this.isAnswered) {
+            return undefined;
+        }
+        const questionType = this.base.type;
+        if (questionType.isMultipleChoice) {
+            const selectedChoiceId = this.selectedChoices.values().next().value!;
+            return new MultipleChoiceAnswer({ id: selectedChoiceId });
+        }
+        else if (questionType.isCheckBoxes) {
+            const selectedChoiceIds = Array.from(this.selectedChoices);
+            return new CheckBoxesAnswer({ ids: selectedChoiceIds });
+        }
+        else if (questionType.isTrueFalse) {
+            const selectedChoiceId = this.selectedChoices.values().next().value!;
+            return new TrueFalseAnswer({ value: selectedChoiceId === 1 });
+        }
+        else {
+            throw new Error("Invalid question type for ObjectiveQuestionVm: " + questionType);
+        }
+    }
+
 }

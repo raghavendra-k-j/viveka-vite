@@ -1,3 +1,4 @@
+import { Answer, TextBoxAnswer } from "~/domain/forms/models/answer/Answer";
 import { TextboxQuestionView } from "../comp/TextboxQuestionView";
 import { QuestionVm, type QuestionRendererProps, type QuestionVmProps } from "./QuestionVm";
 import { makeObservable, observable, runInAction, computed } from "mobx";
@@ -7,6 +8,8 @@ type TextboxQuestionVmProps = QuestionVmProps & {
 };
 
 export class TextboxQuestionVm extends QuestionVm {
+
+
     public ansStr = "";
 
     constructor(props: TextboxQuestionVmProps) {
@@ -38,4 +41,13 @@ export class TextboxQuestionVm extends QuestionVm {
     render(props: QuestionRendererProps): React.JSX.Element {
         return <TextboxQuestionView vm={this} parentVm={props.parentVm} />;
     }
+
+    getAnswer(): Answer | undefined {
+        if (!this.isAnswered) {
+            return undefined;
+        }
+        const ansString = this.ansStr.trim();
+        return new TextBoxAnswer({ answer: ansString });
+    }
+
 }

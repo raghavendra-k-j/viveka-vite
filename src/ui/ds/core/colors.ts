@@ -18,8 +18,8 @@ const colors = {
     onPrimary: "#ffffff",
 
     textDefault: "#212529",
-    textSecondary: "#6c757d",
-    textTertiary: "#495057",
+    textSecondary: "#495057",
+    textTertiary: "#6c757d",
 };
 
 

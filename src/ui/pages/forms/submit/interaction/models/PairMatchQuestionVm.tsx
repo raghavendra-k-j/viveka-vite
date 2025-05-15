@@ -3,6 +3,7 @@ import type { JSX } from "react";
 import type { PairMatchQExtras, PairMatchItem } from "~/domain/forms/models/question/QExtras";
 import { QuestionVm, type QuestionRendererProps, type QuestionVmProps } from "../models/QuestionVm";
 import { PairMatchQuestionView } from "../comp/PairMatchQuestionView";
+import { Answer, PairMatchAnswer, PairMatchAnswerItem } from "~/domain/forms/models/answer/Answer";
 
 export class PairMatchItemVm {
     rowId: number;
@@ -81,5 +82,20 @@ export class PairMatchQuestionVm extends QuestionVm {
             }
         }
     }
+
+
+    getAnswer(): Answer | undefined {
+        if (!this.isAnswered) return undefined;
+        const answers = this.items.map(item => {
+            if (item.selectedRowId === null) return null;
+            return new PairMatchAnswerItem({
+                rowId: item.rowId,
+                correctRowId: item.selectedRowId,
+            });
+        });
+        if (answers.includes(null)) return undefined;
+        return new PairMatchAnswer({ answers: answers as PairMatchAnswerItem[] });
+    }
+
 
 }

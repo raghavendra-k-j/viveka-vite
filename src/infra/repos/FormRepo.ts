@@ -4,6 +4,7 @@ import { ApiError } from "../errors/ApiError";
 import { FormDetail } from "~/domain/forms/models/FormDetail";
 import { logger } from "~/core/utils/logger";
 import { QuestionRes } from "~/domain/forms/models/QuestionsRes";
+import { SubmitFormReq, SubmitFormRes } from "~/domain/forms/models/submit/SubmitFormModels";
 
 export class FormRepo {
 
@@ -40,6 +41,19 @@ export class FormRepo {
         } catch (error) {
             const apiError = ApiError.fromAny(error);
             logger.error("Error in getQuestions:", { error: apiError, formId, languageId });
+            return ResEither.error(apiError);
+        }
+    }
+
+
+    async submitForm(req: SubmitFormReq): Promise<ResEither<ApiError, SubmitFormRes>> {
+        try {
+            const response = await this.axios.post(`/api/v1/forms/${req.formId}/submit`, req.toJson());
+            const formResponse = SubmitFormRes.deserialize(response.data);
+            return ResEither.data(formResponse);
+        } catch (error) {
+            const apiError = ApiError.fromAny(error);
+            logger.error("Error in submitForm:", { error: apiError, req });
             return ResEither.error(apiError);
         }
     }

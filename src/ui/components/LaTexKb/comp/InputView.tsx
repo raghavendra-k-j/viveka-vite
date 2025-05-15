@@ -5,7 +5,6 @@ import "mathlive";
 import styles from "./../style.module.css";
 import { useCallback } from "react";
 import type { STT } from "~/infra/utils/stt/STT";
-import { STTDialog, type STTDialogProps } from "~/ui/components/sttdialog/STTDialog";
 import { useDialogManager, type DialogEntry } from "~/ui/widgets/dialogmanager";
 import { Mic } from "lucide-react";
 import { STTLaTexDialog, STTLaTexDialogProps } from "../../sttlatexdialog/STTLaTexDialog";

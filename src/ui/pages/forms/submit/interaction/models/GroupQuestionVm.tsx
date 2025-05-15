@@ -1,3 +1,4 @@
+import { Answer } from "~/domain/forms/models/answer/Answer";
 import { GroupQuestionView } from "../comp/GroupQuestionView";
 import { QuestionVm, type QuestionVmProps } from "./QuestionVm";
 import { QuestionVmFactory } from "./QuestionVmFactory";
@@ -5,6 +6,7 @@ import { computed, makeObservable } from "mobx";
 
 
 export class GroupQuestionVm extends QuestionVm {
+
     subQuestions: QuestionVm[];
 
     constructor(props: QuestionVmProps) {
@@ -39,6 +41,10 @@ export class GroupQuestionVm extends QuestionVm {
     }
 
     validateQuestion(): string | undefined {
+        return undefined;
+    }
+
+    getAnswer(): Answer | undefined {
         return undefined;
     }
 

@@ -6,6 +6,7 @@ import { runInAction } from "mobx";
 import { InstanceId } from "~/core/utils/InstanceId";
 import { logger } from "~/core/utils/logger";
 import { GroupQuestionVm } from "./GroupQuestionVm";
+import { Answer } from "~/domain/forms/models/answer/Answer";
 
 export type QuestionRendererProps = {
     vm: QuestionVm;
@@ -18,6 +19,7 @@ export type QuestionVmProps = {
 }
 
 export abstract class QuestionVm {
+
 
     static readonly DEFAULT_REQUIRED_ERROR_MESSAGE = "This question is required.";
 
@@ -54,4 +56,5 @@ export abstract class QuestionVm {
     }
 
     abstract render(props: QuestionRendererProps): JSX.Element;
+    abstract getAnswer(): Answer | undefined;
 }

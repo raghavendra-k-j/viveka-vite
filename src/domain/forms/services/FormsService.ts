@@ -3,6 +3,7 @@ import type { FormDetail } from "../models/FormDetail";
 import type { AppError } from "~/core/error/AppError";
 import type { FormRepo } from "~/infra/repos/FormRepo";
 import type { QuestionRes } from "../models/QuestionsRes";
+import { SubmitFormReq, SubmitFormRes } from "../models/submit/SubmitFormModels";
 
 export class FormService {
 
@@ -21,5 +22,13 @@ export class FormService {
         const res = await this.formRepo.getQuestions({ formId, languageId });
         return res;
     }
+
+
+    async submitForm(req: SubmitFormReq): Promise<ResEither<AppError, SubmitFormRes>> {
+        const res = await this.formRepo.submitForm(req);
+        return res;
+    }
+
+
 }
 

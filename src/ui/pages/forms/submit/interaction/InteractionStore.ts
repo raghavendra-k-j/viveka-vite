@@ -7,20 +7,24 @@ import type { FormType } from "~/domain/forms/models/FormType";
 import { InteractionVm } from "./models/InteractionVm";
 import { STT } from "~/infra/utils/stt/STT";
 import { InstanceId } from "~/core/utils/InstanceId";
+import { SubmitFormQuestion } from "~/domain/forms/models/SubmitFormQuestion";
+import { GroupQuestionVm } from "./models/GroupQuestionVm";
+import { SubmitFormReq, SubmitFormRes } from "~/domain/forms/models/submit/SubmitFormModels";
 
 type InteractionStoreProps = {
     parentStore: SubmitStore;
 };
 
 export class InteractionStore {
-
     parentStore: SubmitStore;
     vmState: DataState<InteractionVm>;
     startedOn!: Date;
+    endedOn: Date | null = null;
     remainingSeconds: number = 0;
     private timer: ReturnType<typeof setInterval> | null = null;
     public readonly instanceId = InstanceId.generate("InteractionStore");
     _stt!: STT;
+    submitState = DataState.init<SubmitFormRes>();
 
     constructor(props: InteractionStoreProps) {
         logger.debug("Creating InteractionStore", this.instanceId);
@@ -29,6 +33,7 @@ export class InteractionStore {
         makeObservable(this, {
             vmState: observable.ref,
             remainingSeconds: observable,
+            submitState: observable.ref,
         });
         this.loadQuestions();
     }
@@ -130,6 +135,71 @@ export class InteractionStore {
         console.log("Time is up.");
     }
 
+    get selectedLanguageId() {
+        return this.parentStore.selectedLanguage?.id;
+    }
+
+
+    async onClickSubmitForm() {
+        this.stopTimer();
+        this.endedOn = new Date();
+        await this.submitDataToServer();
+    }
+
+    private async submitDataToServer() {
+        try {
+            const data = this.prepareDataToSubmit();
+            const submitFormReq = new SubmitFormReq({
+                formId: this.parentStore.formDetail.id,
+                submittedLanguageId: this.selectedLanguageId!,
+                startedOn: this.startedOn,
+                endedOn: this.endedOn!,
+                questions: data,
+            });
+            const res = (await this.parentStore.formService.submitForm(submitFormReq)).getOrError();
+            runInAction(() => {
+                this.submitState = DataState.data(res);
+            });
+        }
+        catch (error) {
+            logger.error("Error submitting form", error);
+            const appError = AppError.fromAny(error);
+            runInAction(() => {
+                this.vmState = DataState.error(appError);
+            });
+        }
+    }
+
+    prepareDataToSubmit() {
+        const submitQuestions: SubmitFormQuestion[] = [];
+        for (const question of this.questions) {
+            if (!question.base.type.isGroup) {
+                // Non-group question: get answer directly
+                const answer = question.getAnswer();
+                if (answer) {
+                    submitQuestions.push(new SubmitFormQuestion(question.base.id, answer));
+                }
+                continue;
+            }
+
+            const groupQuestion = question as GroupQuestionVm;
+            const subQuestionAnswers: SubmitFormQuestion[] = [];
+            for (const subQuestion of groupQuestion.subQuestions) {
+                const answer = subQuestion.getAnswer?.();
+                if (answer !== undefined) {
+                    subQuestionAnswers.push(new SubmitFormQuestion(subQuestion.base.id, answer));
+                }
+            }
+            if (subQuestionAnswers.length > 0) {
+                submitQuestions.push(new SubmitFormQuestion(question.base.id, undefined, subQuestionAnswers));
+            }
+        }
+        return submitQuestions;
+    }
+
+
+
+
     dispose() {
         this.vmState.data?.dispose();
         this.stopTimer();
@@ -137,3 +207,5 @@ export class InteractionStore {
         logger.debug("Disposed STT: ", this.stt.instanceId);
     }
 }
+
+
