@@ -21,6 +21,8 @@ export function useAiListenDialog(stt: STT, editorRef: React.RefObject<TinyMCEEd
                 onCancel: () => {
                     dialogManager.closeById('ai-voice-dialog');
                 },
+                allowAi: true,
+                enableAi: true,
             },
         };
         dialogManager.show(dialogEntry);

@@ -5,8 +5,8 @@ import { AiSTTReq, AiSTTRes, TokenUsage } from "../models/AiSTTModels";
 import { ModelResponseParser } from "./ModelResponseParser";
 
 export class AiSTTServiceOpenAI {
-    private readonly API_KEY = "SAMPLE_API_KEY";
-    private readonly MODEL = "gpt-4.1-nano";
+    private readonly API_KEY = "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";
+    private readonly MODEL = "gpt-4o";
 
     public async generateResponse(req: AiSTTReq): Promise<ResEither<AiSTTError, AiSTTRes>> {
         try {
@@ -45,37 +45,24 @@ export class AiSTTServiceOpenAI {
 
     private systemPrompt() {
         return `
-You are an AI transcriber for mathematical and scientific speech. Your task is to convert user speech—captured via the Web Speech API—into clean Markdown output with embedded LaTeX for mathematical content.
+You are an AI transcriber converting user speech—captured via the Web Speech API—into clean Markdown output with embedded LaTeX for all mathematical and scientific content.
 
-# Instructions:
-- This is for exam, so **DO NOT** solve, expand, simplify, or evaluate expressions.
-- Reformat the spoken content clearly and cleanly.
-- Use normalization when needed based on the context (e.g., "A" → "a", "why" → "y") and standardize math phrases (e.g., "squared" → \`^2\`, "cubed" → \`^3\`, "to the power of n" → \`^n\`, "divided by" → \`/\`, "times" or "multiplied by" → \`\\times\`, "equals" → \`=\`). You can decide other normalizations based on the context of the speech, but not limited to these.
-- Punctuation is allowed but should be kept **outside** LaTeX where possible.
-- Do **not** repeat or infer content the user did not explicitly say.
-- Ensure math expressions are not split across lines unnecessarily.
-- Use inline math \`$...$\` for short expressions, and block math \`\\[ ... \\]\` when the user clearly speaks a standalone equation or declares "the equation is...".
-- Group related ideas into paragraphs. Use a blank line to separate distinct thoughts.
+# Transcribe Instructions
+- Transcribe the user speech faithfully with **minor corrections only** (such as fixing obvious spelling or case errors as specified below), but **do NOT complete, solve, simplify, or infer any missing parts of the speech or equations**.
 
-# Output Format:
-Return a Markdown string composed of paragraphs.
-- Plain text should be written as-is.
-- All math variables and expressions must be wrapped in LaTeX delimiters \`$...$\` or \`\\[ ... \\]\`.
-- Use paragraphs separated by blank lines if needed.
+- Display the final output **exactly in Markdown format**, following the detailed output instructions below.
 
-# Example Output:
-\`\`\`markdown
-Let $a = 2$ and $b = 3$.
+# Correction Instructions
+- Allow minor spelling corrections to fix common voice recognition mistakes (e.g., "we" → "v", "why" → "y") when needed.
+- Normalize case for mathematical variables when appropriate (e.g., uppercase "A" → lowercase "a").   
+- Do **not** add, remove, or infer any mathematical content beyond these minor corrections.
 
-Substituting into the equation $(a + b)^2 = a^2 + b^2 + 2ab$, we get:
-
-\\[
-(2 + 3)^2 = 2^2 + 3^2 + 2 \\times 2 \\times 3
-\\]
-\`\`\`
-
-Keep formatting clean, readable, and true to the user's spoken input.
-    `;
+# Output Instructions
+- Return Markdown text with paragraphs separated by blank lines.  
+- Transcribe plain text as-is.  
+- Wrap all math variables and expressions in LaTeX delimiters: use inline math \`$...$\` for short expressions and block math \`\\[ ... \\]\` for standalone equations.  
+- Keep punctuation outside LaTeX expressions where possible.  
+`;
     }
 
 

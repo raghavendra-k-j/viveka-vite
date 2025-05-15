@@ -1,65 +1,58 @@
-/* General Editor Body Styling */
+/* For Editor */
 .mce-content-body {
   padding: 0.5rem;
   border-radius: 0 0 var(--dimen-input-radius) var(--dimen-input-radius);
   color: var(--color-text-default);
-  font-size: 1rem;
-  line-height: 1.5;
 }
 
-/* Focus Outline */
 .mce-content-body:focus {
   outline: 2px solid var(--color-primary);
   box-shadow: 0 0 0 3px
     color-mix(in srgb, var(--color-primary) 30%, transparent);
 }
 
+/* Editor Content Body */
 .mce-content-body {
-  font-size: 0.938rem;
+  font-size: 1rem;
+  line-height: 1.5;
   color: var(--color-text-default);
-  line-height: 1.2;
 }
 
-/* Inline Formatting */
-.mce-content-body b,
-.mce-content-body strong {
+.mce-editor-content b,
+.mce-editor-content strong {
   font-weight: 600;
 }
 
-.mce-content-body i,
-.mce-content-body em {
+.mce-editor-content i,
+.mce-editor-content em {
   font-style: italic;
 }
 
-.mce-content-body u {
+.mce-editor-content u {
   text-decoration: underline;
   text-decoration-thickness: 2px;
-  text-underline-offset: 2px;
 }
 
-/* ✅ Fix List Styling */
 .mce-content-body ul,
 .mce-content-body ol {
-  margin: 0.5rem 0;
   padding-left: 1.5rem;
+  margin: 0.5rem 0;
 }
 
-.mce-content-body ul {
+.mce-editor-content ul {
   list-style-type: disc;
 }
 
-.mce-content-body ol {
+.mce-editor-content ol {
   list-style-type: decimal;
 }
 
-.mce-content-body li {
+.mce-editor-content li {
   margin-bottom: 0.25rem;
 }
 
-/* Custom <latex> Tag Styling */
-.mce-content-body latex,
-.mce-content-body .latex {
-  background: #f5f5f5;
+.mce-editor-content .latex {
+  background: var(--color-slate-50);
   padding: 2px 6px;
   border-radius: 4px;
   display: inline-block;
@@ -68,7 +61,15 @@
   user-select: none;
 }
 
-.mce-content-body latex:hover,
-.mce-content-body .latex:hover {
-  background: #e2e8f0;
+.mce-editor-content .latex:hover {
+  background: var(--color-slate-200);
+}
+
+.mce-editor-content .latex * {
+  pointer-events: none;
+}
+
+.mce-editor-content .latex {
+  pointer-events: auto;
+  cursor: pointer;
 }

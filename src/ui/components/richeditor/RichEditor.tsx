@@ -10,9 +10,13 @@ import {
     SquareRadical,
     Mic,
 } from 'lucide-react';
-import { useMathDialog } from './useMathDialog';
+import { useMathDialog, renderLatexElements } from './useMathDialog';
 import { useAiListenDialog } from './useAiListenDialog';
 import type { STT } from '~/infra/utils/stt/STT';
+import clsx from 'clsx';
+import styles from './RichEditor.module.css';
+import './rich-editor.css';
+import { logger } from '~/core/utils/logger';
 
 export function RichEditor({ stt }: { stt: STT }) {
     const editorRef = useRef<TinyMCEEditor | null>(null);
@@ -28,7 +32,7 @@ export function RichEditor({ stt }: { stt: STT }) {
     const openAiListenDialog = useAiListenDialog(stt, editorRef);
 
     return (
-        <div className="w-full">
+        <div className={clsx(styles.richEditor)}>
             <RichEditorToolbar
                 editorRef={editorRef}
                 formats={formats}
@@ -42,6 +46,7 @@ export function RichEditor({ stt }: { stt: STT }) {
                 onInit={(_, editor) => {
                     editorRef.current = editor;
 
+                    // Handle formatting states
                     editor.on('NodeChange', () => {
                         setFormats({
                             bold: editor.queryCommandState('Bold'),
@@ -50,18 +55,29 @@ export function RichEditor({ stt }: { stt: STT }) {
                             bullist: editor.queryCommandState('InsertUnorderedList'),
                             numlist: editor.queryCommandState('InsertOrderedList'),
                         });
+
+                        // Re-render KaTeX when content changes
+                        renderLatexElements(editor.getBody());
                     });
 
+                    // Click-to-edit <latex> tag
                     editor.on('click', (e) => {
                         const target = e.target as HTMLElement;
-                        const wrapper = target.closest('.math-equation');
-                        if (wrapper) {
+                        const wrapper = target.closest('.latex');
+                        logger.debug('Click event target:', target);
+                        logger.debug('Closest .latex wrapper:', wrapper);
+
+                        if (wrapper && editor.getBody().contains(wrapper)) {
                             const latex = wrapper.getAttribute('data-latex') || '';
                             e.preventDefault();
                             e.stopPropagation();
                             openMathDialog(latex, wrapper);
                         }
                     });
+
+
+                    // Initial render of any existing <latex> tags
+                    renderLatexElements(editor.getBody());
                 }}
                 init={{
                     height: 200,
@@ -83,7 +99,6 @@ export function RichEditor({ stt }: { stt: STT }) {
     );
 }
 
-// ✅ DRY Toolbar Component
 function RichEditorToolbar({
     editorRef,
     formats,
@@ -100,7 +115,7 @@ function RichEditorToolbar({
     };
 
     const getButtonClass = (active: boolean) =>
-        `p-1 rounded hover:bg-gray-100 ${active ? 'text-blue-600' : 'text-gray-600'}`;
+        clsx(styles.toolbarButton, active ? 'text-blue-600' : 'text-gray-600');
 
     const toolbarButtons = [
         { icon: Bold, title: 'Bold', command: 'Bold', formatKey: 'bold' },
@@ -110,8 +125,10 @@ function RichEditorToolbar({
         { icon: ListOrdered, title: 'Ordered List', command: 'InsertOrderedList', formatKey: 'numlist' },
     ];
 
+    const iconSize = 16;
+
     return (
-        <div className="flex gap-2 mb-2 items-center">
+        <div className={clsx(styles.toolbar)}>
             {toolbarButtons.map(({ icon: Icon, title, command, formatKey }) => (
                 <button
                     key={command}
@@ -120,24 +137,24 @@ function RichEditorToolbar({
                     onClick={() => applyCommand(command)}
                     title={title}
                 >
-                    <Icon size={18} />
+                    <Icon strokeWidth={2} size={iconSize} />
                 </button>
             ))}
             <button
                 type="button"
-                className="p-1 rounded hover:bg-gray-100 text-gray-600"
+                className={styles.toolbarButton}
                 onClick={() => openMathDialog('')}
                 title="Insert Equation"
             >
-                <SquareRadical size={18} />
+                <SquareRadical size={iconSize} />
             </button>
             <button
                 type="button"
-                className="p-1 rounded hover:bg-gray-100 text-gray-600"
+                className={styles.toolbarButton}
                 onClick={openAiListenDialog}
                 title="Speech Input"
             >
-                <Mic size={18} />
+                <Mic size={iconSize} />
             </button>
         </div>
     );

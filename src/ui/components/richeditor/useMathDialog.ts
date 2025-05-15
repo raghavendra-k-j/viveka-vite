@@ -7,7 +7,10 @@ import { LaTexKbProps } from '../LaTexKb/LaTexKbProvider';
 import type { STT } from '~/infra/utils/stt/STT';
 import type { Editor as TinyMCEEditor } from 'tinymce';
 
-export function useMathDialog(editorRef: React.RefObject<TinyMCEEditor | null>, stt: STT) {
+export function useMathDialog(
+    editorRef: React.RefObject<TinyMCEEditor | null>,
+    stt: STT
+) {
     const dialogManager = useDialogManager();
 
     return useCallback((latex: string, targetNode?: Node) => {
@@ -17,19 +20,16 @@ export function useMathDialog(editorRef: React.RefObject<TinyMCEEditor | null>, 
             props: {
                 expr: new LaTexExpr({ latex }),
                 onDone: (expr: LaTexExpr) => {
-                    const mathHtml = katex.renderToString(expr.latex, {
-                        throwOnError: false,
-                        output: 'html',
-                    });
-
-                    const content = `<span class="math-equation" contenteditable="false" data-latex="${expr.latex}">${mathHtml}</span>`;
-
+                    const content = `<span class="latex" contenteditable="false" data-latex="${expr.latex}">${expr.latex}</span>`;
                     if (targetNode) {
                         editorRef.current?.dom.setOuterHTML(targetNode as HTMLElement, content);
                     } else {
                         editorRef.current?.insertContent(content, { format: 'html' });
                     }
-
+                    const container = editorRef.current?.getBody();
+                    if (container) {
+                        renderLatexElements(container);
+                    }
                     dialogManager.closeById('math-dialog');
                 },
                 onClose: () => dialogManager.closeById('math-dialog'),
@@ -39,4 +39,21 @@ export function useMathDialog(editorRef: React.RefObject<TinyMCEEditor | null>, 
 
         dialogManager.show(dialogEntry);
     }, [dialogManager, editorRef, stt]);
+}
+
+
+
+export function renderLatexElements(container: HTMLElement) {
+    const nodes = container.querySelectorAll('.latex');
+    nodes.forEach((node) => {
+        const latex = node.getAttribute('data-latex') || node.textContent || '';
+        try {
+            katex.render(latex, node as HTMLElement, {
+                throwOnError: false,
+                output: 'html',
+            });
+        } catch {
+            node.textContent = latex;
+        }
+    });
 }
