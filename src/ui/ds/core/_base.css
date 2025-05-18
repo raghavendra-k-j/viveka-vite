@@ -1,6 +1,11 @@
 :root {
   --color-input-border: var(--color-slate-200);
   --dimen-input-radius: 4px;
+  --toastify-font-family: var(--font-default);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {

@@ -1,8 +1,6 @@
-import type { AbsUserBase, AbsUserBaseJson, AbsUserProps } from "./AbsUserBase";
+import { JsonObj } from "~/core/types/Json";
+import type { AbsUserBase, AbsUserProps } from "./AbsUserBase";
 
-export interface UserBaseJson extends AbsUserBaseJson {
-    userName?: string;
-}
 
 type UserBaseProps = AbsUserProps & {
     userName?: string;
@@ -40,17 +38,7 @@ export class UserBase implements AbsUserBase {
         return this._userName;
     }
 
-    serialize(): UserBaseJson {
-        return {
-            id: this._id,
-            name: this._name,
-            email: this._email,
-            mobile: this._mobile,
-            userName: this._userName,
-        };
-    }
-
-    static deserialize(json: UserBaseJson): UserBase {
+    static fromJson(json: JsonObj): UserBase {
         return new UserBase({
             id: json.id,
             name: json.name,

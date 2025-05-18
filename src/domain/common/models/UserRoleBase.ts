@@ -1,4 +1,5 @@
 import { UserRoleType } from "./UserRoleType";
+import { JsonObj } from "~/core/types/Json";
 
 export type UserRoleBaseProps = {
     id: number;
@@ -19,6 +20,16 @@ export class UserRoleBase {
         this.type = props.type;
         this.defaultType = props.defaultType;
     }
+
+    static fromJson(json: JsonObj): UserRoleBase {
+        return new UserRoleBase({
+            id: json.id,
+            name: json.name,
+            type: UserRoleType.fromString(json.type),
+            defaultType: json.defaultType ? UserRoleType.fromString(json.defaultType) : undefined,
+        });
+    }
+
 
 
     get isDefault(): boolean {

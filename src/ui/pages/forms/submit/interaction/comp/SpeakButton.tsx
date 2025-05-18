@@ -15,7 +15,7 @@ export const SpeakButton = observer(({ vm }: SpeakButtonProps) => {
     };
 
     const Icon = isSpeaking ? CircleStop : Volume2;
-    const iconColor = isSpeaking ? colors.error : colors.textDefault;
+    const iconColor = isSpeaking ? colors.primary : colors.textDefault;
 
     return (
         <button

@@ -1,10 +1,12 @@
 function AppBarLogo() {
-    return (<div className="font-bold text-xl flex flex-row items-center gap-2 select-none" style={{ color: "white" }}>
-        <span className="flex items-center justify-center" style={{ width: "32px", height: "32px" }}>
-            <LogoSvg />
-        </span>
-        <span>Viveka</span>
-    </div>);
+    return (<a href="/">
+        <div className="font-bold text-xl flex flex-row items-center gap-2 select-none" style={{ color: "white" }}>
+            <span className="flex items-center justify-center" style={{ width: "32px", height: "32px" }}>
+                <LogoSvg />
+            </span>
+            <span>Viveka</span>
+        </div>
+    </a>);
 }
 
 export default AppBarLogo;

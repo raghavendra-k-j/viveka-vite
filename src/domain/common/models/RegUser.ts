@@ -1,4 +1,5 @@
 import type { AbsUser } from "./AbsUser";
+import { AppUserType } from "./AppUserType";
 import { UserBase } from "./UserBase";
 
 export type RegUserProps = {
@@ -24,4 +25,5 @@ export abstract class RegUser implements AbsUser {
     get mobile(): string | undefined {
         return this.base.mobile;
     }
+    abstract get appUserType(): AppUserType;
 }

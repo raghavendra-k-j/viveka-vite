@@ -14,7 +14,7 @@
 --color-primary-950: #1d2743;
 --color-primary: #377bd9;
 --color-on-primary: #ffffff;
---color-text-default: #212529;
+--color-text-default: #3c3c43;
 --color-text-secondary: #495057;
 --color-text-tertiary: #6c757d;
 --ff-app-sans: Poppins, sans-serif;
@@ -24,5 +24,22 @@
 --dimen-button-md-py: 0.5rem;
 --dimen-button-md-font-size: 0.9375rem;
 --dimen-button-md-min-height: 2.5rem;
+--dimen-button-md-ldr-size: 1.25rem;
+--dimen-button-md-ldr-margin: 0.75rem;
+--dimen-button-sm-px: 0.75rem;
+--dimen-button-sm-py: 0.375rem;
+--dimen-button-sm-font-size: 0.8125rem;
+--dimen-button-sm-min-height: 2rem;
+--dimen-button-sm-ldr-size: 0.75rem;
+--dimen-button-sm-ldr-margin: 0.5rem;
+--dimen-input-radius: 0.375rem;
+--dimen-input-md-px: 1rem;
+--dimen-input-md-py: 0.5rem;
+--dimen-input-md-font-size: 0.875rem;
+--dimen-input-md-min-height: 2.5rem;
+--dimen-input-sm-px: 0.5rem;
+--dimen-input-sm-py: 0.375rem;
+--dimen-input-sm-font-size: 0.75rem;
+--dimen-input-sm-min-height: 2rem;
 --dimen-dialog-radius: 0.375rem;
 }

@@ -31,4 +31,21 @@ export class BaseEnv {
         }
         return BaseEnv._instance!;
     }
+
+    static async loadFromFile(url: string = "/env.json"): Promise<BaseEnv> {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to load env file: ${response.statusText}`);
+        }
+        const json = await response.json();
+        BaseEnv._instance = new BaseEnv({
+            tenant: json.tenant,
+            apiSchema: json.apiSchema,
+            apiHost: json.apiHost,
+            apiPort: json.apiPort
+        });
+        return BaseEnv._instance;
+    }
+
+
 }

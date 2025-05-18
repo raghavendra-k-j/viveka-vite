@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import tsconfigPaths from "vite-tsconfig-paths";
 import createDsPlugin from "./plugins/ds/ds";
+import path from 'path';
 
 export default defineConfig({
   plugins: [
@@ -14,4 +15,9 @@ export default defineConfig({
       cssOutputPath: "./src/ui/ds/core/_variables.css",
     }),
   ],
+  resolve: {
+    alias: {
+      '~': path.resolve(__dirname, './src'),
+    },
+  },
 })

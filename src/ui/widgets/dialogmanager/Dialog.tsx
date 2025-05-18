@@ -62,6 +62,21 @@ export function DialogScaffold({ children, className, ...rest }: DialogScaffoldP
     );
 }
 
+
+export type DialogBottomSheetScaffoldProps = {
+    children: ReactNode;
+    className?: string;
+};
+
+export function DialogBottomSheetScaffold({ children, className, ...rest }: DialogBottomSheetScaffoldProps & React.HTMLAttributes<HTMLDivElement>) {
+    return (
+        <div className={clsx("bottom-sheet-scaffold", className)} {...rest}>
+            {children}
+        </div>
+    );
+}
+
+
 export type DialogContentProps = {
     children: ReactNode;
     className?: string;
@@ -79,3 +94,6 @@ export function DialogContent(props: DialogContentProps) {
         </div>
     );
 }
+
+
+

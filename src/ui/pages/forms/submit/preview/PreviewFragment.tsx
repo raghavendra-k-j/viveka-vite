@@ -11,15 +11,18 @@ import {
 import { NumFmt } from "~/core/utils/NumFmt";
 import { DateFmt } from "~/core/utils/DateFmt";
 import { TimeFmt } from "~/core/utils/TimeFmt";
-import Button from "~/ui/widgets/button/FilledButton";
 import type { Language } from "~/domain/forms/models/Language";
 import AppBarLogo from "~/ui/components/AppBarLogo";
+import { ProfileView } from "../comp/profile/ProfileView";
+import FilledButton from "~/ui/widgets/button/FilledButton";
+import { Observer } from "mobx-react-lite";
 
 export function PreviewFragment() {
     return (
         <div className="flex flex-col">
             <AppBar
                 leading={<AppBarLogo />}
+                trailing={<ProfileView />}
             />
             <div className="flex justify-center my-4 mx-4">
                 <FormDetailCard />
@@ -33,9 +36,9 @@ function FormDetailCard() {
     const { formDetail } = store;
 
     return (
-        <div className="flex flex-col bg-white border border-slate-200 rounded-sm shadow-md max-w-[576px] w-full">
+        <div className="flex flex-col bg-surface border border-slate-200 rounded-sm shadow-md max-w-[576px] w-full">
             <div className="flex flex-col mb-2 px-6 py-4">
-                <ReadMoreText text={formDetail.title} maxChars={120} className="font-semibold text-[17px] text-default" />
+                <ReadMoreText text={formDetail.title} maxChars={120} className="font-semibold text-base text-default" />
                 {formDetail.description && (
                     <ReadMoreText maxChars={120} className="text-secondary text-sm mt-1" text={formDetail.description} />
                 )}
@@ -122,7 +125,7 @@ function StartFormFooter() {
     return (
         <div className="flex flex-col px-4 py-4 border-t border-slate-200">
             <SelectLanguage />
-            <Button onClick={() => store.onClickStart()}>{buttonText}</Button>
+            <FilledButton onClick={() => store.onClickStart()}>{buttonText}</FilledButton>
         </div>
     );
 }
@@ -140,21 +143,25 @@ function SelectLanguage() {
 
     return (
         <div className="flex items-center mb-4">
-            <label htmlFor="flex language-select flex-1" className="font-medium text-sm mr-3">
+            <label htmlFor="language-select" className="font-medium text-sm mr-3">
                 Select Language:
             </label>
-            <select
-                id="language-select"
-                value={store.selectedLanguage?.id || ''}
-                onChange={handleLanguageChange}
-                className="p-2 border border-slate-300 flex-1 rounded-md bg-white text-sm"
-            >
-                {languages.map((language: Language) => (
-                    <option key={language.id} value={language.id}>
-                        {language.name}
-                    </option>
-                ))}
-            </select>
+            <Observer>
+                {() => (
+                    <select
+                        id="language-select"
+                        value={store.selectedLanguage?.id ?? languages[0]?.id ?? ''}
+                        onChange={handleLanguageChange}
+                        className="p-2 border border-slate-300 flex-1 rounded-md bg-white text-sm"
+                    >
+                        {languages.map((language: Language) => (
+                            <option key={language.id} value={language.id}>
+                                {language.name}
+                            </option>
+                        ))}
+                    </select>
+                )}
+            </Observer>
         </div>
     );
 }

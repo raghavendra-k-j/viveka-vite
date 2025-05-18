@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import katex, { render } from 'katex';
+import katex from 'katex';
 import { LaTexExpr } from '~/domain/latexkb/models/LaTexExpr';
 import { DialogEntry, useDialogManager } from '~/ui/widgets/dialogmanager';
 import { LatexKb } from '../LaTexKb/LaTexKb';
@@ -14,17 +14,6 @@ export function useMathDialog(
     const dialogManager = useDialogManager();
 
     return useCallback((latex: string, targetNode?: Node) => {
-        if (true) {
-            let tempLatex = katex.renderToString("e=mc^2", {
-                throwOnError: false,
-                output: 'html',
-                displayMode: false,
-            });
-            const content = `<span data-latex="e=mc^2" contenteditable="false">${tempLatex}</span>`;
-            editorRef.current?.insertContent(content, { format: 'html' });
-            return;
-        }
-
         const dialogEntry: DialogEntry<LaTexKbProps> = {
             id: 'math-dialog',
             component: LatexKb,

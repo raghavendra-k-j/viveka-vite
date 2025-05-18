@@ -12,7 +12,10 @@ export function GroupQuestionView({ vm }: { vm: GroupQuestionVm }) {
                 {() => (
                     <>
                         {vm.subQuestions.map((subQuestion, index) => (
-                            <div key={subQuestion.base.id}>
+                            <div
+                                id={`question-${subQuestion.base.id}`}
+                                key={subQuestion.base.id}
+                            >
                                 {index > 0 && <hr className="border-slate-200" />}
                                 {subQuestion.render({ vm: subQuestion, parentVm: vm })}
                             </div>

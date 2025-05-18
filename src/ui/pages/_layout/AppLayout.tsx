@@ -1,27 +1,25 @@
+import { useEffect, useState } from "react";
 import { AppProvider } from "./AppProvider";
-import { useAppBootstrap } from "./useAppBootstrap";
-import "./../../ds/core/core.css";
+import { bootApp, getOrgConfig } from "../bootApp";
+import { AppEnv } from "~/core/config/AppEnv";
 import { Outlet } from "react-router";
-import { PageLoader } from "~/ui/components/loaders/PageLoader";
 
 export default function AppLayout() {
-    const { appEnv, orgConfig, loadState } = useAppBootstrap();
+    const [isBooted, setIsBooted] = useState(false);
 
-    if (loadState.isInit || loadState.isLoading) {
-        return <PageLoader />;
+    useEffect(() => {
+        async function callBootApp() {
+            await bootApp();
+            setIsBooted(true);
+        }
+        callBootApp();
+    });
+
+    if (!isBooted) {
+        return null;
     }
 
-    if (loadState.isError) {
-        return <div>Error: {loadState.error.message}</div>;
-    }
-
-    if (!appEnv || !orgConfig) {
-        return <div>Unexpected error while loading app environment.</div>;
-    }
-
-    return (
-        <AppProvider appEnv={appEnv} orgConfig={orgConfig}>
-            <Outlet />
-        </AppProvider>
-    );
+    return (<AppProvider appEnv={AppEnv.instance} orgConfig={getOrgConfig()}>
+        <Outlet/>
+    </AppProvider>);
 }

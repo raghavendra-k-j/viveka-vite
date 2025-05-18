@@ -13,7 +13,7 @@ interface BadgeProps {
 const Badge: React.FC<BadgeProps> = ({ text, bgColor, textColor }) => {
     return (
         <span
-            className={`inline-block text-truncate px-3 py-1 text-xs font-semibold rounded-sm ${bgColor} ${textColor}`}
+            className={`inline-block text-truncate px-3 py-1 text-xs font-medium rounded-sm ${bgColor} ${textColor}`}
         >
             {text}
         </span>
@@ -21,7 +21,7 @@ const Badge: React.FC<BadgeProps> = ({ text, bgColor, textColor }) => {
 };
 
 export const QuestionTypeBadge: React.FC<QuestionTypeBadgeProps> = ({ type }) => {
-    return <Badge text={type} bgColor="bg-blue-50" textColor="text-blue-500" />;
+    return <Badge text={type} bgColor="bg-indigo-50" textColor="text-indigo-500" />;
 };
 
 interface MarksBadgeProps {
@@ -37,6 +37,6 @@ interface LevelBadgeProps {
 }
 
 export const LevelBadge: React.FC<LevelBadgeProps> = ({ text }) => {
-    return <Badge text={text} bgColor="bg-indigo-50" textColor="text-indigo-500" />;
+    return <Badge text={text} bgColor="bg-indigo-50" textColor="text-indigo-600" />;
 }
 

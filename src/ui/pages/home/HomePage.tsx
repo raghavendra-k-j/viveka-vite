@@ -1,14 +1,12 @@
-import { useRef } from 'react';
-import { STT } from '~/infra/utils/stt/STT';
-import SimpleEditor from '~/ui/components/richeditor/TestEditor';
-
+import { AppBar } from "../forms/submit/comp/AppBar";
 
 export default function HomePage() {
-    const sttRef = useRef<STT>(new STT());
-
     return (
-        <div className='max-w-[500px] m-5 mx-auto shaodow-lg'>
-            <SimpleEditor />
+        <div className="h-screen flex flex-col">
+            <AppBar />
+            <div className="flex-1 flex items-center justify-center">
+                <div>Centered</div>
+            </div>
         </div>
     );
 }

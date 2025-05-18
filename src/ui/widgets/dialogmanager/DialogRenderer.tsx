@@ -17,4 +17,8 @@ const DialogRenderer: React.FC<{ store: DialogManagerStore }> = observer(({ stor
     );
 });
 
+
+
+
+
 export default DialogRenderer;

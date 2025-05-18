@@ -1,5 +1,7 @@
+import { JsonObj } from "~/core/types/Json";
 import type { AbsUser } from "./AbsUser";
-import type { GuestBase } from "./GuestBase";
+import { AppUserType } from "./AppUserType";
+import { GuestBase } from "./GuestBase";
 
 export class GuestUser implements AbsUser {
     base: GuestBase;
@@ -19,4 +21,15 @@ export class GuestUser implements AbsUser {
     get mobile(): string | undefined {
         return this.base.mobile;
     }
+
+    get appUserType(): AppUserType {
+        return AppUserType.guest;
+    }
+
+    static fromJson(json: JsonObj): GuestUser {
+        const base = GuestBase.fromJson(json);
+        return new GuestUser(base);
+    }
+
+
 }

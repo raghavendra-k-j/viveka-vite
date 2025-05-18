@@ -140,8 +140,8 @@ export class FormResponse {
             incorrectQCount: json.incorrectQCount,
             partiallyCorrectQCount: json.partiallyCorrectQCount,
             updatedAt: new Date(json.updatedAt),
-            user: (json.user ?? json.userTile) ? UserBase.deserialize(json.user ?? json.userTile) : null,
-            guest: (json.guest ?? json.guestTile) ? GuestBase.deserialize(json.guest ?? json.guestTile) : null
+            user: (json.user ?? json.userTile) ? UserBase.fromJson(json.user ?? json.userTile) : null,
+            guest: (json.guest ?? json.guestTile) ? GuestBase.fromJson(json.guest ?? json.guestTile) : null
         });
     }
 

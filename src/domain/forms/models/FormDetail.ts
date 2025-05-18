@@ -136,7 +136,7 @@ export class FormDetail {
         };
     }
 
-    static deserialize(json: FormDetailJson): FormDetail {
+    static fromJson(json: FormDetailJson): FormDetail {
         const startDate = new Date(json.startDate);
         const endDate = new Date(json.endDate);
 

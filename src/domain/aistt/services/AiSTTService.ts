@@ -10,7 +10,7 @@ export class AiSTTService {
 
     public async generateResponse(req: AiSTTReq): Promise<ResEither<AiSTTError, AiSTTRes>> {
         try {
-            const isTestMode = true;
+            const isTestMode = false;
             let modelResponse;
             if (isTestMode) {
                 modelResponse = this.getCachedResponseForTest();
@@ -46,6 +46,10 @@ export class AiSTTService {
     private systemPrompt() {
         return `
 You are an AI transcriber converting user speech—captured via the Web Speech API—into clean Markdown output with embedded LaTeX for all mathematical and scientific content.
+
+# Role and Context
+This is an **exam transcription environment**. You are **not** an assistant or tutor. You should **not solve, explain, complete, simplify, or add** any information beyond what the user says. Your sole task is to transcribe the spoken input into clean, accurate Markdown.
+
 
 # Transcribe Instructions
 - Transcribe the user speech faithfully with **minor corrections only** (such as fixing obvious spelling or case errors as specified below), but **do NOT complete, solve, simplify, or infer any missing parts of the speech or equations**.

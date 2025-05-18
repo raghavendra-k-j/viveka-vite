@@ -2,6 +2,8 @@ import { AppUserType } from "./AppUserType";
 import { RegUser, type RegUserProps } from "./RegUser";
 import { UserRoleBase } from "./UserRoleBase";
 import { PermissionBase } from "./PermissionBase";
+import { JsonObj } from "~/core/types/Json";
+import { UserBase } from "./UserBase";
 
 type AuthUserProps = RegUserProps & {
     role: UserRoleBase;
@@ -27,10 +29,24 @@ export class AuthUser extends RegUser {
     }
 
     getAppUserType(): AppUserType {
-        return AppUserType.AUTH;
+        return AppUserType.auth;
     }
 
     hasPermission(id: string): boolean {
         return this._permissionIds.has(id);
     }
+
+    get appUserType(): AppUserType {
+        return AppUserType.auth;
+    }
+
+    static fromJson(json: JsonObj): AuthUser {
+        return new AuthUser({
+            base: UserBase.fromJson(json),
+            role: UserRoleBase.fromJson(json.role),
+            permissions: json.permissions.map((p: JsonObj) => PermissionBase.fromJson(p)),
+        });
+    }
+
+
 }

@@ -59,7 +59,7 @@ export const ChoiceItem = observer(function ChoiceItem({ vm, choice }: ChoiceIte
             ? FaCircleDot
             : FaRegCircle;
 
-    const iconColor = isSelected ? colors.primary : colors.textSecondary;
+    const iconColor = isSelected ? colors.primary : colors.textTertiary;
 
     return (
         <button

@@ -1,8 +1,7 @@
-import type { AbsUserBase, AbsUserBaseJson, AbsUserProps } from "./AbsUserBase";
+import { JsonObj } from "~/core/types/Json";
+import type { AbsUserBase, AbsUserProps } from "./AbsUserBase";
 
-export interface GuestBaseJson extends AbsUserBaseJson {
-    emailVerified: boolean;
-}
+
 
 export type GuestBaseProps = AbsUserProps & {
     emailVerified: boolean;
@@ -44,17 +43,7 @@ export class GuestBase implements AbsUserBase {
         return this._emailVerified;
     }
 
-    serialize(): GuestBaseJson {
-        return {
-            id: this._id,
-            name: this._name,
-            email: this._email,
-            mobile: this._mobile,
-            emailVerified: this._emailVerified,
-        };
-    }
-
-    static deserialize(json: GuestBaseJson): GuestBase {
+    static fromJson(json: JsonObj): GuestBase {
         return new GuestBase({
             id: json.id,
             name: json.name,

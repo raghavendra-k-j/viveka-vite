@@ -17,10 +17,10 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "paths": {
       "~/*": [
-        "./*"
+        "src/*"
       ]
     },
     /* Linting */

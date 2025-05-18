@@ -8,6 +8,7 @@ import { CategoryVm } from "./models/CategoryVm";
 import { CategoriesVm } from "./models/CategoriesVm";
 import { LaTexExpr } from "~/domain/latexkb/models/LaTexExpr";
 import { logger } from "~/core/utils/logger";
+import { STT } from "~/infra/utils/stt/STT";
 
 type LaTexKbStoreProps = {
     latexKbService: LaTexKbService;

@@ -3,10 +3,10 @@ import type { AppStore } from "./AppStore";
 
 export const AppContext = createContext<AppStore | null>(null);
 
-export const useAppContext = () => {
+export const useAppStore = () => {
     const context = useContext(AppContext);
     if (!context) {
-        throw new Error("useAppContext must be used within an AppProvider");
+        throw new Error("useAppStore must be used within an AppProvider");
     }
     return context;
 }

@@ -1,0 +1,72 @@
+/* Base Input Styles */
+.input {
+  --input-px: var(--dimen-input-md-px);
+  --input-py: var(--dimen-input-md-py);
+  --input-font-size: var(--dimen-input-md-fontSize);
+  --input-min-height: var(--dimen-input-md-minHeight);
+  --input-radius: var(--dimen-input-radius);
+
+  display: inline-flex;
+  align-items: center;
+  padding: var(--input-py) var(--input-px);
+  font-size: var(--input-font-size);
+  min-height: var(--input-min-height);
+  border-radius: var(--input-radius);
+  border: 1px solid var(--color-slate-300);
+  background-color: var(--color-surface);
+  color: var(--color-text-default);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Focus and Hover States */
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-500);
+}
+
+.input:hover {
+  border-color: var(--color-slate-400);
+}
+
+/* Disabled State */
+.input:disabled,
+.input.is-disabled {
+  background-color: var(--color-slate-100);
+  border-color: var(--color-slate-200);
+  color: var(--color-slate-500);
+  cursor: not-allowed;
+}
+
+/* Size Modifiers */
+.input--md {
+  --input-px: var(--dimen-input-md-px);
+  --input-py: var(--dimen-input-md-py);
+  --input-font-size: var(--dimen-input-md-font-size);
+  --input-min-height: var(--dimen-input-md-min-height);
+}
+
+.input--sm {
+  --input-px: var(--dimen-input-sm-px);
+  --input-py: var(--dimen-input-sm-py);
+  --input-font-size: var(--dimen-input-sm-font-size);
+  --input-min-height: var(--dimen-input-sm-min-height);
+}
+
+/* Optional: For placeholder styling */
+.input::placeholder {
+  color: var(--color-slate-400);
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.input-label {
+  font-size: 0.875rem;
+  color: var(--color-slate-700);
+  font-weight: 500;
+}

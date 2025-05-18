@@ -29,26 +29,23 @@ export class ApiError extends AppError {
     }
 
     static fromAxiosError(error: AxiosError): ApiError {
-        const response = error.response;
+        logger.debug("fromAxiosError", error);
+        const response = error.response as any;
 
         if (!response) {
             return ApiError.parseError();
         }
 
-        const data: any = response.data;
-        if (!data) {
-            return ApiError.parseError();
-        }
+        const data = response.data as any;
 
-        const message: string = data.message as string;
-        const description: string = data.description as string;
-
-        logger.debug("message", message);
+        const message: string = data["message"] as string;
+        const description: string = data["description"] as string;
+        const statusCode: number | undefined = error.status;
 
         return new ApiError({
             message,
             description,
-            statusCode: response.status,
+            statusCode: statusCode,
         });
     }
 

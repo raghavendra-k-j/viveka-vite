@@ -3,6 +3,7 @@ import { useSubmitStore } from "../SubmitContext";
 import { InteractionContext } from "./InteractionContext";
 import { InteractionStore } from "./InteractionStore";
 import { STT } from "~/infra/utils/stt/STT";
+import { useDialogManager } from "~/ui/widgets/dialogmanager";
 
 type InteractionProviderProps = {
     children: ReactNode;
@@ -11,11 +12,15 @@ type InteractionProviderProps = {
 export function InteractionProvider({ children }: InteractionProviderProps) {
     const parentStore = useSubmitStore();
     const sttRef = useRef<STT | null>(null);
+    const dialogManager = useDialogManager();
 
     const store = useMemo<InteractionStore>(() => {
-        const store = new InteractionStore({ parentStore });
+        const store = new InteractionStore({
+            parentStore,
+            dialogManager,
+        });
         return store;
-    }, [parentStore]);
+    }, [parentStore, dialogManager]);
 
     useEffect(() => {
         if (!sttRef.current) {

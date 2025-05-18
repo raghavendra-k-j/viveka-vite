@@ -4,6 +4,8 @@ import type { AppError } from "~/core/error/AppError";
 import type { FormRepo } from "~/infra/repos/FormRepo";
 import type { QuestionRes } from "../models/QuestionsRes";
 import { SubmitFormReq, SubmitFormRes } from "../models/submit/SubmitFormModels";
+import { GetAppUserReq } from "../models/submit/GetAppUserReq";
+import { GetAppUserRes } from "../models/submit/GetAppUserRes";
 
 export class FormService {
 
@@ -28,6 +30,30 @@ export class FormService {
         const res = await this.formRepo.submitForm(req);
         return res;
     }
+
+    async getAppUser(req: GetAppUserReq): Promise<ResEither<AppError, GetAppUserRes>> {
+        const res = await this.formRepo.getAppUser(req);
+        return res;
+    }
+
+    async verifyGetAppUser({
+        formId,
+        id,
+        otp,
+    }: {
+        formId: number;
+        id: number;
+        otp: string;
+    }): Promise<ResEither<AppError, GetAppUserRes>> {
+        const res = await this.formRepo.verifyGetAppUser({ formId, id, otp });
+        return res;
+    }
+
+    async resendSubmitFormOtp({ otpId, formId }: { otpId: number; formId: number }): Promise<ResEither<AppError, number>> {
+        const res = await this.formRepo.resendSubmitFormOtp({ otpId, formId });
+        return res;
+    }
+
 
 
 }

@@ -10,13 +10,19 @@ import { InstanceId } from "~/core/utils/InstanceId";
 import { SubmitFormQuestion } from "~/domain/forms/models/SubmitFormQuestion";
 import { GroupQuestionVm } from "./models/GroupQuestionVm";
 import { SubmitFormReq, SubmitFormRes } from "~/domain/forms/models/submit/SubmitFormModels";
+import { SimpleOverlay } from "~/ui/components/overlays/SimpleOverlays";
+import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
 
 type InteractionStoreProps = {
     parentStore: SubmitStore;
+    dialogManager: DialogManagerStore;
 };
 
 export class InteractionStore {
+
     parentStore: SubmitStore;
+    dialogManager: DialogManagerStore;
+
     vmState: DataState<InteractionVm>;
     startedOn!: Date;
     endedOn: Date | null = null;
@@ -29,6 +35,7 @@ export class InteractionStore {
     constructor(props: InteractionStoreProps) {
         logger.debug("Creating InteractionStore", this.instanceId);
         this.parentStore = props.parentStore;
+        this.dialogManager = props.dialogManager;
         this.vmState = DataState.init<InteractionVm>();
         makeObservable(this, {
             vmState: observable.ref,
@@ -144,10 +151,39 @@ export class InteractionStore {
         this.stopTimer();
         this.endedOn = new Date();
         await this.submitDataToServer();
+        // await this.mockSubmitDataToServer();
     }
+
+
+    private async mockSubmitDataToServer() {
+        runInAction(() => {
+            this.submitState = DataState.loading();
+            this.dialogManager.show({
+                id: "submit-form-overlay",
+                component: SimpleOverlay,
+                props: {
+                    message: "Submitting " + this.formType.name,
+                },
+            });
+        });
+        await new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(true);
+            }, 8000);
+        });
+
+        runInAction(() => {
+            this.submitState = DataState.init();
+            this.dialogManager.closeById("submit-form-overlay");
+        });
+    }
+
 
     private async submitDataToServer() {
         try {
+            runInAction(() => {
+                this.submitState = DataState.loading();
+            });
             const data = this.prepareDataToSubmit();
             const submitFormReq = new SubmitFormReq({
                 formId: this.parentStore.formDetail.id,
@@ -159,6 +195,7 @@ export class InteractionStore {
             const res = (await this.parentStore.formService.submitForm(submitFormReq)).getOrError();
             runInAction(() => {
                 this.submitState = DataState.data(res);
+                window.location.reload();
             });
         }
         catch (error) {
@@ -197,7 +234,9 @@ export class InteractionStore {
         return submitQuestions;
     }
 
+    onExitForm() {
 
+    }
 
 
     dispose() {
@@ -206,6 +245,7 @@ export class InteractionStore {
         this.stt.dispose();
         logger.debug("Disposed STT: ", this.stt.instanceId);
     }
+
 }
 
 

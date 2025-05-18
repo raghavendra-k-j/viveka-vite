@@ -24,9 +24,29 @@
   z-index: 20;
 }
 
+.bottom-sheet-scaffold {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: auto;
+  display: flex;
+  align-items: flex-end;
+  width: 100vw;
+  z-index: 20;
+}
+
 .dialog-content {
   background-color: var(--color-surface);
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(10px);
   border-radius: var(--dimen-dialog-radius);
+}
+
+.dialog-scaffold > .dialog-content {
+  border-radius: var(--dimen-dialog-radius);
+}
+
+.bottom-sheet-scaffold > .dialog-content {
+  border-radius: var(--dimen-dialog-radius) var(--dimen-dialog-radius) 0 0;
 }

@@ -3,7 +3,9 @@
   --button-py: var(--dimen-button-md-py);
   --button-font-size: var(--dimen-button-md-font-size);
   --button-min-height: var(--dimen-button-md-min-height);
-  --button-radius: var(--dimen-button-radius, 0.5rem);
+  --button-radius: var(--dimen-button-radius);
+  --btn-ldr-size: var(--dimen-button-md-ldr-size);
+  --btn-ldr-margin: var(--dimen-button-md-ldr-margin);
 
   display: inline-flex;
   align-items: center;
@@ -48,6 +50,17 @@
   --button-py: var(--dimen-button-md-py);
   --button-font-size: var(--dimen-button-md-font-size);
   --button-min-height: var(--dimen-button-md-min-height);
+  --btn-ldr-size: var(--dimen-button-md-ldr-size);
+  --btn-ldr-margin: var(--dimen-button-md-ldr-margin);
+}
+
+.btn--sm {
+  --button-px: var(--dimen-button-sm-px);
+  --button-py: var(--dimen-button-sm-py);
+  --button-font-size: var(--dimen-button-sm-font-size);
+  --button-min-height: var(--dimen-button-sm-min-height);
+  --btn-ldr-size: var(--dimen-button-sm-ldr-size);
+  --btn-ldr-margin: var(--dimen-button-sm-ldr-margin);
 }
 
 .btn--primary {
@@ -79,8 +92,9 @@
 
 .btn-filled:disabled,
 .btn-filled.is-disabled {
-  background-color: var(--button-bg-color-disabled, var(--color-slate-300));
-  color: var(--button-text-color-disabled, var(--color-slate-500));
+  /* background-color: var(--button-bg-color-disabled, var(--color-slate-300));
+  color: var(--button-text-color-disabled, var(--color-slate-500)); */
+  cursor: not-allowed;
 }
 
 .btn-outlined:disabled,
@@ -88,4 +102,15 @@
   border-color: var(--button-border-color-disabled, var(--color-slate-300));
   color: var(--button-text-color-disabled, var(--color-slate-500));
   background-color: transparent;
+}
+
+.btn .loader-icon {
+  margin-right: var(--btn-ldr-margin);
+  width: var(--btn-ldr-size);
+  height: var(--btn-ldr-size);
+}
+
+.btn .loader-icon > svg {
+  width: 100%;
+  height: 100%;
 }

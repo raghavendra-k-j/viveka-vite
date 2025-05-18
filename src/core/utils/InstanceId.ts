@@ -1,3 +1,5 @@
+import { boolean } from "zod";
+
 export class InstanceId {
 
     static generate(ref?: string): string {
@@ -46,6 +48,12 @@ export class InstanceId {
 
         // Generate a random index to select an animal from the list
         const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
+
+        const enableRandomId = false;
+        if (!enableRandomId) {
+            return `${ref}-${randomAnimal}`;
+        }
+
 
         // Generate a random number (you can specify the range or length here)
         const randomId = Math.floor(Math.random() * 1000000); // Random number from 0 to 999999
