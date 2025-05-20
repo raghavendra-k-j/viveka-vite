@@ -7,6 +7,9 @@ import { QuestionRes } from "~/domain/forms/models/QuestionsRes";
 import { SubmitFormReq, SubmitFormRes } from "~/domain/forms/models/submit/SubmitFormModels";
 import { GetAppUserRes } from "~/domain/forms/models/submit/GetAppUserRes";
 import { GetAppUserReq } from "~/domain/forms/models/submit/GetAppUserReq";
+import { FormResponseDetail } from "~/domain/forms/models/FormResponseDetail";
+import { RDQuestionsReq } from "~/domain/forms/models/RDQuestionsReq";
+import { RDQuestionsRes } from "~/domain/forms/models/RDQuestionsRes";
 
 export class FormRepo {
 
@@ -108,6 +111,37 @@ export class FormRepo {
             return ResEither.error(apiError);
         }
     }
+
+
+    async getFormResponseDetail({ formId, responseUid, }: { formId: number; responseUid: string; }): Promise<ResEither<ApiError, FormResponseDetail>> {
+        try {
+            const response = await this.axios.get(`/api/v1/forms/${formId}/responses/${responseUid}`);
+            const detail = FormResponseDetail.fromJson(response.data);
+            logger.debug("Form response detail:", { detail });
+            return ResEither.data(detail);
+        }
+        catch (error) {
+            const apiError = ApiError.fromAny(error);
+            return ResEither.error(apiError);
+        }
+    }
+
+    async getFormResponseDetailQuestions(req: RDQuestionsReq): Promise<ResEither<ApiError, RDQuestionsRes>> {
+        try {
+            const params = req.toJson();
+            const response = await this.axios.get(
+                `/api/v1/forms/${req.formId}/responses/${req.responseUid}/questions`,
+                { params }
+            );
+            const questionsRes = RDQuestionsRes.fromJson(response.data);
+            return ResEither.data(questionsRes);
+        } catch (error) {
+            const apiError = ApiError.fromAny(error);
+            logger.error("Error in getFormResponseDetailQuestions:", error);
+            return ResEither.error(apiError);
+        }
+    }
+
 
 
 

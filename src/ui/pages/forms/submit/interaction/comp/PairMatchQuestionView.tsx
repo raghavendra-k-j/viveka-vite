@@ -4,6 +4,7 @@ import type { PairMatchQuestionVm } from "../models/PairMatchQuestionVm";
 import { QuestionHeaderView } from "./QuestionHeaderView";
 import { QuestionCardView } from "./QuestionCardView";
 import { GroupQuestionVm } from "../models/GroupQuestionVm";
+import { PairMatchRowText } from "~/ui/components/form/commons/QuestionText";
 
 interface Props {
     vm: PairMatchQuestionVm;
@@ -29,7 +30,7 @@ export const PairMatchQuestionView: React.FC<Props> = observer(({ vm, parentVm }
                     {vm.items.map((item, index) => (
                         <tr key={item.rowId} className="hover:bg-gray-50 transition">
                             <td className="p-3 align-top border-t border-gray-200">
-                                <div className="text-gray-800">{item.colAText}</div>
+                                <div className="text-gray-800"><PairMatchRowText text={item.colAText}/></div>
                             </td>
                             <td className="p-3 align-top border-t border-gray-200">
                                 <div className="flex flex-col gap-2">

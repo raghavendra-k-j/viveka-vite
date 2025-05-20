@@ -5,7 +5,7 @@ import { AiSTTReq, AiSTTRes, TokenUsage } from "../models/AiSTTModels";
 import { ModelResponseParser } from "./ModelResponseParser";
 
 export class AiSTTService {
-    private readonly API_KEY = "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";
+    private readonly API_KEY = "API_KEY_HERE";
     private readonly MODEL = "gpt-4o";
 
     public async generateResponse(req: AiSTTReq): Promise<ResEither<AiSTTError, AiSTTRes>> {

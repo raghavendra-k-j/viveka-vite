@@ -10,6 +10,8 @@ import { AppUserType } from "~/domain/common/models/AppUserType";
 export class AuthService {
 
 
+
+
     private readonly authRepo: AuthRepo;
 
     constructor(authRepo: AuthRepo) {
@@ -37,6 +39,11 @@ export class AuthService {
 
     async checkAuthEmailOTPStatus(otpId: number): Promise<ResEither<ApiError, EmailOtpStatus | undefined>> {
         return this.authRepo.checkAuthEmailOTPStatus(otpId);
+    }
+
+    async clearTokenLocally() {
+        Cookies.remove(AuthConst.keyAccessToken);
+        Cookies.remove(AuthConst.keyAppUserType);
     }
 
 

@@ -6,6 +6,9 @@ import type { QuestionRes } from "../models/QuestionsRes";
 import { SubmitFormReq, SubmitFormRes } from "../models/submit/SubmitFormModels";
 import { GetAppUserReq } from "../models/submit/GetAppUserReq";
 import { GetAppUserRes } from "../models/submit/GetAppUserRes";
+import { FormResponseDetail } from "../models/FormResponseDetail";
+import { RDQuestionsReq } from "../models/RDQuestionsReq";
+import { RDQuestionsRes } from "../models/RDQuestionsRes";
 
 export class FormService {
 
@@ -55,6 +58,14 @@ export class FormService {
     }
 
 
+    async getFormResponseDetail({ formId, responseUid }: { formId: number; responseUid: string }): Promise<ResEither<AppError, FormResponseDetail>> {
+        return await this.formRepo.getFormResponseDetail({ formId, responseUid });
+    }
+
+    async getFormResponseDetailQuestions(req: RDQuestionsReq): Promise<ResEither<AppError, RDQuestionsRes>> {
+        const res = await this.formRepo.getFormResponseDetailQuestions(req);
+        return res;
+    }
 
 }
 

@@ -1,12 +1,6 @@
+import { JsonObj } from "~/core/types/Json";
 import { AiEvalStatus } from "./AiEvalStatus";
 
-export type FormAiEvalJson = {
-    id: number;
-    responseId: number;
-    status: string;
-    statusMessage?: string;
-    statusDate: string;
-};
 
 export type FormAiEvalParams = {
     id: number;
@@ -31,7 +25,7 @@ export class FormAiEval {
         this.statusMessage = statusMessage;
     }
 
-    static deserialize(json: FormAiEvalJson): FormAiEval {
+    static fromJson(json: JsonObj): FormAiEval {
         return new FormAiEval({
             id: json.id,
             responseId: json.responseId,
@@ -39,15 +33,5 @@ export class FormAiEval {
             statusDate: new Date(json.statusDate),
             statusMessage: json.statusMessage
         });
-    }
-
-    serialize(): FormAiEvalJson {
-        return {
-            id: this.id,
-            responseId: this.responseId,
-            status: this.status.value,
-            statusMessage: this.statusMessage,
-            statusDate: this.statusDate.toISOString(),
-        };
     }
 }

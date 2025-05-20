@@ -32,7 +32,7 @@ export class FormAccess {
         };
     }
 
-    static deserialize(json: FormAccessJson): FormAccess {
+    static fromJson(json: FormAccessJson): FormAccess {
         return new FormAccess({
             id: json.id,
             sharedAt: json.sharedAt ? new Date(json.sharedAt) : null,

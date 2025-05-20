@@ -45,7 +45,7 @@ export class SubmitFormRes {
 
     static deserialize(json: JsonObj): SubmitFormRes {
         return new SubmitFormRes({
-            formResponse: FormResponse.deserialize(json.formResponse),
+            formResponse: FormResponse.fromJson(json.formResponse),
         });
     }
 }

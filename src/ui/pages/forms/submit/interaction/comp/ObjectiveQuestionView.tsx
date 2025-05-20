@@ -7,6 +7,7 @@ import { colors } from "~/ui/ds/core/colors";
 import { FaRegSquare, FaRegCircle } from "react-icons/fa";
 import { FaSquareCheck, FaCircleDot } from "react-icons/fa6";
 import { GroupQuestionVm } from "../models/GroupQuestionVm";
+import { ChoiceText } from "~/ui/components/form/commons/QuestionText";
 
 
 type ObjectiveQuestionViewProps = {
@@ -68,7 +69,7 @@ export const ChoiceItem = observer(function ChoiceItem({ vm, choice }: ChoiceIte
             ${isSelected ? "bg-primary-50" : ""}`}
         >
             <Icon size={20} color={iconColor} />
-            <span>{choice.text}</span>
+            <ChoiceText text={choice.text}/>
         </button>
     );
 });

@@ -1,9 +1,5 @@
-export type LanguageJson = {
-    id: string;
-    name: string;
-    translateCode: string;
-    ttsCode: string;
-};
+import { JsonObj } from "~/core/types/Json";
+
 
 export class Language {
 
@@ -29,16 +25,7 @@ export class Language {
         this.ttsCode = ttsCode;
     }
 
-    serialize(): LanguageJson {
-        return {
-            id: this.id,
-            name: this.name,
-            translateCode: this.translateCode,
-            ttsCode: this.ttsCode
-        };
-    }
-
-    static deserialize(json: LanguageJson): Language {
+    static fromJson(json: JsonObj): Language {
         return new Language({
             id: json.id,
             name: json.name,

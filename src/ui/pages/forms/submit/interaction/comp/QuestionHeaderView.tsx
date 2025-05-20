@@ -3,7 +3,8 @@ import { SpeakButton } from "./SpeakButton";
 import { MarksBadge, QuestionTypeBadge } from "~/ui/components/question/QuestionBadges";
 import { NumFmt } from "~/core/utils/NumFmt";
 import { QNumberUtil } from "~/domain/forms/utils/QNumberUtil";
-import { FillBlankToHtmlConverter } from "~/ui/utils/forms/FillBlankToHtmlConverter";
+import { QuestionText } from "~/ui/components/form/commons/QuestionText";
+import { HintTextView } from "~/ui/components/form/commons/HintText";
 
 type QuestionHeaderProps = {
   vm: QuestionVm;
@@ -19,13 +20,12 @@ export const QuestionHeaderView = (props: QuestionHeaderProps) => {
         </div>
         <SpeakButton vm={props.vm} />
       </div>
-      <div className="text-default text-sm font-medium mt-2">
-        {props.vm.base.isRequired.isTrue && <span className="text-red-500">*&nbsp;</span>}
-        <span>Q{QNumberUtil.getQNumber(props.vm.base.dOrder)}. </span>
-        <span
-          dangerouslySetInnerHTML={{ __html: FillBlankToHtmlConverter.convert(props.vm.base.question) }}
-        />
-      </div>
+      <QuestionText
+        asterisk={props.vm.base.isRequired.isTrue}
+        number={`${QNumberUtil.getQNumber(props.vm.base.dOrder, )}`}
+        question={props.vm.base.question}
+      />
+      {props.vm.base.ansHint && (<HintTextView className="mt-2" hint={props.vm.base.ansHint}/>)}
     </div>
   );
 };

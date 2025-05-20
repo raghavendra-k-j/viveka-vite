@@ -22,6 +22,7 @@ export class AppStore {
     authService: AuthService;
     authState: DataState<undefined> = DataState.init();
     public _appUser: AbsUser | null = null;
+    public _authToken: AuthToken | null = null;
 
     get appUser(): AbsUser {
         return this._appUser!;
@@ -35,12 +36,22 @@ export class AppStore {
         return this._appUser;
     }
 
+    get authToken(): AuthToken {
+        return this._authToken!;
+    }
+
+    get optAuthToken(): AuthToken | null {
+        return this._authToken;
+    }
+
+
+
     constructor({ appEnv, orgConfig }: { appEnv: AppEnv, orgConfig: OrgConfig }) {
         this.appEnv = appEnv;
         this.orgConfig = orgConfig;
         BaseApiClient.createInstace({ baseURL: this.appEnv.apiBase });
         ApiClient.createInstace({ baseURL: this.appEnv.apiBase });
-        addAuthInterceptor();
+        addAuthInterceptor({ appStore: this });
         makeObservable(this, {
             _appUser: observable.ref
         });
@@ -66,9 +77,9 @@ export class AppStore {
                 throw new Error("accessToken is null");
             }
             const res = (await this.authService.softLogin(accessToken)).getOrError();
-            runInAction(() => {
-                this._appUser = res.user;
-                this.authState = DataState.data(undefined);
+            await this.updateAuthResponse({
+                user: res.user,
+                authToken: AuthToken.fromAccessToken(accessToken),
             });
         }
         catch (err) {
@@ -88,16 +99,19 @@ export class AppStore {
     }
 
     async updateAuthResponse({ user, authToken }: { user: AbsUser, authToken: AuthToken }) {
-        await this.authService.saveTokenLocally({
-            accessToken: authToken.accessToken,
-            appUserType: user.appUserType,
-        });
+        await this.authService.clearTokenLocally();
+        if (user.appUserType.isRegUser) {
+            await this.authService.saveTokenLocally({
+                accessToken: authToken.accessToken,
+                appUserType: user.appUserType,
+            });
+        }
+
         runInAction(() => {
             this._appUser = user;
+            this._authToken = authToken;
         });
     }
-
-
 
 
 

@@ -4,11 +4,14 @@ import { AppBar } from '../comp/AppBar';
 import AppBarLogo from '~/ui/components/AppBarLogo';
 import FilledButton from '~/ui/widgets/button/FilledButton';
 import OutlinedButton from '~/ui/widgets/button/OutlinedButton';
+import { ProfileView } from '../comp/profile/ProfileView';
+import { useViewResponse } from './useViewResponse'; // new hook
+import { Card, Title, Message } from './SubmitCommon';
 
 export function SubmittedFragment() {
     return (
         <>
-            <AppBar leading={<AppBarLogo />} />
+            <AppBar leading={<AppBarLogo />} trailing={<ProfileView />} />
             <Body />
         </>
     );
@@ -16,7 +19,7 @@ export function SubmittedFragment() {
 
 function Body() {
     const store = useSubmitStore();
-    return !store.formDetail.type.isSurvey ? <Survey /> : <Assessment />;
+    return store.formDetail.type.isSurvey ? <Survey /> : <Assessment />;
 }
 
 function SuccessCheckMark() {
@@ -30,62 +33,31 @@ function SuccessCheckMark() {
 }
 
 function ReturnToHomeButton() {
+    return null;
     const store = useSubmitStore();
     return (
-        <OutlinedButton onClick={() => {
-            const url = store.returnToHomeURL;
-            window.location.href = url;
-        }}>
+        <OutlinedButton onClick={() => (window.location.href = store.returnToHomeURL)}>
             Return to Home
         </OutlinedButton>
-    );
-}
-
-function Title({ children }: { children: React.ReactNode }) {
-    return (
-        <h1 className="text-lg font-semibold text-default mb-2 text-center">
-            {children}
-        </h1>
-    );
-}
-
-function Message({ children }: { children: React.ReactNode }) {
-    return (
-        <p className="text-secondary text-base-m mt-2 text-center">
-            {children}
-        </p>
-    );
-}
-
-function Card({ children }: { children: React.ReactNode }) {
-    return (
-        <div className="p-4 sm:pt-16 flex justify-center items-start">
-            <div className="bg-surface shadow-sm rounded-sm p-6 w-full max-w-md text-center">
-                {children}
-            </div>
-        </div>
     );
 }
 
 function Assessment() {
     const store = useSubmitStore();
     const title = store.formDetail.title;
+    const viewResponse = useViewResponse();
 
     return (
         <Card>
             <SuccessCheckMark />
-
             <Title>Assessment Submitted</Title>
-
             <Message>
                 Your responses for&nbsp;
-                <span className="font-medium text-default">"{title}"</span> have been successfully submitted.
+                <span className="font-medium text-default">"{title}"</span>&nbsp;have been successfully submitted.
             </Message>
 
             <div className="flex flex-col gap-3 mt-8">
-                <FilledButton>
-                    View Results
-                </FilledButton>
+                <FilledButton onClick={viewResponse}>View Results</FilledButton>
                 <ReturnToHomeButton />
             </div>
         </Card>
@@ -95,22 +67,19 @@ function Assessment() {
 function Survey() {
     const store = useSubmitStore();
     const title = store.formDetail.title;
+    const viewResponse = useViewResponse();
 
     return (
         <Card>
             <SuccessCheckMark />
-
             <Title>Thank You for Your Response</Title>
-
             <Message>
                 Your response to&nbsp;
-                <span className="font-medium text-default">"{title}"</span> has been successfully recorded.
+                <span className="font-medium text-default">"{title}"</span>&nbsp;has been successfully recorded.
             </Message>
 
             <div className="flex flex-col gap-3 mt-8">
-                <FilledButton>
-                    View Response
-                </FilledButton>
+                <FilledButton onClick={viewResponse}>View Response</FilledButton>
                 {store.hasBackNavigation && <ReturnToHomeButton />}
             </div>
         </Card>

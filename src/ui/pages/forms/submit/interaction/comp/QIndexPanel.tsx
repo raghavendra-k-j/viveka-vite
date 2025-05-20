@@ -30,8 +30,8 @@ function QuestionIndexItem({
                 });
 
                 const qNumber = parentVm
-                    ? QNumberUtil.getQNumber(parentVm.base.dOrder, vm.base.dOrder)
-                    : QNumberUtil.getQNumber(vm.base.dOrder);
+                    ? QNumberUtil.getQNumberDot(parentVm.base.dOrder, vm.base.dOrder)
+                    : QNumberUtil.getQNumberDot(vm.base.dOrder);
 
                 return (
                     <div

@@ -24,7 +24,6 @@ export async function bootApp(): Promise<void> {
     // Create Api Clients
     BaseApiClient.createInstace({ baseURL: appEnv.apiBase });
     ApiClient.createInstace({ baseURL: appEnv.apiBase });
-    addAuthInterceptor();
 
     // Create Config Service
     const configService = new ConfigService();

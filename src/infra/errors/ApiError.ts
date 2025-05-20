@@ -29,7 +29,7 @@ export class ApiError extends AppError {
     }
 
     static fromAxiosError(error: AxiosError): ApiError {
-        logger.debug("fromAxiosError", error);
+        logger.error("fromAxiosError", error, error.stack);
         const response = error.response as any;
 
         if (!response) {

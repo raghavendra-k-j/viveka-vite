@@ -79,4 +79,24 @@ export class DataState<Data> {
                 throw new Error('Unhandled state in DataState.when()');
         }
     }
+
+    stateWhen<T>(handlers: {
+        initOrLoading: () => T;
+        loaded: (data: Data) => T;
+        error: (error: AppError) => T;
+    }): T {
+        switch (this.stateValue) {
+            case DataStateState.INIT:
+            case DataStateState.LOADING:
+                return handlers.initOrLoading();
+            case DataStateState.LOADED:
+                return handlers.loaded(this.dataValue as Data);
+            case DataStateState.ERROR:
+                return handlers.error(this.errorValue as AppError);
+            default:
+                throw new Error('Unhandled state in DataState.stateWhen()');
+        }
+    }
+
+
 }

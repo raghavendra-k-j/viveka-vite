@@ -1,32 +1,10 @@
-import { UserBase, type UserBaseJson } from "~/domain/common/models/UserBase";
+import { UserBase } from "~/domain/common/models/UserBase";
 import { EvaluationType } from "./EvaluationType";
-import { FormUser, type FormUserJson } from "./FormUser";
-import { Language, type LanguageJson } from "./Language";
-import { GuestBase, type GuestBaseJson } from "~/domain/common/models/GuestBase";
+import { FormUser } from "./FormUser";
+import { Language } from "./Language";
+import { GuestBase } from "~/domain/common/models/GuestBase";
+import { JsonObj } from "~/core/types/Json";
 
-export type FormResponseJson = {
-    id: number;
-    uid: string;
-    submittedLanguage: LanguageJson;
-    submittedAt: string;
-    startedAt: string;
-    endedAt: string;
-    isEvaluated: boolean | null;
-    evaluationType: string | null;
-    evaluatedOn: string | null;
-    evaluator: FormUserJson | null;
-    timeTaken: number;
-    marks: number | null;
-    percentage: number | null;
-    attemptedQCount: number;
-    correctQCount: number | null;
-    incorrectQCount: number | null;
-    partiallyCorrectQCount: number | null;
-    updatedAt: string;
-    user: UserBaseJson | null;
-    guest: GuestBaseJson | null;
-    [key: string]: any;
-};
 
 
 export type FormResponseProps = {
@@ -118,13 +96,13 @@ export class FormResponse {
     readonly user: UserBase | null;
     readonly guest: GuestBase | null;
 
-    static deserialize(json: FormResponseJson): FormResponse {
+    static fromJson(json: JsonObj): FormResponse {
         const parseDate = (s: string | null) => (s ? new Date(s) : null);
 
         return new FormResponse({
             id: json.id,
             uid: json.uid,
-            submittedLanguage: Language.deserialize(json.submittedLanguage),
+            submittedLanguage: Language.fromJson(json.submittedLanguage),
             submittedAt: new Date(json.submittedAt),
             startedAt: new Date(json.startedAt),
             endedAt: new Date(json.endedAt),
@@ -143,30 +121,5 @@ export class FormResponse {
             user: (json.user ?? json.userTile) ? UserBase.fromJson(json.user ?? json.userTile) : null,
             guest: (json.guest ?? json.guestTile) ? GuestBase.fromJson(json.guest ?? json.guestTile) : null
         });
-    }
-
-    serialize(): FormResponseJson {
-        return {
-            id: this.id,
-            uid: this.uid,
-            submittedLanguage: this.submittedLanguage.serialize(),
-            submittedAt: this.submittedAt.toISOString(),
-            startedAt: this.startedAt.toISOString(),
-            endedAt: this.endedAt.toISOString(),
-            isEvaluated: this.isEvaluated,
-            evaluationType: this.evaluationType ? this.evaluationType.type : null,
-            evaluatedOn: this.evaluatedOn ? this.evaluatedOn.toISOString() : null,
-            evaluator: this.evaluator ? this.evaluator.serialize() : null,
-            timeTaken: this.timeTaken,
-            marks: this.marks,
-            percentage: this.percentage,
-            attemptedQCount: this.attemptedQCount,
-            correctQCount: this.correctQCount,
-            incorrectQCount: this.incorrectQCount,
-            partiallyCorrectQCount: this.partiallyCorrectQCount,
-            updatedAt: this.updatedAt.toISOString(),
-            user: this.user ? this.user.serialize() : null,
-            guest: this.guest ? this.guest.serialize() : null
-        };
     }
 }
