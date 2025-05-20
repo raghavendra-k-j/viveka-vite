@@ -1,0 +1,49 @@
+.rich-pm-editor-wrapper {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.toolbar {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+  background-color: #f7f7f7;
+}
+
+.toolbar button {
+  margin-right: 6px;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.toolbar button:hover {
+  background-color: #f0f0f0;
+}
+
+.editor-content {
+  padding: 12px;
+  min-height: 150px;
+  outline: none; /* Handled by ProseMirror's contentEditable */
+}
+
+/* Styling for the ProseMirror editor itself */
+.ProseMirror {
+  outline: none;
+}
+
+/* Styling for your custom user_mention node (can also be in UserMentionNodeView.ts if preferred using CSS-in-JS or direct style manipulation) */
+.ProseMirror .user-mention-nodeview {
+  /* Or the class you used in UserMentionNodeView if different from schema's toDOM */
+  /* Styles are mostly applied directly in UserMentionNodeView.ts for this example,
+     but you can add more general styles here.
+     Example:
+     display: inline-block;
+  */
+}
+
+.ProseMirror p {
+  margin: 0 0 0.5em 0; /* Basic paragraph spacing */
+}
