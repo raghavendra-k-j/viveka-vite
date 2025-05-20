@@ -14,43 +14,29 @@ export const schema = new Schema({
         text: {
             group: "inline"
         },
-        user_mention: {
+        latex: {
             group: "inline",
             inline: true,
             atom: true,
             attrs: {
-                email: { default: "" }
+                latex: {
+                    default: ""
+                }
             },
             toDOM(node) {
                 return [
-                    "span",
-                    {
-                        "data-user-email": node.attrs.email,
-                        style: "padding: 2px 4px; border-radius: 3px; cursor: pointer;"
+                    "span", {
+                        "data-latex": node.attrs.latex,
                     },
-                    node.attrs.email
+                    node.attrs.latex
                 ];
             },
             parseDOM: [{
-                tag: "span[data-user-email]",
+                tag: "span[data-latex]",
                 getAttrs(dom) {
-                    return { email: (dom as HTMLElement).getAttribute("data-user-email") };
+                    return { latex: (dom as HTMLElement).getAttribute("data-latex") };
                 }
             }],
         },
-    },
-    marks: {
-        strong: {
-            parseDOM: [{ tag: "strong" }, { tag: "b" }, { style: "font-weight=bold" }],
-            toDOM() { return ["strong", 0]; }
-        },
-        em: {
-            parseDOM: [{ tag: "em" }, { tag: "i" }, { style: "font-style=italic" }],
-            toDOM() { return ["em", 0]; }
-        },
-        underline: {
-            parseDOM: [{ tag: "u" }, { style: "text-decoration=underline" }],
-            toDOM() { return ["u", 0]; }
-        }
     }
 });

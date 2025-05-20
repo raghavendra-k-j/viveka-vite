@@ -2,6 +2,13 @@
   --color-input-border: var(--color-slate-200);
   --dimen-input-radius: 4px;
   --toastify-font-family: var(--font-default);
+
+  --color-input-bg: var(--color-surface);
+  --color-input-border: var(--color-slate-300);
+  --color-input-border-hover: var(--color-slate-400);
+  --color-input-border-focus: var(--color-primary);
+  --color-input-placeholder: var(--color-text-tertiary);
+  --shadow-input: 0 0 0 1px var(--color-primary);
 }
 
 html {

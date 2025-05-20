@@ -3,6 +3,7 @@ import { TextAreaQuestionView } from "../comp/TextAreaQuestionView";
 import { QuestionVm, type QuestionRendererProps, type QuestionVmProps } from "./QuestionVm";
 import { computed, makeObservable, observable, runInAction } from "mobx";
 import { Answer, TextAreaAnswer } from "~/domain/forms/models/answer/Answer";
+import { Node as ProseMirrorNode } from 'prosemirror-model';
 
 type TextAreaQuestionVmProps = QuestionVmProps & {};
 
@@ -17,9 +18,10 @@ export class TextAreaQuestionVm extends QuestionVm {
         });
     }
 
-    public onAnsStrChanged(value: string): void {
+    public onAnsStrChanged(value: ProseMirrorNode): void {
         runInAction(() => {
-            this.ansStr = value;
+            logger.debug("TextAreaQuestionVm: onAnsStrChanged: ", JSON.stringify(value.toJSON()));
+            this.ansStr = value.textContent ?? "";
         });
         this.validate();
     }
@@ -36,7 +38,6 @@ export class TextAreaQuestionVm extends QuestionVm {
     }
 
     render(props: QuestionRendererProps): React.JSX.Element {
-        logger.debug("Rendering TextAreaQuestionVm with instance id: ", this.instanceId, " and STT instance id: ", this.base.store.parentStore.stt.instanceId);
         return <TextAreaQuestionView vm={this} parentVm={props.parentVm} />;
     }
 
