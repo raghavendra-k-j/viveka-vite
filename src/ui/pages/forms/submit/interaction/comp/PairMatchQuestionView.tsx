@@ -12,6 +12,7 @@ interface Props {
 }
 
 export const PairMatchQuestionView: React.FC<Props> = observer(({ vm, parentVm }) => {
+    return null;
     const handleSelectionChange = (index: number, selectedRowId: number | null) => {
         vm.setSelectedRowIdForItem(index, selectedRowId);
     };

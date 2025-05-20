@@ -11,9 +11,10 @@ type LaTexNodeViewProps = {
     onClick: OnClickLaTexNodeView;
 }
 
-type OnClickLaTexNodeView = (node: LaTexNodeView) => void;
+export type OnClickLaTexNodeView = (node: LaTexNodeView) => void;
 
 export class LaTexNodeView implements NodeView {
+
     public dom: HTMLElement;
     private node: ProseMirrorNode;
     private view: EditorView;
@@ -29,6 +30,14 @@ export class LaTexNodeView implements NodeView {
         this.dom.classList.add('latex-nodeview');
         this.renderContent();
         this.dom.addEventListener('click', this.handleClick);
+    }
+
+    get getView(): EditorView {
+        return this.view;
+    }
+
+    getLaTex() {
+        return this.node.attrs.latex;
     }
 
     private renderContent(): void {
@@ -64,6 +73,14 @@ export class LaTexNodeView implements NodeView {
         }
         return true;
     }
+
+    public updateLaTex(latex: string): void {
+        const pos = this.getPos();
+        if (pos === undefined) return;
+        this.view.dispatch(this.view.state.tr.setNodeMarkup(pos, undefined, { latex }));
+        this.renderContent();
+    }
+
 
     public stopEvent(event: Event): boolean {
         return event instanceof MouseEvent && event.target === this.dom && !!this.onClick;

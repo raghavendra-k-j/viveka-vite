@@ -33,6 +33,10 @@ export class DataState<Data> {
         return new DataState<Data>(DataStateState.ERROR, null, error);
     }
 
+    get isInitOrLoading(): boolean {
+        return this.stateValue === DataStateState.INIT || this.stateValue === DataStateState.LOADING;
+    }
+
     get isInit(): boolean {
         return this.stateValue === DataStateState.INIT;
     }

@@ -28,3 +28,12 @@
   color: var(--color-input-placeholder);
   pointer-events: none;
 }
+
+
+.latex-nodeview {
+  display: inline-block;
+  background-color: var(--color-slate-50);
+  padding: 0.25rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}

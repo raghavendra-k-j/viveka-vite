@@ -39,6 +39,8 @@ export function MobileFooterView() {
 
     return (
         <div className="z-50
+                        fixed bottom-0 left-0 right-0
+                        w-full
                         bg-surface
                         shadow-xl px-4 py-2 
                         flex justify-between items-center 

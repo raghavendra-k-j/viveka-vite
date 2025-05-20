@@ -1,4 +1,3 @@
-import { logger } from "~/core/utils/logger";
 import { TextAreaQuestionView } from "../comp/TextAreaQuestionView";
 import { QuestionVm, type QuestionRendererProps, type QuestionVmProps } from "./QuestionVm";
 import { computed, makeObservable, observable, runInAction } from "mobx";
@@ -20,7 +19,6 @@ export class TextAreaQuestionVm extends QuestionVm {
 
     public onAnsStrChanged(value: ProseMirrorNode): void {
         runInAction(() => {
-            logger.debug("TextAreaQuestionVm: onAnsStrChanged: ", JSON.stringify(value.toJSON()));
             this.ansStr = value.textContent ?? "";
         });
         this.validate();

@@ -18,8 +18,9 @@ type ObjectiveQuestionViewProps = {
 export function ObjectiveQuestionView(props: ObjectiveQuestionViewProps) {
     return (
         <QuestionCardView parent={props.parentVm}>
+            {props.vm.base.question}
             <QuestionHeaderView vm={props.vm} />
-            <ChoiceList vm={props.vm} />
+            {/* <ChoiceList vm={props.vm} /> */}
         </QuestionCardView>
     );
 }
@@ -69,7 +70,7 @@ export const ChoiceItem = observer(function ChoiceItem({ vm, choice }: ChoiceIte
             ${isSelected ? "bg-primary-50" : ""}`}
         >
             <Icon size={20} color={iconColor} />
-            <ChoiceText text={choice.text}/>
+            <ChoiceText text={choice.text} />
         </button>
     );
 });

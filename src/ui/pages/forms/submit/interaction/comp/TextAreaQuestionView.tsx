@@ -11,6 +11,7 @@ type TextAreaQuestionViewProps = {
 
 
 export function TextAreaQuestionView({ vm, parentVm }: TextAreaQuestionViewProps) {
+    return null;
     return (
         <QuestionCardView parent={parentVm} >
             <QuestionHeaderView vm={vm} />

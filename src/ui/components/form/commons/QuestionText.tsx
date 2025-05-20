@@ -1,4 +1,6 @@
 import { questionMarkIt } from "./questionmarkit";
+import "katex/dist/katex.min.css";
+import DomPurify from "dompurify";
 
 export type QuestionTextProps = {
     number?: string | null;
@@ -12,7 +14,10 @@ export function QuestionText(props: QuestionTextProps) {
         <div className={`text-default text-sm font-medium ${props.className}`}>
             {props.asterisk && <span className="text-red-600 mr-1">*</span>}
             {props.number && <span className="mr-0.5">Q{props.number}. </span>}
-            <span dangerouslySetInnerHTML={{ __html: questionMarkIt.renderInline(props.question) }} />
+            <div className="katex-render text-sm leading-relaxed">
+                <span dangerouslySetInnerHTML={{ __html: DomPurify.sanitize(questionMarkIt.renderInline(props.question)) }} />
+            </div>
+            {/* <div dangerouslySetInnerHTML={{ __html: DomPurify.sanitize(questionMarkIt.renderInline(props.question)) }}></div> */}
         </div>
     );
 }
