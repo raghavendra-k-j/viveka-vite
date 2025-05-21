@@ -21,24 +21,26 @@ export function FormAuthFragment() {
 function Body() {
     const store = useFormAuthStore();
     return (
-        <>
+        <div className="h-screen flex flex-col">
             <AppBar
                 leading={<AppBarLogo />}
                 trailing={<ProfileView />}
             />
-            <Observer>
-                {() => {
-                    if (store.currentFragment === FormCurrentAuthFragment.CollectDetails) {
-                        return <CollectDetailsView />;
-                    } else if (store.currentFragment === FormCurrentAuthFragment.VerifyEmail) {
-                        return <VerifyEmailView />;
-                    }
-                    else {
-                        return <div>Unknown Fragment</div>;
-                    }
-                }}
-            </Observer>
-        </>
+            <main className="overflow-y-auto p-4 sm:p-6">
+                <Observer>
+                    {() => {
+                        if (store.currentFragment === FormCurrentAuthFragment.CollectDetails) {
+                            return <CollectDetailsView />;
+                        } else if (store.currentFragment === FormCurrentAuthFragment.VerifyEmail) {
+                            return <VerifyEmailView />;
+                        }
+                        else {
+                            return <div>Unknown Fragment</div>;
+                        }
+                    }}
+                </Observer>
+            </main>
+        </div>
     );
 }
 

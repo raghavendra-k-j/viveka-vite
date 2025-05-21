@@ -17,12 +17,12 @@ export function CollectDetailsView() {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <FormAuthCard>
-                
+        <FormAuthCard>
+            <form onSubmit={handleSubmit}>
+
                 <HeaderView
                     title={"Let's get started"}
-                    subTitle={"Please fill in your details to begin."}
+                    subTitle={"Please fill in your details to begin"}
                 />
 
                 <div className="flex flex-col gap-6 px-6 mt-2">
@@ -73,7 +73,7 @@ export function CollectDetailsView() {
                         )}
                     </Observer>
                 </div>
-            </FormAuthCard>
-        </form>
+            </form>
+        </FormAuthCard>
     );
 }

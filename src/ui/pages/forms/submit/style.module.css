@@ -1,14 +1,10 @@
 .appbar {
   background: linear-gradient(
     135deg,
-    var(--color-primary-600),
-    var(--color-primary-500)
+    var(--color-primary-800) 0%,
+    var(--color-primary-800) 100%
   );
-  /* background-color: #FFFFFF; */
   color: var(--color-on-primary);
-  /* position: sticky;
-  top: 0;
-  left: 0; */
   width: 100%;
   z-index: 10;
 }

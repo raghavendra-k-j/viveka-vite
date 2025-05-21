@@ -25,7 +25,7 @@ export function VerifyEmailView() {
                     subTitle={
                         <>
                             An OTP has been sent to{" "}
-                            <span className="font-medium">{store.email.value}</span>. Please enter it below to verify.
+                            <span className="font-semibold">{store.email.value}</span>. Please enter it below to verify.
                         </>
                     }
                 />

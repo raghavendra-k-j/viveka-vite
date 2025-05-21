@@ -55,7 +55,7 @@ function Footer() {
     const hasEnded = endDate < now;
 
     return (
-        <div className="flex flex-col p-4 border-t border-default gap-4">
+        <div className="flex flex-col p-4 border-t border-default bg-slate-50 gap-4">
             {hasNotStarted && <NotStartedInfoView />}
             {hasEnded && <ClosedInfoView />}
             {store.formDetail.languages.length > 0 && !hasEnded && <SelectLanguageInput />}
