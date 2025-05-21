@@ -16,8 +16,6 @@ export type SubmitStoreProps = {
 };
 
 export class SubmitStore {
-
-
     permalink: string;
     currentFragment: CurrentFragment = CurrentFragment.Loading;
     selectedLanguage: Language | null = null;

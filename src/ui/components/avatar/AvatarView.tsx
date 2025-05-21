@@ -1,45 +1,43 @@
+import clsx from "clsx";
+import styles from "./styles.module.css";
 
-export type AvatarViewProps = {
-    name: string;
-    id: number;
-    size?: number;
-};
-
-const tailwindColors = [
-    "bg-red-500",
-    "bg-green-500",
-    "bg-blue-500",
-    "bg-yellow-500",
-    "bg-indigo-500",
-    "bg-pink-500",
-    "bg-purple-500",
-    "bg-teal-500",
-    "bg-orange-500",
-    "bg-cyan-500",
+export const avatarClasses = [
+    "bg-teal-400",
+    "bg-blue-400",
+    "bg-rose-400",
+    "bg-amber-400",
+    "bg-green-400",
+    "bg-purple-400",
+    "bg-pink-400",
+    "bg-orange-400",
+    "bg-cyan-400",
+    "bg-indigo-400",
+    "bg-lime-400",
+    "bg-emerald-400",
+    "bg-fuchsia-400",
+    "bg-violet-400",
+    "bg-yellow-400",
+    "bg-red-400",
 ];
 
-// Hash function to map ID to consistent color index
-function getColorClassById(id: number): string {
-    const index = id % tailwindColors.length;
-    return tailwindColors[index];
-}
 
-// Extract first character from name
-function getInitial(name: string): string {
-    return name?.trim()?.charAt(0).toUpperCase() || "?";
-}
 
-export function AvatarView({ name, id, size = 40 }: AvatarViewProps) {
-    const bgColor = getColorClassById(id);
-    const initial = getInitial(name);
-
+export const AvatarView = ({
+    id,
+    name,
+    fontSize,
+}: {
+    id: number;
+    name: string;
+    fontSize?: number | string;
+}) => {
+    const colorClass = avatarClasses[id % avatarClasses.length];
     return (
         <div
-            className={`flex items-center justify-center rounded-full text-white font-semibold ${bgColor}`}
-            style={{ width: size, height: size, fontSize: size * 0.5 }}
-            title={name}
+            className={clsx(styles.avatarLetter, colorClass, "text-white")}
+            style={fontSize ? { fontSize } : undefined}
         >
-            {initial}
+            {name?.charAt(0) ?? ""}
         </div>
     );
-}
+};

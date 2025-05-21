@@ -2,19 +2,17 @@
 
 @theme {
   --font-default: "Poppins", sans-serif;
+
+  /* Text Size */
   --text-xs-m: 11px;
-  --text-xs-p: 12px;
   --text-sm-m: 13px;
-  --text-sm-p: 15px;
   --text-base-m: 15px;
   --text-base-p: 17px;
-  --text-lg-m: 17px;
   --text-lg-p: 19px;
 
-  --color-text-default: #212529;
-  --color-text-secondary: #6c757d;
-  --color-text-tertiary: #495057;
+  
 
+  /* Primary Colors */
   --color-primary: var(--color-primary);
   --color-primary-50: var(--color-primary-50);
   --color-primary-100: var(--color-primary-100);

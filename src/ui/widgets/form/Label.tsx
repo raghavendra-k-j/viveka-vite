@@ -1,5 +1,6 @@
 import React from "react";
 
+
 export function Label({ children, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
     return (
         <label {...props} className="text-sm font-medium text-default">
@@ -17,14 +18,3 @@ export function RequiredMarker() {
     );
 }
 
-type ErrorMessageProps = React.HTMLAttributes<HTMLElement> & {
-    as?: React.ElementType;
-};
-
-export function ErrorMessage({ as: Component = "span", children, ...props }: ErrorMessageProps) {
-    return (
-        <Component {...props} className={`text-sm-m text-red-500 ${props.className || ""}`}>
-            {children}
-        </Component>
-    );
-}

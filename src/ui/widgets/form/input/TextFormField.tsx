@@ -1,10 +1,11 @@
 import React from "react";
 import { Observer } from "mobx-react-lite";
-import { Label, RequiredMarker, ErrorMessage } from "~/ui/widgets/form/Label";
+import { Label, RequiredMarker } from "~/ui/widgets/form/Label";
 import { Input } from "~/ui/widgets/form/input/Input";
 import { FieldValue } from "../FieldValue";
+import { ErrorMessage } from "../ErrorMessage";
 
-type TextFormFieldProps = {
+type TextFormFieldProps = React.HTMLAttributes<HTMLDivElement> & {
     id?: string;
     label?: React.ReactNode;
     required?: boolean;
@@ -20,13 +21,14 @@ export function TextFormField({
     type = "text",
     placeholder,
     field,
+    ...divProps
 }: TextFormFieldProps) {
     const handleChange = (newVal: string) => {
         field.set(newVal);
     };
 
     return (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1" {...divProps}>
             {label && (
                 <Label htmlFor={id}>
                     {label} {required && <RequiredMarker />}

@@ -18,7 +18,7 @@ export function SimpleRetryableAppView({
             message={appError.message}
             description={appError.description}
             actions={[
-                <FilledButton size="sm" onClick={onRetry} key="retry" >
+                <FilledButton onClick={onRetry} key="retry" >
                     Retry
                 </FilledButton>
             ]}

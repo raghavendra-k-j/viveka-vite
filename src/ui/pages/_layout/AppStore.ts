@@ -89,15 +89,6 @@ export class AppStore {
         }
     }
 
-    logout() {
-        this.authService.removeTokenLocally();
-        runInAction(() => {
-            this._appUser = null;
-            this.authState = DataState.init();
-        });
-        window.location.reload();
-    }
-
     async updateAuthResponse({ user, authToken }: { user: AbsUser, authToken: AuthToken }) {
         await this.authService.clearTokenLocally();
         if (user.appUserType.isRegUser) {
@@ -113,6 +104,20 @@ export class AppStore {
         });
     }
 
+    navigateToLogin() {
+        const loginUrl = this.appEnv.webBase + "/login";
+        window.location.href = loginUrl;
+    }
+
+
+    async logoutAndGoToLogin() {
+        await this.authService.removeTokenLocally();
+        runInAction(() => {
+            this._appUser = null;
+            this.authState = DataState.init();
+        });
+        this.navigateToLogin();
+    }
 
 
 

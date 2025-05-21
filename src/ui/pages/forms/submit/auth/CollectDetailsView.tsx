@@ -19,6 +19,7 @@ export function CollectDetailsView() {
     return (
         <form onSubmit={handleSubmit}>
             <FormAuthCard>
+                
                 <HeaderView
                     title={"Let's get started"}
                     subTitle={"Please fill in your details to begin."}

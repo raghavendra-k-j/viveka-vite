@@ -1,0 +1,23 @@
+.avatar {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--color-primary-600);
+  font-weight: bold;
+  font-size: 14px;
+  padding: 0.15rem;
+}
+
+.avatarLetter {
+  text-transform: uppercase;
+  border-radius: 50%;
+  font-size: 16px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -27,7 +27,7 @@ export class AuthService {
         return accessToken;
     }
 
-    removeTokenLocally() {
+    async removeTokenLocally() {
         Cookies.remove(AuthConst.keyAccessToken);
         Cookies.remove(AuthConst.keyAppUserType);
     }

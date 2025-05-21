@@ -21,7 +21,7 @@ export function FormAuthFragment() {
 function Body() {
     const store = useFormAuthStore();
     return (
-        <div>
+        <>
             <AppBar
                 leading={<AppBarLogo />}
                 trailing={<ProfileView />}
@@ -32,12 +32,13 @@ function Body() {
                         return <CollectDetailsView />;
                     } else if (store.currentFragment === FormCurrentAuthFragment.VerifyEmail) {
                         return <VerifyEmailView />;
-                    } else {
+                    }
+                    else {
                         return <div>Unknown Fragment</div>;
                     }
                 }}
             </Observer>
-        </div>
+        </>
     );
 }
 

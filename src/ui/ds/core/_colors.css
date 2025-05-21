@@ -1,3 +1,4 @@
+/* Background */
 .bg-background {
   background-color: var(--color-background);
 }
@@ -6,24 +7,9 @@
   background-color: var(--color-surface);
 }
 
-.bg-primary {
-  background-color: var(--color-primary);
-}
-
-.bg-primary-50 {
-  background-color: var(--color-primary-50);
-}
-
-.text-on-primary {
-  color: var(--color-on-primary);
-}
-
-.text-primary {
-  color: var(--color-primary);
-}
-
-.text-error {
-  color: var(--color-error);
+/* Text */
+.text-strong {
+  color: var(--color-text-strong);
 }
 
 .text-default {
@@ -38,6 +24,45 @@
   color: var(--color-text-tertiary);
 }
 
-.focus\:ring-primary:focus {
-  --tw-ring-color: var(--color-primary);
+.text-error {
+  color: var(--color-error);
+}
+
+/* Text on */
+.text-on-primary {
+  color: var(--color-on-primary);
+}
+
+/* Border */
+.border-default {
+  border-color: var(--color-border-default);
+}
+
+.border-strong {
+  border-color: var(--color-border-strong);
+}
+
+.border-secondary {
+  border-color: var(--color-border-secondary);
+}
+
+.border-tertiary {
+  border-color: var(--color-border-tertiary);
+}
+
+/* Divide colors */
+.divide-strong > :not([hidden]) {
+  border-color: var(--color-border-strong);
+}
+
+.divide-default > :not([hidden]) {
+  border-color: var(--color-border-default);
+}
+
+.divide-secondary > :not([hidden]) {
+  border-color: var(--color-border-secondary);
+}
+
+.divide-tertiary > :not([hidden]) {
+  border-color: var(--color-border-tertiary);
 }

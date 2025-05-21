@@ -1,18 +1,28 @@
 :root {
-  --color-input-border: var(--color-slate-200);
-  --dimen-input-radius: 4px;
+  /* Text Colors */
+  --color-text-strong: var(--color-gray-900);
+  --color-text-default: var(--color-gray-800);
+  --color-text-secondary: var(--color-gray-600);
+  --color-text-tertiary: var(--color-gray-500);
+
+  /* Border Colors */
+  --color-border-strong: var(--color-slate-300);
+  --color-border-default: var(--color-slate-200);
+  --color-border-secondary: var(--color-slate-100);
+  --color-border-tertiary: var(--color-slate-50);
+
   --toastify-font-family: var(--font-default);
 
-  --color-input-bg: var(--color-surface);
   --color-input-border: var(--color-slate-300);
-  --color-input-border-hover: var(--color-slate-400);
+  --color-input-border-hover: var(--color-slate-300);
   --color-input-border-focus: var(--color-primary);
-  --color-input-placeholder: var(--color-text-tertiary);
-  --shadow-input: 0 0 0 1px var(--color-primary);
-}
-
-html {
-  scroll-behavior: smooth;
+  --color-input-placeholder: var(--color-gray-500);
+  --color-input-text: var(--color-text-default);
+  --color-input-text-disabled: var(--color-text-secondary);
+  --color-input-bg: var(--color-surface);
+  --color-input-bg-disabled: var(--color-slate-500);
+  --shadow-input: var(--shadow-xs);
+  --shadow-input-focused: 0 0 0 1px var(--color-input-border-focus);
 }
 
 html,
