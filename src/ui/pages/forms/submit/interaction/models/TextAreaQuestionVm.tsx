@@ -3,29 +3,34 @@ import { QuestionVm, type QuestionRendererProps, type QuestionVmProps } from "./
 import { computed, makeObservable, observable, runInAction } from "mobx";
 import { Answer, TextAreaAnswer } from "~/domain/forms/models/answer/Answer";
 import { Node as ProseMirrorNode } from 'prosemirror-model';
+import { PmToMd } from "~/ui/components/richpmeditor/utils/PmToMd";
+import { schema } from "~/ui/components/richpmeditor/pm/schema";
 
 type TextAreaQuestionVmProps = QuestionVmProps & {};
 
 export class TextAreaQuestionVm extends QuestionVm {
-    public ansStr = "";
+    public ansNode: ProseMirrorNode | undefined = undefined;
 
     constructor(props: TextAreaQuestionVmProps) {
         super(props);
         makeObservable(this, {
-            ansStr: observable,
+            ansNode: observable.ref,
             isAnswered: computed
         });
     }
 
     public onAnsStrChanged(value: ProseMirrorNode): void {
         runInAction(() => {
-            this.ansStr = value.textContent ?? "";
+            this.ansNode = value;
         });
         this.validate();
     }
 
     get isAnswered(): boolean {
-        return this.ansStr.trim().length > 0;
+        if (this.ansNode === undefined) {
+            return false;
+        }
+        return this.ansNode.textContent.trim().length > 0;
     }
 
     validateQuestion(): string | undefined {
@@ -43,7 +48,7 @@ export class TextAreaQuestionVm extends QuestionVm {
         if (!this.isAnswered) {
             return undefined;
         }
-        const ansString = this.ansStr.trim();
+        const ansString = PmToMd.getContent(this.ansNode!, schema);
         return new TextAreaAnswer({ answer: ansString });
     }
 

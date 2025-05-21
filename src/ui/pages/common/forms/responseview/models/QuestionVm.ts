@@ -36,6 +36,7 @@ export class RDQuestionVm {
     public readonly mEvaluationStatus?: MEvaluationStatus;
     public readonly storeRef: ResponseViewStore;
 
+
     constructor(props: RDQuestionVmProps) {
         const q = props.question;
         this.id = q.id;
@@ -60,4 +61,21 @@ export class RDQuestionVm {
         this.mEvaluationStatus = q.mEvaluationStatus;
         this.storeRef = props.storeRef;
     }
+
+
+    get hasMarks(): boolean {
+        return this.marks !== undefined && this.marks != null && this.marks > 0;
+    }
+
+
+    get hasPositiveGainedMarks(): boolean {
+        return this.gainedMarks !== undefined && this.gainedMarks != null && this.gainedMarks > 0;
+    }
+
+    get isAnswered(): boolean {
+        if(this.userAnswer === null) return false;
+        if(this.userAnswer === undefined) return false;
+        return true;
+    }
+
 }

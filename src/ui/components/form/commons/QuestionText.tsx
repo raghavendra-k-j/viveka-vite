@@ -1,6 +1,5 @@
-import { questionMarkIt } from "./questionmarkit";
 import "katex/dist/katex.min.css";
-import DomPurify from "dompurify";
+import { MdQRenderer } from "./questionmarkit";
 
 export type QuestionTextProps = {
     number?: string | null;
@@ -14,23 +13,14 @@ export function QuestionText(props: QuestionTextProps) {
         <div className={`text-default text-sm font-medium ${props.className}`}>
             {props.asterisk && <span className="text-red-600 mr-1">*</span>}
             {props.number && <span className="mr-0.5">Q{props.number}. </span>}
-            <div className="katex-render text-sm leading-relaxed">
-                <span dangerouslySetInnerHTML={{ __html: DomPurify.sanitize(questionMarkIt.renderInline(props.question)) }} />
-            </div>
-            {/* <div dangerouslySetInnerHTML={{ __html: DomPurify.sanitize(questionMarkIt.renderInline(props.question)) }}></div> */}
+            <span dangerouslySetInnerHTML={{ __html: MdQRenderer.question(props.question) }} />
         </div>
     );
 }
 
-export function ChoiceText(props: { text: string }) {
+export function ExplanationText(props: { text: string }) {
     return (
-        <span dangerouslySetInnerHTML={{ __html: questionMarkIt.renderInline(props.text) }} />
-    );
-}
-
-export function PairMatchRowText(props: { text: string }) {
-    return (
-        <span dangerouslySetInnerHTML={{ __html: questionMarkIt.renderInline(props.text) }} />
+        <span dangerouslySetInnerHTML={{ __html: MdQRenderer.explanation(props.text) }} />
     );
 }
 

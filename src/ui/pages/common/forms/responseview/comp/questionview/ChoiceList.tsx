@@ -2,6 +2,7 @@ import { Choice } from "~/domain/forms/models/question/QExtras";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { FaRegSquare, FaRegCircle } from "react-icons/fa";
 import { FaSquareCheck, FaCircleDot } from "react-icons/fa6";
+import { MdQRenderer } from "~/ui/components/form/commons/questionmarkit";
 
 export type ChoiceListProps = {
     choices: Choice[];
@@ -82,7 +83,7 @@ function ChoiceItemReadonly({
         >
             <div className="flex items-center gap-3">
                 <Icon size={20} className={iconColor} />
-                <span className={`text-sm ${textColorClass}`}>{choice.text}</span>
+                <div className={`text-sm ${textColorClass}`} dangerouslySetInnerHTML={{ __html: MdQRenderer.choiceText(choice.text) }} />
             </div>
             {correctnessIcon && <div>{correctnessIcon}</div>}
         </div>

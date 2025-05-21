@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { questionMarkIt } from "./questionmarkit";
+import { MdQRenderer } from "./questionmarkit";
 
 type HintTextViewProps = {
     hint: string;
@@ -15,7 +15,7 @@ export function HintTextView({ hint, className }: HintTextViewProps) {
             )}
         >
             <span className="font-semibold mr-1">Hint:</span>
-            <span dangerouslySetInnerHTML={{ __html: questionMarkIt.renderInline(hint) }} />
+            <span dangerouslySetInnerHTML={{ __html: MdQRenderer.hint(hint) }} />
         </div>
     );
 }

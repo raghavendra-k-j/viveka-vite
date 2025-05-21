@@ -26,7 +26,6 @@
   border-bottom: 1px solid var(--color-slate-200);
 }
 
-
 .qIndexPanelContent {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
@@ -414,4 +413,15 @@
   .questionsGridContainer {
     gap: 1rem; /* sm:gap-4 */
   }
+}
+
+.mobileFooter {
+  width: 100%;
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid var(--color-slate-200);
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

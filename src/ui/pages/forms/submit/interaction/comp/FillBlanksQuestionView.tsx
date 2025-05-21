@@ -12,7 +12,6 @@ type FillBlanksQuestionViewProps = {
 };
 
 export const FillBlanksQuestionView = ({ vm, parentVm }: FillBlanksQuestionViewProps) => {
-    return null;
     return (
         <QuestionCardView parent={parentVm}>
             <QuestionHeaderView vm={vm} />

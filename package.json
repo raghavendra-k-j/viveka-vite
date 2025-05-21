@@ -34,6 +34,7 @@
     "prosemirror-commands": "^1.7.1",
     "prosemirror-history": "^1.4.1",
     "prosemirror-keymap": "^1.2.3",
+    "prosemirror-markdown": "^1.13.2",
     "prosemirror-model": "^1.25.1",
     "prosemirror-schema-basic": "^1.2.4",
     "prosemirror-state": "^1.4.3",

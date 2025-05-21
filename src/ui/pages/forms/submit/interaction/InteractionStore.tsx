@@ -12,6 +12,7 @@ import { GroupQuestionVm } from "./models/GroupQuestionVm";
 import { SubmitFormReq, SubmitFormRes } from "~/domain/forms/models/submit/SubmitFormModels";
 import { SimpleOverlay } from "~/ui/components/overlays/SimpleOverlays";
 import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
+import { showErrorToast } from "~/ui/widgets/toast/toast";
 
 type InteractionStoreProps = {
     parentStore: SubmitStore;
@@ -195,7 +196,8 @@ export class InteractionStore {
             const res = (await this.parentStore.formService.submitForm(submitFormReq)).getOrError();
             runInAction(() => {
                 this.submitState = DataState.data(res);
-                window.location.reload();
+                this.parentStore.setCurrentFragmentPreview();
+                this.parentStore.loadFormDetail();
             });
         }
         catch (error) {
@@ -204,6 +206,19 @@ export class InteractionStore {
             runInAction(() => {
                 this.vmState = DataState.error(appError);
             });
+            showErrorToast({
+                message: appError.message,
+                description: appError.description,
+                primaryButton: {
+                    text: "Retry",
+                    onClick: () => {
+                        this.onClickSubmitForm();
+                    },
+                }
+            });
+        }
+        finally {
+            this.dialogManager.closeById("submit-form-overlay");
         }
     }
 

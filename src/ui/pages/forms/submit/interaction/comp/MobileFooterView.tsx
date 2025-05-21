@@ -5,6 +5,7 @@ import { useDialogManager } from "~/ui/widgets/dialogmanager";
 import { FormDetailBottomSheet, QuestionsBottomSheet } from "./FooterBottomSheet";
 import { Info } from "lucide-react";
 import { Observer } from "mobx-react-lite";
+import styles from "./../styles.module.css";
 
 
 export function MobileFooterView() {
@@ -38,13 +39,7 @@ export function MobileFooterView() {
     };
 
     return (
-        <div className="z-50
-                        fixed bottom-0 left-0 right-0
-                        w-full
-                        bg-surface
-                        shadow-xl px-4 py-2 
-                        flex justify-between items-center 
-                        border-t border-slate-300">
+        <div className={styles.mobileFooter}>
             <div className="flex gap-2">
                 <OutlinedButton onClick={openQuestionList}>
                     Questions

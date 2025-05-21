@@ -7,7 +7,7 @@ import { colors } from "~/ui/ds/core/colors";
 import { FaRegSquare, FaRegCircle } from "react-icons/fa";
 import { FaSquareCheck, FaCircleDot } from "react-icons/fa6";
 import { GroupQuestionVm } from "../models/GroupQuestionVm";
-import { ChoiceText } from "~/ui/components/form/commons/QuestionText";
+import { MdQRenderer } from "~/ui/components/form/commons/questionmarkit";
 
 
 type ObjectiveQuestionViewProps = {
@@ -18,9 +18,8 @@ type ObjectiveQuestionViewProps = {
 export function ObjectiveQuestionView(props: ObjectiveQuestionViewProps) {
     return (
         <QuestionCardView parent={props.parentVm}>
-            {props.vm.base.question}
             <QuestionHeaderView vm={props.vm} />
-            {/* <ChoiceList vm={props.vm} /> */}
+            <ChoiceList vm={props.vm} />
         </QuestionCardView>
     );
 }
@@ -70,7 +69,7 @@ export const ChoiceItem = observer(function ChoiceItem({ vm, choice }: ChoiceIte
             ${isSelected ? "bg-primary-50" : ""}`}
         >
             <Icon size={20} color={iconColor} />
-            <ChoiceText text={choice.text} />
+            <div dangerouslySetInnerHTML={{ __html: MdQRenderer.choiceText(choice.text) }} />
         </button>
     );
 });

@@ -2,20 +2,30 @@ import type MarkdownIt from 'markdown-it';
 import katex from 'katex';
 import { StateBlock, StateInline } from 'markdown-it/index.js';
 
-// Main plugin function
+/**
+ * Markdown-it plugin to render LaTeX math using KaTeX.
+ * Supports:
+ *  - Inline math with $...$
+ *  - Block math with $$...$$
+ */
+
 export default function markItLaTex(md: MarkdownIt): void {
-    // ---------- INLINE MATH: $...$ ----------
-    md.inline.ruler.after('escape', 'math_inline', function (state: StateInline, silent: boolean): boolean {
+
+    // ---------------- INLINE MATH ----------------
+    md.inline.ruler.after('escape', 'math_inline', (state: StateInline, silent: boolean): boolean => {
         const start = state.pos;
         if (state.src[start] !== '$') return false;
 
         let match = start + 1;
+
         while ((match = state.src.indexOf('$', match)) !== -1) {
+            // Ignore escaped dollar signs
             if (state.src[match - 1] !== '\\') break;
             match++;
         }
 
         if (match === -1 || match === start + 1) return false;
+
         const content = state.src.slice(start + 1, match);
 
         if (!silent) {
@@ -27,27 +37,22 @@ export default function markItLaTex(md: MarkdownIt): void {
         return true;
     });
 
-    // ---------- BLOCK MATH: $$...$$ ----------
-    md.block.ruler.after('blockquote', 'math_block', function (
-        state: StateBlock,
-        startLine: number,
-        endLine: number,
-        silent: boolean
-    ): boolean {
+    // ---------------- BLOCK MATH ----------------
+    md.block.ruler.after('blockquote', 'math_block', (state: StateBlock, startLine: number, endLine: number, silent: boolean): boolean => {
         const startPos = state.bMarks[startLine] + state.tShift[startLine];
         const maxPos = state.eMarks[startLine];
-        const line = state.src.slice(startPos, maxPos).trim();
+        const firstLine = state.src.slice(startPos, maxPos).trim();
 
-        if (!line.startsWith('$$')) return false;
+        if (!firstLine.startsWith('$$')) return false;
 
         let nextLine = startLine + 1;
         let found = false;
         let content = '';
 
         while (nextLine < endLine) {
-            const nextLineStart = state.bMarks[nextLine] + state.tShift[nextLine];
-            const nextLineMax = state.eMarks[nextLine];
-            const nextLineText = state.src.slice(nextLineStart, nextLineMax).trim();
+            const nextStart = state.bMarks[nextLine] + state.tShift[nextLine];
+            const nextMax = state.eMarks[nextLine];
+            const nextLineText = state.src.slice(nextStart, nextMax).trim();
 
             if (nextLineText.endsWith('$$')) {
                 content = state.getLines(startLine + 1, nextLine, 0, true).trim();
@@ -71,8 +76,8 @@ export default function markItLaTex(md: MarkdownIt): void {
         return true;
     });
 
-    // ---------- RENDERERS ----------
-    md.renderer.rules.math_inline = function (tokens, idx): string {
+    // ---------------- RENDERERS ----------------
+    md.renderer.rules.math_inline = (tokens, idx): string => {
         try {
             return katex.renderToString(tokens[idx].content, {
                 throwOnError: false,
@@ -83,12 +88,12 @@ export default function markItLaTex(md: MarkdownIt): void {
         }
     };
 
-    md.renderer.rules.math_block = function (tokens, idx): string {
+    md.renderer.rules.math_block = (tokens, idx): string => {
         try {
-            return `<div class="katex-block">${katex.renderToString(tokens[idx].content, {
+            return katex.renderToString(tokens[idx].content, {
                 throwOnError: false,
                 displayMode: true,
-            })}</div>`;
+            });
         } catch (err) {
             console.error('KaTeX block render error:', err);
             return `<pre>${tokens[idx].content}</pre>`;

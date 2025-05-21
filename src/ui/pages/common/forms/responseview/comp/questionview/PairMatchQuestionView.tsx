@@ -2,6 +2,7 @@ import React from "react";
 import { RDQuestionVm } from "../../models/QuestionVm";
 import { PairMatchQExtras, PairMatchItem } from "~/domain/forms/models/question/QExtras";
 import { PairMatchAnswer } from "~/domain/forms/models/answer/Answer";
+import { MdQRenderer } from "~/ui/components/form/commons/questionmarkit";
 
 export type PairMatchQuestionViewProps = {
     question: RDQuestionVm;
@@ -42,9 +43,15 @@ export function PairMatchQuestionView({ question }: PairMatchQuestionViewProps) 
                 <tbody>
                     {qExtras.items.map((item) => (
                         <tr key={item.rowId} className="even:bg-surface">
-                            <TableBodyCell>{item.colAText}</TableBodyCell>
-                            <TableBodyCell>{correctAnswerMap[item.rowId] || "-"}</TableBodyCell>
-                            <TableBodyCell>{userAnswerMap[item.rowId] || "-"}</TableBodyCell>
+                            <TableBodyCell>
+                                <div dangerouslySetInnerHTML={{ __html: MdQRenderer.pairMatchText(item.colAText) }}></div>
+                            </TableBodyCell>
+                            <TableBodyCell>
+                                <div dangerouslySetInnerHTML={{ __html: MdQRenderer.pairMatchText(correctAnswerMap[item.rowId] || "-") }}></div>
+                            </TableBodyCell>
+                            <TableBodyCell>
+                                <div dangerouslySetInnerHTML={{ __html: MdQRenderer.pairMatchText(userAnswerMap[item.rowId] || "-") }}></div>
+                            </TableBodyCell>
                         </tr>
                     ))}
                 </tbody>

@@ -1,5 +1,6 @@
 import { TextBoxAnswer, TextAreaAnswer } from "~/domain/forms/models/answer/Answer";
 import { RDQuestionVm } from "../../models/QuestionVm";
+import { MdQRenderer } from "~/ui/components/form/commons/questionmarkit";
 
 export type TextQuestionViewProps = {
     question: RDQuestionVm;
@@ -43,7 +44,7 @@ function AnswerSection({
     return (
         <div>
             <div className={`text-sm font-semibold ${colorClass}`}>{prefix}</div>
-            {text && <div>{text}</div>}
+            {text && <div dangerouslySetInnerHTML={{ __html: MdQRenderer.textAnswer(text) }}></div>}
         </div>
     );
 }

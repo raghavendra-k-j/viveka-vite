@@ -4,7 +4,6 @@ import { QuestionCardView } from "./QuestionCardView";
 import { QuestionHeaderView } from "./QuestionHeaderView";
 
 export function GroupQuestionView({ vm }: { vm: GroupQuestionVm }) {
-    return null;
     return (
         <QuestionCardView>
             <QuestionHeaderView vm={vm} />

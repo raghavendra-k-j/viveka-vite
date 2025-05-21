@@ -12,8 +12,6 @@ type TextboxQuestionViewProps = {
 }
 
 export function TextboxQuestionView({ vm, parentVm }: TextboxQuestionViewProps) {
-    return null;
-
     return (
         <QuestionCardView parent={parentVm} >
             <QuestionHeaderView vm={vm} />

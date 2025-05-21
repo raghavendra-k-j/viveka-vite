@@ -1,6 +1,7 @@
 import { RDQuestionVm } from "../../models/QuestionVm";
 import { FillBlanksQExtras } from "~/domain/forms/models/question/QExtras";
 import { FillBlanksAnswer } from "~/domain/forms/models/answer/Answer";
+import { MdQRenderer } from "~/ui/components/form/commons/questionmarkit";
 
 export type FillBlanksQuestionViewProps = {
     question: RDQuestionVm;
@@ -25,8 +26,12 @@ export function FillBlanksQuestionView({ question }: FillBlanksQuestionViewProps
                     {qExtras.inputs.map((blank, i) => (
                         <tr key={blank.id} className="even:bg-surface">
                             <TableBodyCell className="whitespace-nowrap">Fill up {blank.id}</TableBodyCell>
-                            <TableBodyCell>{correctAnswer?.answers[i].answer || "-"}</TableBodyCell>
-                            <TableBodyCell>{userAnswer?.answers[i].answer || "-"}</TableBodyCell>
+                            <TableBodyCell>
+                                <div>{MdQRenderer.fillBlanksText(correctAnswer?.answers[i].answer || "-")}</div>
+                            </TableBodyCell>
+                            <TableBodyCell>
+                                <div dangerouslySetInnerHTML={{ __html: MdQRenderer.fillBlanksText(userAnswer?.answers[i].answer || "-") }} />
+                            </TableBodyCell>
                         </tr>
                     ))}
                 </tbody>
@@ -39,6 +44,7 @@ type CellProps = {
     children: React.ReactNode;
     className?: string;
 };
+
 
 function TableHeaderCell({ children, className = "" }: CellProps) {
     return (

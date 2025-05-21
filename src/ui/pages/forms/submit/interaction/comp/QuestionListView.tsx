@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useInteractionStore } from "../InteractionContext";
 import type { QuestionVm } from "../models/QuestionVm";
-import { questionMarkIt } from "~/ui/components/form/commons/questionmarkit";
 
 export const QuestionListView = observer(() => {
     const store = useInteractionStore();

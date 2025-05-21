@@ -1,15 +1,58 @@
 import AppBarLogo from "~/ui/components/AppBarLogo";
 import { AppBar } from "../forms/submit/comp/AppBar";
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
 
 export default function HomePage() {
     return (
         <div className="flex flex-col h-screen">
-            <AppBar 
-            leading={<AppBarLogo/>}
-            />
-            <div className="overflow-y-auto p-4">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem amet optio facere repellat quis suscipit aperiam officiis quas provident ut? Perferendis, recusandae? Laboriosam debitis voluptatum perspiciatis! Libero cumque odio beatae ab eius quis maiores, sunt eos, nobis fugit numquam maxime impedit necessitatibus accusantium quasi et magnam! Qui veritatis nobis eveniet voluptatum sed quisquam numquam, reprehenderit quod accusantium libero, nostrum provident iure sequi amet similique rerum ullam quia animi exercitationem omnis veniam. Repellendus eaque totam labore provident dolorem in architecto cupiditate aliquam sapiente consequatur, recusandae, modi natus debitis vitae quod velit culpa sunt repudiandae. Autem quis culpa deleniti earum accusantium repudiandae nostrum rerum quia eveniet dolorem quos explicabo eligendi illo illum beatae provident, fugit aut veritatis nemo voluptates soluta vitae exercitationem quibusdam esse. At nostrum amet obcaecati ullam repudiandae temporibus fugiat! Quisquam cupiditate odio cum facilis sit provident qui ad totam aspernatur ea iste eligendi, placeat consequatur quas, quasi ipsa, recusandae voluptatem. Cum, quam eius nam, perferendis, deserunt tempore placeat optio nemo necessitatibus voluptatum molestias ut. Pariatur accusantium dolorem exercitationem quis ut praesentium vero commodi velit necessitatibus quo, ratione officiis non eos nostrum nihil numquam facere beatae aliquid laudantium, facilis deserunt impedit! Quaerat nihil quis distinctio? Tempore laborum eos illum voluptatum quos ex ipsum aperiam rerum? Dolores consequatur accusantium enim nobis praesentium maiores quod sint libero tempora minima inventore quis alias, totam dicta necessitatibus repellendus consectetur repudiandae impedit voluptatum assumenda veniam. Quisquam, esse excepturi quod ut laboriosam facilis est saepe unde, dolores quae, aliquam aut. Nostrum, consectetur! Doloremque, ad placeat sit perspiciatis quod unde assumenda quo esse totam dignissimos. Quisquam voluptas suscipit qui nesciunt repellendus, earum veniam, necessitatibus magni error totam minus asperiores. Sapiente aperiam eaque molestiae id voluptas quos aut pariatur vel vitae eveniet rerum quidem, tempora eum et harum possimus laborum suscipit quibusdam non corrupti dolore beatae nesciunt. Eius, itaque veniam. Voluptatibus accusantium iure doloribus ab! Quae ea quos, velit odio dolore voluptatum illum nobis, soluta, adipisci quidem et temporibus! Natus veritatis recusandae cupiditate deserunt rerum soluta eum distinctio at! Quisquam eos vitae sed numquam impedit quos, excepturi voluptatem magni ratione officiis rerum velit neque enim! Hic corrupti rem vero alias, debitis quisquam, maiores nam ipsum, quasi velit sit culpa? Quis blanditiis pariatur ducimus porro enim doloribus repellat nisi vitae, consectetur saepe dicta, perspiciatis non aliquam cupiditate quas inventore quos veritatis reiciendis. Fuga earum reiciendis vitae, amet nam harum corrupti. Accusamus nemo laudantium corporis ea dolor tempora minima accusantium iure praesentium et veritatis nihil, repudiandae, minus consectetur numquam magni labore earum inventore ullam iste voluptatem dicta corrupti perferendis repellat! Animi nostrum commodi tempore. Magni dolorum consequuntur autem perspiciatis, libero perferendis aperiam, ducimus eveniet totam sit culpa pariatur soluta sequi quia eos? A nemo repudiandae tenetur recusandae facere eveniet et id consequuntur obcaecati nam. Veniam ipsa officia ab pariatur, iure assumenda odio delectus quas quo exercitationem praesentium, a dolorum quia sapiente iusto temporibus mollitia vero rem distinctio? Rerum iusto molestiae ducimus ex tempora dolor sapiente quos perferendis, odit atque nulla dignissimos, non in. Ducimus, dicta voluptatibus. Ad sapiente sit soluta non facilis, ipsum veniam, impedit qui iste, perferendis reiciendis dolorem. Tempora ad rerum labore facere animi, laborum iusto id, libero aliquid, laudantium nisi debitis impedit sapiente eaque quam. Harum eveniet accusamus facilis? Error facilis magnam sed similique explicabo minima? Labore vel inventore dolorum maiores soluta blanditiis eaque eveniet laudantium consequuntur veritatis dolorem, voluptatum placeat quae itaque et magnam explicabo ullam a debitis incidunt provident pariatur ratione rerum quas? Sint magnam omnis asperiores nemo laudantium. Rerum ad maiores doloremque expedita? Natus, aliquid odit. Dignissimos, impedit perspiciatis dolor obcaecati, eveniet quod ipsum explicabo esse in, et laborum ad! Voluptas rem sequi dolorem enim dolorum suscipit quod corporis doloribus nisi, distinctio, laudantium aspernatur repellat blanditiis ipsum sint neque ea. In labore vero quibusdam doloremque minus porro laboriosam praesentium incidunt libero. Delectus, repellendus. Culpa, ullam repellat natus temporibus quae itaque aliquid nobis qui corrupti deleniti cupiditate hic. Alias sit necessitatibus velit atque. Nobis, nulla. Animi sint eos consequuntur laborum ab repellendus voluptates ipsa consectetur! Odit dicta dolorum minima a. Dignissimos eius quibusdam rerum officia, doloremque ipsum eaque laboriosam adipisci impedit porro voluptates praesentium totam? Ab cumque, quo voluptate ea autem vero voluptas sed fugit quos explicabo dolorem vitae tempora deserunt optio, inventore natus maiores cupiditate et rem? Laudantium nihil vel hic minima. Magnam veniam repellat modi totam ea autem nobis non, dolor omnis mollitia beatae accusantium ab quo et minima magni vel maxime illum in maiores molestiae. Neque soluta ex nemo quidem incidunt veritatis commodi ullam consequatur fuga accusantium repellat eveniet quo obcaecati, earum itaque molestiae excepturi vero eligendi sapiente ipsum hic quae! Ratione exercitationem aliquid architecto, suscipit est veniam provident corrupti quo laudantium velit vel commodi debitis. Eveniet quasi inventore delectus laudantium consequuntur corporis veniam? Quaerat perferendis dicta eligendi delectus. Unde quos, dolor tempora, animi dolores aut vero at ab, laboriosam nemo veritatis possimus ad facilis quibusdam explicabo doloremque adipisci quisquam voluptate in harum? Quidem possimus fugiat eaque iste? Illum quisquam voluptatem perferendis dolorem facilis natus ut rem, at rerum molestiae, ea delectus, soluta porro magni ab magnam ipsum hic aspernatur dolores facere molestias fuga debitis! Ullam quas aspernatur architecto earum, reiciendis at fugiat molestiae sapiente rem nihil reprehenderit veritatis sunt veniam! Perferendis tempora voluptatem aliquam eveniet pariatur neque obcaecati? Dicta tempora voluptas eveniet provident nesciunt repellat ab sed officiis dolores error consequatur quis, dignissimos blanditiis maiores laboriosam! Nihil ullam quos minima enim necessitatibus corporis voluptas exercitationem ratione ad omnis repellendus earum eveniet tempore, iure et! Omnis eos, eum porro reiciendis aperiam incidunt modi placeat ratione unde, quia, repudiandae magni alias impedit vel ut. Obcaecati, quia sequi tempore soluta suscipit ipsam illum magni quidem, quibusdam vel voluptates omnis fugit dolore dignissimos porro? Fugit impedit eius, maxime architecto reiciendis vero cumque iure ducimus. Eveniet dolores soluta ipsam hic et commodi iusto saepe. Illum quasi minus officiis tempore ipsa hic eveniet, autem quibusdam quia? Laudantium autem fugiat exercitationem inventore. Perspiciatis itaque et quia commodi magnam nesciunt cupiditate quis illum fugit officia magni amet vero qui, sequi soluta quaerat hic possimus veniam ullam. Optio, molestiae quisquam.
+            {/* Fixed height AppBar */}
+            <div className="h-14">
+                <AppBar leading={<AppBarLogo />} />
             </div>
+
+            {/* Main Content Area */}
+            <div className="flex flex-1 min-h-0 border-2 border-red-500">
+                {/* Sidebar */}
+                <div className="w-1/5 overflow-y-auto border-r border-gray-300 p-2 min-h-0">
+                    <ScrollableList count={10} label="Sidebar" />
+                </div>
+
+                {/* Main Content */}
+                <div className="flex-1 overflow-y-auto p-4 border-x border-gray-300 min-h-0">
+                    <ScrollableList count={10} label="Main" />
+                </div>
+
+                {/* Right Panel */}
+                <div className="w-1/4 overflow-y-auto border-l border-gray-300 p-2 min-h-0">
+                    <ScrollableList count={10} label="Right" />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+
+
+export function ScrollableList({ count, label }: { count: number; label: string }) {
+    const katexString = "e = mc^2";
+    const katexHtml = katex.renderToString(katexString, {
+        throwOnError: false,
+        displayMode: true,
+    });
+
+    return (
+        <div className="space-y-2">
+            {Array.from({ length: count }).map((_, index) => (
+                <div
+                    key={index}
+                    className="p-2 bg-white border border-gray-300 rounded shadow-sm"
+                >
+                    <div dangerouslySetInnerHTML={{ __html: katexHtml }} />
+                    <div>{label} Item #{index + 1}</div>
+                </div>
+            ))}
         </div>
     );
 }

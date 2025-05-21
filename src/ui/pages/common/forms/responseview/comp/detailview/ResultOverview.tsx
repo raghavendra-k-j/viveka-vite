@@ -2,6 +2,7 @@ import { InfoCard, InfoCardHeader, InfoCardItem } from "./InfoCard";
 import { useResponseViewStore } from "../../ResponseViewContext";
 import { DateFmt } from "~/core/utils/DateFmt";
 import { NumFmt } from "~/core/utils/NumFmt";
+import { Badge } from "~/ui/widgets/badges/Badge";
 
 export function ResponseOverview() {
     const store = useResponseViewStore();
@@ -35,11 +36,22 @@ function SurveyResponseOverview() {
 function AssessmentResponseOverview() {
     const store = useResponseViewStore();
     const formResponse = store.formDetail.formResponse!;
+    const formDetail = store.formDetail;
+
+    function getStatusBadge() {
+        if (formResponse.marks! >= formDetail.passingMarks!) {
+            return <Badge color="green">Pass</Badge>;
+        }
+        else {
+            return <Badge color="red">Fail</Badge>;
+        }
+    }
+
 
     return (
         <InfoCard>
             <InfoCardHeader title="Result Overview" />
-            <InfoCardItem label="Result" value={"Pass"} />
+            {formDetail.passingMarks && (<InfoCardItem label="Result" value={getStatusBadge()} />)}
             <InfoCardItem label="Marks" value={NumFmt.roundToStr(formResponse.marks!, 2)} />
             <InfoCardItem label="Time Taken" value={formResponse.timeTaken} />
             <InfoCardItem label="Submitted On" value={DateFmt.datetime(formResponse.submittedAt)} />
