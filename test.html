@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Flexbox Playground</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .flex-item {
+            min-width: 60px; /* Minimum width for items */
+            min-height: 60px; /* Minimum height for items */
+            transition: all 0.3s ease-in-out;
+        }
+        .selected-item {
+            outline: 3px solid #3b82f6; /* Blue-500 */
+            outline-offset: 2px;
+        }
+        /* Custom scrollbar for better aesthetics if needed */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 0.375rem; /* rounded-md */
+            border: 1px solid #d1d5db; /* gray-300 */
+            margin-bottom: 0.75rem;
+        }
+        button {
+            transition: background-color 0.2s ease-in-out;
+        }
+        .control-group {
+            background-color: #f9fafb; /* gray-50 */
+            padding: 1rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .code-display {
+            background-color: #1f2937; /* gray-800 */
+            color: #d1d5db; /* gray-300 */
+            padding: 0.75rem;
+            border-radius: 0.375rem; /* rounded-md */
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 0.875rem; /* text-sm */
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 md:p-8">
+
+    <div class="container mx-auto max-w-7xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-600">Interactive Flexbox Playground</h1>
+            <p class="text-gray-600 mt-2">Experiment with Flexbox properties and see the results live!</p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-6">
+            <div class="lg:w-1/3 space-y-6">
+                <div class="control-group">
+                    <h2 class="text-xl font-semibold mb-3 text-gray-700">Flex Container Properties</h2>
+                    <div>
+                        <label for="flex-direction">flex-direction:</label>
+                        <select id="flex-direction" class="bg-white">
+                            <option value="row">row</option>
+                            <option value="row-reverse">row-reverse</option>
+                            <option value="column">column</option>
+                            <option value="column-reverse">column-reverse</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="flex-wrap">flex-wrap:</label>
+                        <select id="flex-wrap" class="bg-white">
+                            <option value="nowrap">nowrap</option>
+                            <option value="wrap">wrap</option>
+                            <option value="wrap-reverse">wrap-reverse</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="justify-content">justify-content:</label>
+                        <select id="justify-content" class="bg-white">
+                            <option value="flex-start">flex-start</option>
+                            <option value="flex-end">flex-end</option>
+                            <option value="center">center</option>
+                            <option value="space-between">space-between</option>
+                            <option value="space-around">space-around</option>
+                            <option value="space-evenly">space-evenly</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="align-items">align-items:</label>
+                        <select id="align-items" class="bg-white">
+                            <option value="stretch">stretch</option>
+                            <option value="flex-start">flex-start</option>
+                            <option value="flex-end">flex-end</option>
+                            <option value="center">center</option>
+                            <option value="baseline">baseline</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="align-content">align-content: (for multi-line)</label>
+                        <select id="align-content" class="bg-white">
+                            <option value="stretch">stretch</option>
+                            <option value="flex-start">flex-start</option>
+                            <option value="flex-end">flex-end</option>
+                            <option value="center">center</option>
+                            <option value="space-between">space-between</option>
+                            <option value="space-around">space-around</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label for="gap">gap (px):</label>
+                        <input type="number" id="gap" value="8" min="0" class="bg-white">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h2 class="text-xl font-semibold mb-3 text-gray-700">Flex Item Properties (Select an item)</h2>
+                    <p id="selected-item-indicator" class="text-sm text-gray-500 mb-2">No item selected. Click an item in the container.</p>
+                    <div>
+                        <label for="item-order">order:</label>
+                        <input type="number" id="item-order" value="0" class="bg-white" disabled>
+                    </div>
+                    <div>
+                        <label for="item-flex-grow">flex-grow:</label>
+                        <input type="number" id="item-flex-grow" value="0" min="0" class="bg-white" disabled>
+                    </div>
+                    <div>
+                        <label for="item-flex-shrink">flex-shrink:</label>
+                        <input type="number" id="item-flex-shrink" value="1" min="0" class="bg-white" disabled>
+                    </div>
+                    <div>
+                        <label for="item-flex-basis">flex-basis: (e.g., auto, 100px, 20%)</label>
+                        <input type="text" id="item-flex-basis" value="auto" class="bg-white" disabled>
+                    </div>
+                    <div>
+                        <label for="item-align-self">align-self:</label>
+                        <select id="item-align-self" class="bg-white" disabled>
+                            <option value="auto">auto</option>
+                            <option value="flex-start">flex-start</option>
+                            <option value="flex-end">flex-end</option>
+                            <option value="center">center</option>
+                            <option value="baseline">baseline</option>
+                            <option value="stretch">stretch</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h2 class="text-xl font-semibold mb-3 text-gray-700">Manage Items</h2>
+                    <button id="add-item" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md mb-2">Add Item</button>
+                    <button id="remove-item" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md" disabled>Remove Selected Item</button>
+                </div>
+
+                <div class="control-group">
+                     <h2 class="text-xl font-semibold mb-3 text-gray-700">Reset</h2>
+                    <button id="reset-all" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">Reset All</button>
+                </div>
+            </div>
+
+            <div class="lg:w-2/3 space-y-4">
+                <div id="flex-container-wrapper" class="bg-white p-4 rounded-lg shadow-lg min-h-[400px] overflow-auto">
+                    <div id="flex-container" class="flex bg-gray-200 min-h-[350px] p-2 rounded border-2 border-dashed border-gray-400">
+                        </div>
+                </div>
+                <div class="control-group">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">Container CSS:</h3>
+                    <div id="container-css-display" class="code-display">display: flex;</div>
+                </div>
+                <div class="control-group">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">Selected Item CSS:</h3>
+                    <div id="item-css-display" class="code-display">/* Select an item to see its CSS */</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const flexContainer = document.getElementById('flex-container');
+        
+        // Container controls
+        const flexDirectionSelect = document.getElementById('flex-direction');
+        const flexWrapSelect = document.getElementById('flex-wrap');
+        const justifyContentSelect = document.getElementById('justify-content');
+        const alignItemsSelect = document.getElementById('align-items');
+        const alignContentSelect = document.getElementById('align-content');
+        const gapInput = document.getElementById('gap');
+
+        // Item controls
+        const itemOrderInput = document.getElementById('item-order');
+        const itemFlexGrowInput = document.getElementById('item-flex-grow');
+        const itemFlexShrinkInput = document.getElementById('item-flex-shrink');
+        const itemFlexBasisInput = document.getElementById('item-flex-basis');
+        const itemAlignSelfSelect = document.getElementById('item-align-self');
+        const selectedItemIndicator = document.getElementById('selected-item-indicator');
+
+        // Manage items buttons
+        const addItemButton = document.getElementById('add-item');
+        const removeItemButton = document.getElementById('remove-item');
+        const resetAllButton = document.getElementById('reset-all');
+
+        // CSS Display
+        const containerCssDisplay = document.getElementById('container-css-display');
+        const itemCssDisplay = document.getElementById('item-css-display');
+
+        let items = [];
+        let selectedItem = null;
+        let itemIdCounter = 0;
+
+        const initialItemStyles = {
+            order: '0',
+            flexGrow: '0',
+            flexShrink: '1',
+            flexBasis: 'auto',
+            alignSelf: 'auto'
+        };
+        
+        const defaultContainerStyles = {
+            flexDirection: 'row',
+            flexWrap: 'nowrap',
+            justifyContent: 'flex-start',
+            alignItems: 'stretch',
+            alignContent: 'stretch',
+            gap: '8px'
+        };
+
+        // --- Utility Functions ---
+        function createFlexItem(id, number) {
+            const item = document.createElement('div');
+            item.classList.add('flex-item', 'p-4', 'm-1', 'rounded-md', 'text-white', 'font-semibold', 'text-center', 'cursor-pointer', 'flex', 'justify-center', 'items-center');
+            // Cycle through some bg colors
+            const colors = ['bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500'];
+            item.classList.add(colors[number % colors.length]);
+            item.textContent = `Item ${number}`;
+            item.dataset.id = id;
+            item.style.order = initialItemStyles.order;
+            item.style.flexGrow = initialItemStyles.flexGrow;
+            item.style.flexShrink = initialItemStyles.flexShrink;
+            item.style.flexBasis = initialItemStyles.flexBasis;
+            item.style.alignSelf = initialItemStyles.alignSelf;
+
+            // Store initial styles for reset
+            item.dataset.initialStyles = JSON.stringify(initialItemStyles);
+            
+            item.addEventListener('click', () => selectItem(item));
+            return item;
+        }
+
+        function addNewItem() {
+            itemIdCounter++;
+            const newItem = createFlexItem(`item-${itemIdCounter}`, itemIdCounter);
+            items.push(newItem);
+            flexContainer.appendChild(newItem);
+            if (items.length === 1) { // Auto-select first item if it's the only one
+                selectItem(newItem);
+            }
+            updateContainerCSSDisplay(); // In case gap changes item spacing
+        }
+
+        function removeSelectedItem() {
+            if (selectedItem) {
+                const index = items.indexOf(selectedItem);
+                if (index > -1) {
+                    items.splice(index, 1);
+                }
+                selectedItem.remove();
+                selectedItem = null;
+                disableItemControls();
+                removeItemButton.disabled = true;
+                selectedItemIndicator.textContent = 'No item selected. Click an item.';
+                itemCssDisplay.textContent = '/* Select an item to see its CSS */';
+                // Re-number remaining items for display text if desired, or just leave as is
+            }
+        }
+        
+        function selectItem(itemElement) {
+            if (selectedItem) {
+                selectedItem.classList.remove('selected-item');
+            }
+            selectedItem = itemElement;
+            selectedItem.classList.add('selected-item');
+            
+            enableItemControls();
+            updateItemControls(selectedItem);
+            selectedItemIndicator.textContent = `Selected: ${selectedItem.textContent}`;
+            removeItemButton.disabled = false;
+            updateItemCSSDisplay();
+        }
+
+        function updateItemControls(item) {
+            itemOrderInput.value = item.style.order || initialItemStyles.order;
+            itemFlexGrowInput.value = item.style.flexGrow || initialItemStyles.flexGrow;
+            itemFlexShrinkInput.value = item.style.flexShrink || initialItemStyles.flexShrink;
+            itemFlexBasisInput.value = item.style.flexBasis || initialItemStyles.flexBasis;
+            itemAlignSelfSelect.value = item.style.alignSelf || initialItemStyles.alignSelf;
+        }
+
+        function disableItemControls() {
+            itemOrderInput.disabled = true;
+            itemFlexGrowInput.disabled = true;
+            itemFlexShrinkInput.disabled = true;
+            itemFlexBasisInput.disabled = true;
+            itemAlignSelfSelect.disabled = true;
+        }
+
+        function enableItemControls() {
+            itemOrderInput.disabled = false;
+            itemFlexGrowInput.disabled = false;
+            itemFlexShrinkInput.disabled = false;
+            itemFlexBasisInput.disabled = false;
+            itemAlignSelfSelect.disabled = false;
+        }
+
+        // --- Update CSS Display ---
+        function updateContainerCSSDisplay() {
+            let cssText = `display: flex;\n`;
+            cssText += `flex-direction: ${flexContainer.style.flexDirection || defaultContainerStyles.flexDirection};\n`;
+            cssText += `flex-wrap: ${flexContainer.style.flexWrap || defaultContainerStyles.flexWrap};\n`;
+            cssText += `justify-content: ${flexContainer.style.justifyContent || defaultContainerStyles.justifyContent};\n`;
+            cssText += `align-items: ${flexContainer.style.alignItems || defaultContainerStyles.alignItems};\n`;
+            cssText += `align-content: ${flexContainer.style.alignContent || defaultContainerStyles.alignContent};\n`;
+            cssText += `gap: ${flexContainer.style.gap || defaultContainerStyles.gap};`;
+            containerCssDisplay.textContent = cssText;
+        }
+
+        function updateItemCSSDisplay() {
+            if (!selectedItem) {
+                itemCssDisplay.textContent = '/* Select an item to see its CSS */';
+                return;
+            }
+            let cssText = `/* Styles for ${selectedItem.textContent} */\n`;
+            cssText += `order: ${selectedItem.style.order || initialItemStyles.order};\n`;
+            cssText += `flex-grow: ${selectedItem.style.flexGrow || initialItemStyles.flexGrow};\n`;
+            cssText += `flex-shrink: ${selectedItem.style.flexShrink || initialItemStyles.flexShrink};\n`;
+            cssText += `flex-basis: ${selectedItem.style.flexBasis || initialItemStyles.flexBasis};\n`;
+            cssText += `align-self: ${selectedItem.style.alignSelf || initialItemStyles.alignSelf};`;
+            itemCssDisplay.textContent = cssText;
+        }
+
+        // --- Event Listeners for Container ---
+        function applyContainerStyles() {
+            flexContainer.style.flexDirection = flexDirectionSelect.value;
+            flexContainer.style.flexWrap = flexWrapSelect.value;
+            flexContainer.style.justifyContent = justifyContentSelect.value;
+            flexContainer.style.alignItems = alignItemsSelect.value;
+            flexContainer.style.alignContent = alignContentSelect.value;
+            flexContainer.style.gap = `${gapInput.value}px`;
+            updateContainerCSSDisplay();
+        }
+
+        flexDirectionSelect.addEventListener('change', applyContainerStyles);
+        flexWrapSelect.addEventListener('change', applyContainerStyles);
+        justifyContentSelect.addEventListener('change', applyContainerStyles);
+        alignItemsSelect.addEventListener('change', applyContainerStyles);
+        alignContentSelect.addEventListener('change', applyContainerStyles);
+        gapInput.addEventListener('input', applyContainerStyles);
+
+        // --- Event Listeners for Items ---
+        function applyItemStyles() {
+            if (selectedItem) {
+                selectedItem.style.order = itemOrderInput.value;
+                selectedItem.style.flexGrow = itemFlexGrowInput.value;
+                selectedItem.style.flexShrink = itemFlexShrinkInput.value;
+                selectedItem.style.flexBasis = itemFlexBasisInput.value;
+                selectedItem.style.alignSelf = itemAlignSelfSelect.value;
+                updateItemCSSDisplay();
+            }
+        }
+
+        itemOrderInput.addEventListener('input', applyItemStyles);
+        itemFlexGrowInput.addEventListener('input', applyItemStyles);
+        itemFlexShrinkInput.addEventListener('input', applyItemStyles);
+        itemFlexBasisInput.addEventListener('input', applyItemStyles);
+        itemAlignSelfSelect.addEventListener('change', applyItemStyles);
+
+        // --- Manage Items Buttons Event Listeners ---
+        addItemButton.addEventListener('click', addNewItem);
+        removeItemButton.addEventListener('click', removeSelectedItem);
+        
+        // --- Reset Functionality ---
+        function resetAll() {
+            // Reset container styles
+            flexDirectionSelect.value = defaultContainerStyles.flexDirection;
+            flexWrapSelect.value = defaultContainerStyles.flexWrap;
+            justifyContentSelect.value = defaultContainerStyles.justifyContent;
+            alignItemsSelect.value = defaultContainerStyles.alignItems;
+            alignContentSelect.value = defaultContainerStyles.alignContent;
+            gapInput.value = parseInt(defaultContainerStyles.gap); // remove 'px'
+            applyContainerStyles();
+
+            // Reset items
+            items.forEach(item => {
+                const initial = JSON.parse(item.dataset.initialStyles);
+                item.style.order = initial.order;
+                item.style.flexGrow = initial.flexGrow;
+                item.style.flexShrink = initial.flexShrink;
+                item.style.flexBasis = initial.flexBasis;
+                item.style.alignSelf = initial.alignSelf;
+            });
+            
+            if (selectedItem) {
+                updateItemControls(selectedItem); // Update controls if an item is selected
+                updateItemCSSDisplay();
+            } else {
+                disableItemControls();
+                itemCssDisplay.textContent = '/* Select an item to see its CSS */';
+            }
+            updateContainerCSSDisplay();
+        }
+
+        resetAllButton.addEventListener('click', resetAll);
+
+        // --- Initial Setup ---
+        function initializePlayground() {
+            // Add a few initial items
+            for (let i = 0; i < 3; i++) {
+                addNewItem();
+            }
+            // Set default container styles on load
+            applyContainerStyles();
+            updateContainerCSSDisplay();
+            
+            // Select the first item by default
+            if (items.length > 0) {
+                selectItem(items[0]);
+            } else {
+                disableItemControls();
+                removeItemButton.disabled = true;
+            }
+        }
+
+        // Initialize when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', initializePlayground);
+
+    </script>
+</body>
+</html>

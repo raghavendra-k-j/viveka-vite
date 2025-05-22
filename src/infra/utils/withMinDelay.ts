@@ -12,3 +12,8 @@ export async function withMinDelay<T>(promise: Promise<T>, minDelayMs = 300): Pr
 
     return result;
 }
+
+
+export function mockDelay<T>(minDelayMs = 1000): Promise<T> {
+    return new Promise(resolve => setTimeout(() => resolve({} as T), minDelayMs));
+}

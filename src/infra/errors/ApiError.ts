@@ -90,6 +90,10 @@ export class ApiError extends AppError {
         return this.statusCode === 500;
     }
 
+    get isRateLimited(): boolean {
+        return this.statusCode === 429;
+    }
+
     isServerIssue(): boolean {
         return this.statusCode !== undefined && this.statusCode >= 500 && this.statusCode < 600;
     }

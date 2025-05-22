@@ -1,58 +1,107 @@
-import AppBarLogo from "~/ui/components/AppBarLogo";
-import { AppBar } from "../forms/submit/comp/AppBar";
-import katex from "katex";
-import "katex/dist/katex.min.css";
+import React, { useState } from "react";
 
+type Question = {
+  id: number;
+  type: "objective" | "subjective";
+  questionText: string;
+  options?: string[];
+};
 
-export default function HomePage() {
+const questions: Question[] = Array.from({ length: 10 }, (_, i) => {
+  return {
+    id: i + 1,
+    type: i % 2 === 0 ? "objective" : "subjective",
+    questionText: `Question ${i + 1}: What is the answer to question ${i + 1}?`,
+    options: i % 2 === 0 ? ["Option A", "Option B", "Option C", "Option D"] : undefined,
+  };
+});
+
+const HomePage: React.FC = () => {
+  const [singleQuestionMode, setSingleQuestionMode] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => Math.min(prev + 1, questions.length - 1));
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => Math.max(prev - 1, 0));
+  };
+
+  const renderQuestion = (q: Question) => {
     return (
-        <div className="flex flex-col h-screen">
-            {/* Fixed height AppBar */}
-            <div className="h-14">
-                <AppBar leading={<AppBarLogo />} />
-            </div>
-
-            {/* Main Content Area */}
-            <div className="flex flex-1 min-h-0 border-2 border-red-500">
-                {/* Sidebar */}
-                <div className="w-1/5 overflow-y-auto border-r border-gray-300 p-2 min-h-0">
-                    <ScrollableList count={10} label="Sidebar" />
-                </div>
-
-                {/* Main Content */}
-                <div className="flex-1 overflow-y-auto p-4 border-x border-gray-300 min-h-0">
-                    <ScrollableList count={10} label="Main" />
-                </div>
-
-                {/* Right Panel */}
-                <div className="w-1/4 overflow-y-auto border-l border-gray-300 p-2 min-h-0">
-                    <ScrollableList count={10} label="Right" />
-                </div>
-            </div>
-        </div>
-    );
-}
-
-
-
-export function ScrollableList({ count, label }: { count: number; label: string }) {
-    const katexString = "e = mc^2";
-    const katexHtml = katex.renderToString(katexString, {
-        throwOnError: false,
-        displayMode: true,
-    });
-
-    return (
-        <div className="space-y-2">
-            {Array.from({ length: count }).map((_, index) => (
-                <div
-                    key={index}
-                    className="p-2 bg-white border border-gray-300 rounded shadow-sm"
-                >
-                    <div dangerouslySetInnerHTML={{ __html: katexHtml }} />
-                    <div>{label} Item #{index + 1}</div>
-                </div>
+      <div
+        key={q.id}
+        style={{
+          border: "1px solid #ccc",
+          padding: "20px",
+          marginBottom: "20px",
+          minHeight: "200px",
+          borderRadius: "8px",
+          backgroundColor: "#f9f9f9",
+        }}
+      >
+        <h3>{q.questionText}</h3>
+        {q.type === "objective" ? (
+          <ul>
+            {q.options!.map((opt, idx) => (
+              <li key={idx}>
+                <label>
+                  <input type="radio" name={`question-${q.id}`} /> {opt}
+                </label>
+              </li>
             ))}
-        </div>
+          </ul>
+        ) : (
+          <textarea
+            placeholder="Write your answer here..."
+            style={{ width: "100%", height: "100px" }}
+          />
+        )}
+      </div>
     );
-}
+  };
+
+  return (
+    <div style={{ maxWidth: 700, margin: "20px auto", fontFamily: "Arial, sans-serif" }}>
+      <h1>Quiz Application</h1>
+
+      <div style={{ marginBottom: 20 }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={singleQuestionMode}
+            onChange={() => {
+              setSingleQuestionMode(!singleQuestionMode);
+              setCurrentIndex(0); // reset on toggle
+            }}
+          />{" "}
+          Single Question Mode
+        </label>
+      </div>
+
+      {singleQuestionMode ? (
+        <div>
+          {renderQuestion(questions[currentIndex])}
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <button onClick={handlePrev} disabled={currentIndex === 0}>
+              Previous
+            </button>
+            <span>
+              Question {currentIndex + 1} of {questions.length}
+            </span>
+            <button onClick={handleNext} disabled={currentIndex === questions.length - 1}>
+              Next
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ maxHeight: "80vh", overflowY: "auto" }}>
+          {questions.map((q) => renderQuestion(q))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default HomePage;

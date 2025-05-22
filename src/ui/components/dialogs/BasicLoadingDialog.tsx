@@ -7,11 +7,11 @@ import {
     DialogScaffold
 } from "~/ui/widgets/dialogmanager";
 
-export type SimpleOverlayProps = {
+export type BasicLoadingDialogProps = {
     message: string | ReactNode;
 };
 
-export function SimpleOverlay({ message }: SimpleOverlayProps) {
+export function BasicLoadingDialog({ message }: BasicLoadingDialogProps) {
     return (
         <Dialog>
             <DialogOverlay />

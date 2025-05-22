@@ -12,10 +12,11 @@ import { FieldValue } from "~/ui/widgets/form/FieldValue";
 import { AppEntityConst } from "~/core/const/AppEntityConst";
 import validator from 'validator';
 import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
-import { SimpleOverlay } from "~/ui/components/overlays/SimpleOverlays";
 import { withMinDelay } from "~/infra/utils/withMinDelay";
 import { EmailOTPConst } from "~/core/const/EmailOTPConst";
-import { showErrorToast } from "~/ui/widgets/toast/toast";
+import { ApiError } from "~/infra/errors/ApiError";
+import { showAppErrorDialog } from "~/ui/components/dialogs/showAppErrorDialog";
+import { showLoadingDialog } from "~/ui/components/dialogs/showLoadingDialog";
 
 export type FormAuthStoreProps = {
     parentStore: SubmitStore;
@@ -143,6 +144,7 @@ export class FormAuthStore {
 
     async onClickNextInCollectDetails(dialogManager: DialogManagerStore) {
         if (this.submitState.isLoading) return;
+
         let hasError = false;
         for (const field of [this.name, this.email, this.mobile]) {
             const isValid = field.validate();
@@ -156,50 +158,66 @@ export class FormAuthStore {
             runInAction(() => {
                 this.submitState = DataState.loading();
             });
-            dialogManager.show({
-                id: "form-auth-collect-details",
-                component: SimpleOverlay,
-                props: {
-                    message: "Just a second...",
-                },
+
+            showLoadingDialog({
+                dialogManager,
+                dialogId: "form-auth-collect-details",
+                message: "Just a second...",
             });
+
             const getAppReq = new GetAppUserReq({
                 formId: this.parentStore.formDetail.id,
                 name: this.name.value,
                 email: this.email.value,
                 mobile: this.mobile.value,
             });
+
             const response = (await withMinDelay(this.formService.getAppUser(getAppReq))).getOrError();
             if (!response) return;
 
             if (response.isAppUserType) {
                 await this.onAppUserRetrieved(response);
-            }
-            else if (response.isEmailVerificationRequired) {
+            } else if (response.isEmailVerificationRequired) {
                 await this.onEmailVerificationRequired(response.data as number);
-            }
-            else {
+            } else {
                 throw new Error("Unknown response type");
             }
+
             runInAction(() => {
                 this.submitState = DataState.data(undefined);
             });
-        }
-        catch (error) {
+        } catch (error) {
             const appError = AppError.fromAny(error);
-            logger.error("Error submitting user details: ", appError);
+            logger.error("Error submitting user details:", appError);
             runInAction(() => {
                 this.submitState = DataState.error(appError);
             });
-            showErrorToast({
-                message: appError.message,
-                description: appError.description,
+            const isRateLimited = appError instanceof ApiError && appError.isRateLimited;
+            showAppErrorDialog({
+                dialogManager,
+                appError,
+                dialogId: "form-auth-collect-details-error",
+                primaryButton: isRateLimited
+                    ? {
+                        text: "OK",
+                        onClick: () => {
+                            dialogManager.closeById("form-auth-collect-details-error");
+                        },
+                    }
+                    : {
+                        text: "Retry",
+                        onClick: () => {
+                            dialogManager.closeById("form-auth-collect-details-error");
+                            this.onClickNextInCollectDetails(dialogManager);
+                        },
+                    },
             });
         }
         finally {
             dialogManager.closeById("form-auth-collect-details");
         }
     }
+
 
     onClickBackInVerifyEmail() {
         runInAction(() => {
@@ -211,65 +229,84 @@ export class FormAuthStore {
 
     async onClickVerifyOTP(dialogManager: DialogManagerStore) {
         if (this.submitState.isLoading) return;
+
         const isValid = this.otp.validate();
         if (!isValid) return;
+
         try {
             runInAction(() => {
                 this.verifyState = DataState.loading();
             });
-            dialogManager.show({
-                id: "form-auth-verify-otp",
-                component: SimpleOverlay,
-                props: {
-                    message: "Verifying OTP...",
-                },
+
+
+            showLoadingDialog({
+                dialogManager,
+                dialogId: "form-auth-verify-otp",
+                message: "Verifying OTP...",
             });
-            const response = (await withMinDelay(
-                this.formService.verifyGetAppUser({
-                    id: this.otpId!,
-                    otp: this.otp.value,
-                    formId: this.parentStore.formDetail.id
-                })
-            )).getOrError();
+
+            const response = (
+                await withMinDelay(
+                    this.formService.verifyGetAppUser({
+                        id: this.otpId!,
+                        otp: this.otp.value,
+                        formId: this.parentStore.formDetail.id,
+                    })
+                )
+            ).getOrError();
             if (!response) return;
 
             await this.onVerificationSuccess(response);
+
             runInAction(() => {
                 this.submitState = DataState.data(undefined);
             });
-        }
-        catch (error) {
+        } catch (error) {
             const appError = AppError.fromAny(error);
-            logger.error("Error verifying OTP: ", appError);
+            logger.error("Error verifying OTP:", appError);
+
             runInAction(() => {
                 this.verifyState = DataState.error(appError);
             });
-            showErrorToast({
-                message: appError.message,
-                description: appError.description,
+
+            showAppErrorDialog({
+                dialogManager,
+                appError,
+                dialogId: "form-auth-verify-otp-error",
+                secondaryButton: {
+                    text: "OK",
+                    onClick: () => {
+                        dialogManager.closeById("form-auth-verify-otp-error");
+                    },
+                },
             });
-        }
-        finally {
+        } finally {
             dialogManager.closeById("form-auth-verify-otp");
         }
     }
 
+
     async onClickResendOTP(dialogManager: DialogManagerStore) {
         if (this.submitState.isLoading || this.resendCountdown > 0) return;
+
         try {
-            this.submitState = DataState.loading();
+            runInAction(() => {
+                this.submitState = DataState.loading();
+            });
+
             this.stopOtpPolling();
 
-            dialogManager.show({
-                id: "form-auth-resend-otp",
-                component: SimpleOverlay,
-                props: {
-                    message: "Resending OTP...",
-                },
+            showLoadingDialog({
+                dialogManager,
+                dialogId: "form-auth-resend-otp",
+                message: "Resending OTP...",
             });
 
             const response = (await withMinDelay(
-                this.formService.resendSubmitFormOtp({ otpId: this.otpId!, formId: this.parentStore.formDetail.id })
+                this.formService.resendSubmitFormOtp({
+                    otpId: this.otpId!,
+                    formId: this.parentStore.formDetail.id,
+                })
             )).getOrError();
 
             if (!response) return;
@@ -281,22 +318,30 @@ export class FormAuthStore {
                 this.submitState = DataState.data(undefined);
                 this.startResendCountdown();
             });
-        }
-        catch (error) {
+        } catch (error) {
             const appError = AppError.fromAny(error);
-            logger.error("Error resending OTP: ", appError);
+            logger.error("Error resending OTP:", appError);
+
             runInAction(() => {
                 this.submitState = DataState.error(appError);
             });
-            showErrorToast({
-                message: appError.message,
-                description: appError.description,
+
+            showAppErrorDialog({
+                dialogManager,
+                appError,
+                dialogId: "form-auth-resend-otp-error",
+                secondaryButton: {
+                    text: "OK",
+                    onClick: () => {
+                        dialogManager.closeById("form-auth-resend-otp-error");
+                    },
+                },
             });
-        }
-        finally {
+        } finally {
             dialogManager.closeById("form-auth-resend-otp");
         }
     }
+
 
 
 

@@ -54,14 +54,21 @@ function Footer() {
     const hasNotStarted = startDate > now;
     const hasEnded = endDate < now;
 
+    const showStartButton = !hasEnded;
+    const isButtonDisabled = hasNotStarted;
+
     return (
         <div className="flex flex-col p-4 border-t border-default bg-slate-50 gap-4">
             {hasNotStarted && <NotStartedInfoView />}
             {hasEnded && <ClosedInfoView />}
-            {store.formDetail.languages.length > 0 && !hasEnded && <SelectLanguageInput />}
-            {!hasNotStarted && !hasEnded && (
-                <FilledButton onClick={() => store.onClickStart()}>{buttonText}</FilledButton>
+            {store.formDetail.languages.length > 0 && showStartButton && <SelectLanguageInput />}
+
+            {showStartButton && (
+                <FilledButton onClick={() => store.onClickStart()} disabled={isButtonDisabled}>
+                    {buttonText}
+                </FilledButton>
             )}
         </div>
     );
 }
+

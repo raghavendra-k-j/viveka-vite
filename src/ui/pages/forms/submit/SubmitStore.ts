@@ -95,7 +95,7 @@ export class SubmitStore {
 
 
     get hasBackNavigation() {
-        return true;
+        return false;
     }
 
     get returnToHomeURL(): string {

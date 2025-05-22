@@ -7,6 +7,7 @@ import AppBarLogo from "~/ui/components/AppBarLogo";
 import { ProfileView } from "../comp/profile/ProfileView";
 import { CollectDetailsView } from "./CollectDetailsView";
 import { VerifyEmailView } from "./VerifyEmailView";
+import { UnknowStateView } from "~/ui/components/errors/UnknowStateView";
 
 
 export function FormAuthFragment() {
@@ -29,13 +30,13 @@ function Body() {
             <main className="overflow-y-auto p-4 sm:p-6">
                 <Observer>
                     {() => {
-                        if (store.currentFragment === FormCurrentAuthFragment.CollectDetails) {
-                            return <CollectDetailsView />;
-                        } else if (store.currentFragment === FormCurrentAuthFragment.VerifyEmail) {
-                            return <VerifyEmailView />;
-                        }
-                        else {
-                            return <div>Unknown Fragment</div>;
+                        switch (store.currentFragment) {
+                            case FormCurrentAuthFragment.CollectDetails:
+                                return <CollectDetailsView />;
+                            case FormCurrentAuthFragment.VerifyEmail:
+                                return <VerifyEmailView />;
+                            default:
+                                return <UnknowStateView />;
                         }
                     }}
                 </Observer>

@@ -1,12 +1,13 @@
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Hourglass } from 'lucide-react';
 import { useSubmitStore } from '../SubmitContext';
 import { AppBar } from '../comp/AppBar';
 import AppBarLogo from '~/ui/components/AppBarLogo';
 import FilledButton from '~/ui/widgets/button/FilledButton';
 import OutlinedButton from '~/ui/widgets/button/OutlinedButton';
 import { ProfileView } from '../comp/profile/ProfileView';
-import { useViewResponse } from './useViewResponse'; // new hook
+import { useViewResponse } from './useViewResponse';
 import { Card, Title, Message } from './SubmitCommon';
+import { BasicBanner } from '~/ui/widgets/banner/BasicBanner';
 
 export function SubmittedFragment() {
     return (
@@ -25,7 +26,7 @@ function Body() {
 function SuccessCheckMark() {
     return (
         <div className="flex items-center justify-center">
-            <div className="text-green-600 mb-4">
+            <div className="text-emerald-600 mb-4">
                 <CheckCircle2 size={56} />
             </div>
         </div>
@@ -33,8 +34,10 @@ function SuccessCheckMark() {
 }
 
 function ReturnToHomeButton() {
-    return null;
     const store = useSubmitStore();
+    if (!store.hasBackNavigation) {
+        return null;
+    }
     return (
         <OutlinedButton onClick={() => (window.location.href = store.returnToHomeURL)}>
             Return to Home
@@ -46,6 +49,7 @@ function Assessment() {
     const store = useSubmitStore();
     const title = store.formDetail.title;
     const viewResponse = useViewResponse();
+    const isEvaluated = store.formDetail.formResponse!.isEvaluated;
 
     return (
         <Card>
@@ -56,13 +60,26 @@ function Assessment() {
                 <span className="font-medium text-default">"{title}"</span>&nbsp;have been successfully submitted.
             </Message>
 
+            {!isEvaluated && (
+                <BasicBanner
+                    className="mt-4"
+                    variant="info"
+                    icon={<Hourglass size={16} />}
+                    message="Assessment is under evaluation"
+                    description="We’re currently evaluating your submission. You’ll be notified once the results are available."
+                />
+            )}
+
             <div className="flex flex-col gap-3 mt-8">
-                <FilledButton onClick={viewResponse}>View Results</FilledButton>
+                <FilledButton onClick={viewResponse} disabled={!isEvaluated}>
+                    View Response
+                </FilledButton>
                 <ReturnToHomeButton />
             </div>
         </Card>
     );
 }
+
 
 function Survey() {
     const store = useSubmitStore();

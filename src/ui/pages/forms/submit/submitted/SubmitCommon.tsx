@@ -8,8 +8,8 @@ export function Message({ children }: { children: React.ReactNode }) {
 
 export function Card({ children }: { children: React.ReactNode }) {
     return (
-        <div className="p-4 sm:pt-16 flex justify-center items-start">
-            <div className="bg-surface shadow-sm rounded-sm p-6 w-full max-w-md text-center">
+        <div className="p-4 sm:p-6 flex justify-center items-start">
+            <div className="bg-surface border border-default shadow-lg rounded-sm p-6 w-full max-w-lg">
                 {children}
             </div>
         </div>

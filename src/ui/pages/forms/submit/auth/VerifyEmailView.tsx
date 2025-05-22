@@ -7,6 +7,7 @@ import { HeaderView } from "./HeaderView";
 import { AppEntityConst } from "~/core/const/AppEntityConst";
 import { Observer } from "mobx-react-lite";
 import { useDialogManager } from "~/ui/widgets/dialogmanager";
+import { TimeFmt } from "~/core/utils/TimeFmt";
 
 export function VerifyEmailView() {
     const store = useFormAuthStore();
@@ -18,8 +19,8 @@ export function VerifyEmailView() {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <FormAuthCard>
+        <FormAuthCard>
+            <form onSubmit={handleSubmit}>
                 <HeaderView
                     title="Check your email"
                     subTitle={
@@ -46,7 +47,7 @@ export function VerifyEmailView() {
                             {() =>
                                 store.resendCountdown > 0 ? (
                                     <span className="text-primary font-semibold cursor-not-allowed">
-                                        Resend ({store.resendCountdown}s)
+                                        Resend ({TimeFmt.format(store.resendCountdown)})
                                     </span>
                                 ) : (
                                     <span
@@ -77,7 +78,7 @@ export function VerifyEmailView() {
                         )}
                     </Observer>
                 </div>
-            </FormAuthCard>
-        </form>
+            </form>
+        </FormAuthCard>
     );
 }

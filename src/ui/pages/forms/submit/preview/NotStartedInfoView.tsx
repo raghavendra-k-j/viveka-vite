@@ -2,26 +2,7 @@ import { useEffect } from "react";
 import { Hourglass, Lock } from "lucide-react";
 import { useSubmitStore } from "../SubmitContext";
 import { DateFmt } from "~/core/utils/DateFmt";
-
-interface StatusBannerProps {
-    icon: React.ReactNode;
-    bgColor: string;
-    iconBgColor: string;
-    borderColor: string;
-    textColor: string;
-    children: React.ReactNode;
-}
-
-function StatusBanner({ icon, bgColor, iconBgColor, borderColor, textColor, children }: StatusBannerProps) {
-    return (
-        <div className={`w-full flex items-center gap-3 rounded-md px-4 py-3 ${bgColor} ${borderColor} ${textColor}`}>
-            <div className={`p-2 rounded-md flex items-center justify-center ${iconBgColor}`}>
-                {icon}
-            </div>
-            <p className="text-sm leading-relaxed">{children}</p>
-        </div>
-    );
-}
+import { BasicBanner } from "~/ui/widgets/banner/BasicBanner";
 
 export function NotStartedInfoView() {
     const store = useSubmitStore();
@@ -41,16 +22,16 @@ export function NotStartedInfoView() {
     }, [startDate]);
 
     return (
-        <StatusBanner
+        <BasicBanner
+            variant="info"
             icon={<Hourglass size={16} />}
-            bgColor="bg-blue-50"
-            iconBgColor="bg-blue-100"
-            borderColor="border border-blue-200"
-            textColor="text-blue-800"
-        >
-            This {store.formDetail.type.name.toLowerCase()} will start on{" "}
-            <span className="font-semibold">{DateFmt.datetime(startDate)}</span>. Please wait until then.
-        </StatusBanner>
+            description={
+                <span className="font-medium">
+                    This {store.formDetail.type.name.toLowerCase()} will start on{" "}
+                    <span className="font-semibold">{DateFmt.datetime(startDate)}</span>. Please wait until then.
+                </span>
+            }
+        />
     );
 }
 
@@ -59,15 +40,15 @@ export function ClosedInfoView() {
     const endDate = new Date(store.formDetail.endDate);
 
     return (
-        <StatusBanner
+        <BasicBanner
+            variant="danger"
             icon={<Lock size={16} />}
-            bgColor="bg-red-50"
-            iconBgColor="bg-red-100"
-            borderColor="border border-red-200"
-            textColor="text-red-800"
-        >
-            This {store.formDetail.type.name.toLowerCase()} ended on{" "}
-            <span className="font-semibold">{DateFmt.datetime(endDate)}</span>. You can no longer start it.
-        </StatusBanner>
+            description={
+                <span className="font-medium">
+                    This {store.formDetail.type.name.toLowerCase()} ended on{" "}
+                    <span className="font-semibold">{DateFmt.datetime(endDate)}</span>. You can no longer start it.
+                </span>
+            }
+        />
     );
 }

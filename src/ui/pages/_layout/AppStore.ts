@@ -91,13 +91,10 @@ export class AppStore {
 
     async updateAuthResponse({ user, authToken }: { user: AbsUser, authToken: AuthToken }) {
         await this.authService.clearTokenLocally();
-        if (user.appUserType.isRegUser) {
-            await this.authService.saveTokenLocally({
-                accessToken: authToken.accessToken,
-                appUserType: user.appUserType,
-            });
-        }
-
+        await this.authService.saveTokenLocally({
+            accessToken: authToken.accessToken,
+            appUserType: user.appUserType,
+        });
         runInAction(() => {
             this._appUser = user;
             this._authToken = authToken;

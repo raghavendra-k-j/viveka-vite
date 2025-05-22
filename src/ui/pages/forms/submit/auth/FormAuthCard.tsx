@@ -8,7 +8,7 @@ export function FormAuthCard({
     className?: string;
 }) {
     return (
-        <div className="min-h-full p-4 sm:p-6">
+        <div className="min-h-full">
             <div
                 className={clsx(
                     "flex flex-col bg-surface rounded-sm border border-default shadow-lg mx-auto max-w-md",
