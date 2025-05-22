@@ -1,7 +1,4 @@
-export type FormUserJson = {
-    id: number;
-    name: string;
-};
+import { JsonObj } from "~/core/types/Json";
 
 export class FormUser {
     id: number;
@@ -12,14 +9,7 @@ export class FormUser {
         this.name = name;
     }
 
-    serialize(): FormUserJson {
-        return {
-            id: this.id,
-            name: this.name,
-        };
-    }
-
-    static deserialize(json: FormUserJson): FormUser {
+    static fromJson(json: JsonObj): FormUser {
         return new FormUser({ id: json.id, name: json.name });
     }
 }

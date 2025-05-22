@@ -1,7 +1,7 @@
 import type { ResEither } from "~/core/utils/ResEither";
 import type { FormDetail } from "../models/FormDetail";
 import type { AppError } from "~/core/error/AppError";
-import type { FormRepo } from "~/infra/repos/FormRepo";
+import type { FormRepo } from "~/infra/repos/forms/FormRepo";
 import type { QuestionRes } from "../models/QuestionsRes";
 import { SubmitFormReq, SubmitFormRes } from "../models/submit/SubmitFormModels";
 import { GetAppUserReq } from "../models/submit/GetAppUserReq";

@@ -1,6 +1,6 @@
 import { makeObservable, observable, runInAction } from "mobx";
 import { FormService } from "~/domain/forms/services/FormsService";
-import { FormRepo } from "~/infra/repos/FormRepo";
+import { FormRepo } from "~/infra/repos/forms/FormRepo";
 import { ApiClient } from "~/infra/datasources/ApiClient";
 import { DataState } from "~/ui/utils/DataState";
 import { AppError } from "~/core/error/AppError";

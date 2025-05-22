@@ -21,7 +21,7 @@ export class QuestionRes {
     return new QuestionRes({
       title: data.title,
       description: data.description,
-      questions: data.questions.map((q: any) => Question.deserialize(q)),
+      questions: data.questions.map((q: any) => Question.fromJson(q)),
     });
   }
 

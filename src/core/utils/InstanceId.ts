@@ -1,5 +1,3 @@
-import { boolean } from "zod";
-
 export class InstanceId {
 
     static generate(ref?: string): string {

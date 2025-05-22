@@ -31,7 +31,7 @@ export function UserDetailsView() {
                 onClick={() => setExpanded((prev) => !prev)}
                 aria-label="Toggle user details"
             >
-                <AvatarView size={28} id={userInfo.id} name={userInfo.name} />
+                <AvatarView fontSize={28} id={userInfo.id} name={userInfo.name} />
                 <div className="flex-1">
                     <div className="text-sm font-medium text-default">{userInfo.name}</div>
                 </div>

@@ -52,11 +52,11 @@ export class Question {
     }
 
 
-    static deserialize(json: JsonObj): Question {
+    static fromJson(json: JsonObj): Question {
         const type = QuestionType.fromType(json.type)!;
         const qExtras = json.qExtras ?  QExtras.fromTypeAndMap(type, json.qExtras) : undefined;
         const subQuestions = json.subQuestions
-            ? json.subQuestions.map((subJson: JsonObj) => Question.deserialize(subJson))
+            ? json.subQuestions.map((subJson: JsonObj) => Question.fromJson(subJson))
             : undefined;
         const level = QuestionLevel.fromLevel(json.level);
         const mediaFiles = json.mediaFiles

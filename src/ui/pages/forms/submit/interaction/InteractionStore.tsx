@@ -10,7 +10,6 @@ import { InstanceId } from "~/core/utils/InstanceId";
 import { SubmitFormQuestion } from "~/domain/forms/models/SubmitFormQuestion";
 import { GroupQuestionVm } from "./models/GroupQuestionVm";
 import { SubmitFormReq, SubmitFormRes } from "~/domain/forms/models/submit/SubmitFormModels";
-import { BasicLoadingDialog } from "~/ui/components/dialogs/BasicLoadingDialog";
 import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
 import { showErrorToast } from "~/ui/widgets/toast/toast";
 
@@ -152,32 +151,8 @@ export class InteractionStore {
         this.stopTimer();
         this.endedOn = new Date();
         await this.submitDataToServer();
-        // await this.mockSubmitDataToServer();
     }
 
-
-    private async mockSubmitDataToServer() {
-        runInAction(() => {
-            this.submitState = DataState.loading();
-            this.dialogManager.show({
-                id: "submit-form-overlay",
-                component: BasicLoadingDialog,
-                props: {
-                    message: "Submitting " + this.formType.name,
-                },
-            });
-        });
-        await new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(true);
-            }, 8000);
-        });
-
-        runInAction(() => {
-            this.submitState = DataState.init();
-            this.dialogManager.closeById("submit-form-overlay");
-        });
-    }
 
 
     private async submitDataToServer() {

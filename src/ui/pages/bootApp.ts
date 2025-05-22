@@ -5,7 +5,6 @@ import { logger } from "~/core/utils/logger";
 import { OrgConfig } from "~/domain/common/models/OrgConfig";
 import { ConfigService } from "~/domain/common/services/ConfigService";
 import { ApiClient } from "~/infra/datasources/ApiClient";
-import { addAuthInterceptor } from "~/infra/datasources/apiClientHelper";
 import { BaseApiClient } from "~/infra/datasources/BaseApiClient";
 
 let hasBooted = false;

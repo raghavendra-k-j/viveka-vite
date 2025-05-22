@@ -3,7 +3,7 @@ import { QuestionType } from "./QuestionType";
 
 export abstract class QExtras {
 
-    abstract serialize(): JsonObj;
+    abstract toJson(): JsonObj;
 
     static fromTypeAndMap(type: QuestionType, qExtras: JsonObj): QExtras {
         const deserializer = QExtras.deserializerMap[type.type];
@@ -11,14 +11,12 @@ export abstract class QExtras {
     }
 
     static deserializerMap: Record<string, (json: JsonObj) => QExtras> = {
-        [QuestionType.multipleChoice.type]: (json: JsonObj) => MultipleChoiceQExtras.deserialize(json),
-        [QuestionType.checkboxes.type]: (json: JsonObj) => CheckBoxesQExtras.deserialize(json),
-        [QuestionType.fillBlanks.type]: (json: JsonObj) => FillBlanksQExtras.deserialize(json),
-        [QuestionType.pairMatch.type]: (json: JsonObj) => PairMatchQExtras.deserialize(json),
-        [QuestionType.trueFalse.type]: (json: JsonObj) => TrueFalseQExtras.deserialize(json),
+        [QuestionType.multipleChoice.type]: (json: JsonObj) => MultipleChoiceQExtras.fromJson(json),
+        [QuestionType.checkboxes.type]: (json: JsonObj) => CheckBoxesQExtras.fromJson(json),
+        [QuestionType.fillBlanks.type]: (json: JsonObj) => FillBlanksQExtras.fromJson(json),
+        [QuestionType.pairMatch.type]: (json: JsonObj) => PairMatchQExtras.fromJson(json),
+        [QuestionType.trueFalse.type]: (json: JsonObj) => TrueFalseQExtras.fromJson(json),
     };
-
-
 }
 
 export class Choice {
@@ -33,14 +31,14 @@ export class Choice {
         this.text = text;
     }
 
-    serialize(): JsonObj {
+    toJson(): JsonObj {
         return {
             [Choice.keyId]: this.id,
             [Choice.keyText]: this.text,
         };
     }
 
-    static deserialize(json: JsonObj): Choice {
+    static fromJson(json: JsonObj): Choice {
         return new Choice({
             id: json[Choice.keyId],
             text: json[Choice.keyText],
@@ -59,15 +57,15 @@ export class MultipleChoiceQExtras extends QExtras {
         this.choices = choices;
     }
 
-    serialize(): JsonObj {
+    toJson(): JsonObj {
         return {
-            [MultipleChoiceQExtras.keyChoices]: this.choices.map(choice => choice.serialize()),
+            [MultipleChoiceQExtras.keyChoices]: this.choices.map(choice => choice.toJson()),
         };
     }
 
-    static deserialize(json: JsonObj): MultipleChoiceQExtras {
+    static fromJson(json: JsonObj): MultipleChoiceQExtras {
         return new MultipleChoiceQExtras({
-            choices: json[MultipleChoiceQExtras.keyChoices].map((e: JsonObj) => Choice.deserialize(e)),
+            choices: json[MultipleChoiceQExtras.keyChoices].map((e: JsonObj) => Choice.fromJson(e)),
         });
     }
 }
@@ -83,15 +81,15 @@ export class CheckBoxesQExtras extends QExtras {
         this.choices = choices;
     }
 
-    serialize(): JsonObj {
+    toJson(): JsonObj {
         return {
-            [CheckBoxesQExtras.keyChoices]: this.choices.map(choice => choice.serialize()),
+            [CheckBoxesQExtras.keyChoices]: this.choices.map(choice => choice.toJson()),
         };
     }
 
-    static deserialize(json: JsonObj): CheckBoxesQExtras {
+    static fromJson(json: JsonObj): CheckBoxesQExtras {
         return new CheckBoxesQExtras({
-            choices: json[CheckBoxesQExtras.keyChoices].map((e: JsonObj) => Choice.deserialize(e)),
+            choices: json[CheckBoxesQExtras.keyChoices].map((e: JsonObj) => Choice.fromJson(e)),
         });
     }
 }
@@ -105,13 +103,13 @@ export class FillBlankInput {
         this.id = id;
     }
 
-    serialize(): JsonObj {
+    toJson(): JsonObj {
         return {
             [FillBlankInput.keyId]: this.id,
         };
     }
 
-    static deserialize(json: JsonObj): FillBlankInput {
+    static fromJson(json: JsonObj): FillBlankInput {
         return new FillBlankInput({
             id: json[FillBlankInput.keyId],
         });
@@ -128,15 +126,15 @@ export class FillBlanksQExtras extends QExtras {
         this.inputs = inputs;
     }
 
-    serialize(): JsonObj {
+    toJson(): JsonObj {
         return {
-            [FillBlanksQExtras.keyItems]: this.inputs.map(input => input.serialize()),
+            [FillBlanksQExtras.keyItems]: this.inputs.map(input => input.toJson()),
         };
     }
 
-    static deserialize(json: JsonObj): FillBlanksQExtras {
+    static fromJson(json: JsonObj): FillBlanksQExtras {
         return new FillBlanksQExtras({
-            inputs: json[FillBlanksQExtras.keyItems].map((e: JsonObj) => FillBlankInput.deserialize(e)),
+            inputs: json[FillBlanksQExtras.keyItems].map((e: JsonObj) => FillBlankInput.fromJson(e)),
         });
     }
 }
@@ -155,14 +153,14 @@ export class TrueFalseQExtras extends QExtras {
         this.falseLabel = falseLabel;
     }
 
-    serialize(): JsonObj {
+    toJson(): JsonObj {
         return {
             [TrueFalseQExtras.keyTrueLabel]: this.trueLabel,
             [TrueFalseQExtras.keyFalseLabel]: this.falseLabel,
         };
     }
 
-    static deserialize(json: JsonObj): TrueFalseQExtras {
+    static fromJson(json: JsonObj): TrueFalseQExtras {
         return new TrueFalseQExtras({
             trueLabel: json[TrueFalseQExtras.keyTrueLabel],
             falseLabel: json[TrueFalseQExtras.keyFalseLabel],
@@ -186,7 +184,7 @@ export class PairMatchItem {
         this.colBText = colBText;
     }
 
-    serialize(): JsonObj {
+    toJson(): JsonObj {
         return {
             [PairMatchItem.keyId]: this.rowId,
             [PairMatchItem.keyColAText]: this.colAText,
@@ -194,7 +192,7 @@ export class PairMatchItem {
         };
     }
 
-    static deserialize(json: JsonObj): PairMatchItem {
+    static fromJson(json: JsonObj): PairMatchItem {
         return new PairMatchItem({
             rowId: json[PairMatchItem.keyId],
             colAText: json[PairMatchItem.keyColAText],
@@ -213,15 +211,15 @@ export class PairMatchQExtras extends QExtras {
         this.items = items;
     }
 
-    serialize(): JsonObj {
+    toJson(): JsonObj {
         return {
-            [PairMatchQExtras.keyItems]: this.items.map(item => item.serialize()),
+            [PairMatchQExtras.keyItems]: this.items.map(item => item.toJson()),
         };
     }
 
-    static deserialize(json: JsonObj): PairMatchQExtras {
+    static fromJson(json: JsonObj): PairMatchQExtras {
         return new PairMatchQExtras({
-            items: json[PairMatchQExtras.keyItems].map((e: JsonObj) => PairMatchItem.deserialize(e)),
+            items: json[PairMatchQExtras.keyItems].map((e: JsonObj) => PairMatchItem.fromJson(e)),
         });
     }
 

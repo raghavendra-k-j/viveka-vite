@@ -14,10 +14,10 @@ export class AssmntType {
         return [AssmntType.PreTraining, AssmntType.PostTraining];
     }
 
-    static fromType(type: string | null): AssmntType | null {
-        if (!type) return null;
+    static fromType(type: string | null | undefined): AssmntType | undefined {
+        if (!type) return undefined;
         return AssmntType.values.find(
             (assmntType) => assmntType.type.toLowerCase() === type.toLowerCase()
-        ) || null;
+        ) || undefined;
     }
 }

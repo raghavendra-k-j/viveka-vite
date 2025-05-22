@@ -109,7 +109,7 @@ export class FormResponse {
             isEvaluated: json.isEvaluated,
             evaluationType: json.evaluationType ? EvaluationType.fromType(json.evaluationType) : null,
             evaluatedOn: parseDate(json.evaluatedOn),
-            evaluator: json.evaluator ? FormUser.deserialize(json.evaluator) : null,
+            evaluator: json.evaluator ? FormUser.fromJson(json.evaluator) : null,
             timeTaken: json.timeTaken,
             marks: json.marks,
             percentage: json.percentage,

@@ -50,7 +50,6 @@ export class RDQuestion {
         qNumber: number;
         subQNumber?: number;
         mEvaluationStatus?: MEvaluationStatus;
-        subQuestions?: RDQuestion[];
     }) {
         this.id = props.id;
         this.formId = props.formId;
@@ -72,17 +71,12 @@ export class RDQuestion {
         this.qNumber = props.qNumber;
         this.subQNumber = props.subQNumber;
         this.mEvaluationStatus = props.mEvaluationStatus;
-        this.subQuestions = props.subQuestions;
     }
 
     static fromJson(json: JsonObj): RDQuestion {
         const type = QuestionType.fromType(json.type)!;
 
         const qExtras = json.qExtras ? QExtras.fromTypeAndMap(type, json.qExtras) : undefined;
-
-        const subQuestions = json.subQuestions
-            ? json.subQuestions.map((subJson: JsonObj) => RDQuestion.fromJson(subJson))
-            : undefined;
 
         const level = QuestionLevel.fromLevel(json.level);
 
@@ -115,7 +109,6 @@ export class RDQuestion {
             qNumber: json.qNumber,
             subQNumber: json.subQNumber,
             mEvaluationStatus: mEvaluationStatus,
-            subQuestions: subQuestions,
         });
     }
 }
