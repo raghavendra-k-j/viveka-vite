@@ -1,21 +1,40 @@
-import React, { } from 'react';
 import { Node as ProseMirrorNode } from 'prosemirror-model';
 import { STT } from '~/infra/utils/stt/STT';
 import './RichPmEditor.css';
 import styles from "./styles.module.css";
 import { Mic, SquareRadical } from 'lucide-react';
 import { usePmEditor } from './useProseMirrorEditor';
+import { RichPmEditorSchema } from './pm/schema';
+import 'prosemirror-view/style/prosemirror.css';
 
 export interface RichPmEditorProps {
-    initialContent?: string;
+    schema: RichPmEditorSchema;
+    initialContent?: ProseMirrorNode | undefined;
     onChange?: (node: ProseMirrorNode) => void;
-    getContent?: () => ProseMirrorNode;
     stt: STT;
     placeholder?: string;
 }
 
-const RichPmEditor: React.FC<RichPmEditorProps> = (props) => {
+
+export type RichPmEditorRef = {
+    getContent: () => ProseMirrorNode | null;
+    setContent: (doc: ProseMirrorNode) => void;
+}
+
+
+import React, { forwardRef, useImperativeHandle } from 'react';
+
+
+
+export const RichPmEditor = forwardRef(function RichPmEditor(
+    props: RichPmEditorProps,
+    ref: React.Ref<RichPmEditorRef>
+) {
     const pm = usePmEditor(props);
+    useImperativeHandle(ref, () => ({
+        getContent: pm.getContent,
+        setContent: pm.setContent,
+    }));
     return (
         <div className={styles.richPmEditor}>
             <div className={styles.toolbar}>
@@ -34,6 +53,5 @@ const RichPmEditor: React.FC<RichPmEditorProps> = (props) => {
             ></div>
         </div>
     );
-};
+});
 
-export default RichPmEditor;

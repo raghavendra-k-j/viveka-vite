@@ -3,7 +3,7 @@ import markItBlanks from "~/ui/utils/forms/markItBlanks";
 import markItLaTex from "~/ui/utils/forms/markItLaTex";
 
 
-const questionMarkIt = new MarkdownIt({
+export const questionMarkIt = new MarkdownIt({
     breaks: true,
 })
     .use(markItLaTex)

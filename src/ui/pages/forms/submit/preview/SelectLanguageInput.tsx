@@ -1,15 +1,15 @@
-import { SelectFormField, SelectOption } from "~/ui/widgets/form/input/SelectFormField";
+import { FSelectField, FSelectOption } from "~/ui/widgets/form/input/FSelectField";
 import { useSubmitStore } from "../SubmitContext";
 import { Language } from "~/domain/forms/models/Language";
 import { useMemo, useRef } from "react";
-import { FieldValue } from "~/ui/widgets/form/FieldValue";
+import { FValue } from "~/ui/widgets/form/FValue";
 import { Observer } from "mobx-react-lite";
 
 export function SelectLanguageInput() {
     const store = useSubmitStore();
     const { languages } = store.formDetail;
 
-    const options: SelectOption<Language>[] = useMemo(() =>
+    const options: FSelectOption<Language>[] = useMemo(() =>
         languages.map((language) => ({
             data: language,
             value: (l) => l.id,
@@ -18,11 +18,11 @@ export function SelectLanguageInput() {
         [languages]
     );
 
-    const field = useRef(new FieldValue<string>(store.selectedLanguage?.id || "", {}));
+    const field = useRef(new FValue<string>(store.selectedLanguage?.id || "", {}));
     return (
         <Observer>
             {() => (
-                <SelectFormField
+                <FSelectField
                     id="form-language-select"
                     label="Select Language"
                     required

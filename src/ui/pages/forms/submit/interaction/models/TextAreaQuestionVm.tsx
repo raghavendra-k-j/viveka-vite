@@ -4,7 +4,7 @@ import { computed, makeObservable, observable, runInAction } from "mobx";
 import { Answer, TextAreaAnswer } from "~/domain/forms/models/answer/Answer";
 import { Node as ProseMirrorNode } from 'prosemirror-model';
 import { PmToMd } from "~/ui/components/richpmeditor/utils/PmToMd";
-import { schema } from "~/ui/components/richpmeditor/pm/schema";
+import { blockSchema } from "~/ui/components/richpmeditor/pm/schema";
 
 type TextAreaQuestionVmProps = QuestionVmProps & {};
 
@@ -48,7 +48,7 @@ export class TextAreaQuestionVm extends QuestionVm {
         if (!this.isAnswered) {
             return undefined;
         }
-        const ansString = PmToMd.getContent(this.ansNode!, schema);
+        const ansString = PmToMd.getContent(this.ansNode!, blockSchema);
         return new TextAreaAnswer({ answer: ansString });
     }
 

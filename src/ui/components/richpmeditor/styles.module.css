@@ -3,6 +3,7 @@
   flex-direction: column;
   width: 100%;
   border-radius: var(--dimen-input-radius);
+  box-shadow: var(--shadow-input);
 }
 
 .toolbar {
@@ -50,8 +51,9 @@
   border-radius: 0 0 var(--dimen-input-radius) var(--dimen-input-radius);
 }
 
+
 .editorContent:focus-within {
   border-color: var(--color-input-border-focus);
   border-color: var(--color-input-border-focus);
-  box-shadow: var(--shadow-input);
+  box-shadow: var(--shadow-input-focused);
 }

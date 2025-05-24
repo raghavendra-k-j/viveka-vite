@@ -1,105 +1,67 @@
-import React, { useState } from "react";
-
-type Question = {
-  id: number;
-  type: "objective" | "subjective";
-  questionText: string;
-  options?: string[];
-};
-
-const questions: Question[] = Array.from({ length: 10 }, (_, i) => {
-  return {
-    id: i + 1,
-    type: i % 2 === 0 ? "objective" : "subjective",
-    questionText: `Question ${i + 1}: What is the answer to question ${i + 1}?`,
-    options: i % 2 === 0 ? ["Option A", "Option B", "Option C", "Option D"] : undefined,
-  };
-});
+import { useRef } from "react";
+import { QuestionType } from "~/domain/forms/models/question/QuestionType";
+import { STT } from "~/infra/utils/stt/STT";
+import { blockSchema } from "~/ui/components/richpmeditor/pm/schema";
+import { RichPmEditor } from "~/ui/components/richpmeditor/RichPmEditor";
+import { HtmlToPm } from "~/ui/components/richpmeditor/utils/HtmlToPm";
+import { PmToHtml } from "~/ui/components/richpmeditor/utils/PmToHtml";
+import { FValue } from "~/ui/widgets/form/FValue";
+import { FListBoxField } from "~/ui/widgets/form/input/FListBoxField";
+import { Node as ProseMirrorNode } from 'prosemirror-model';
+import FilledButton from "~/ui/widgets/button/FilledButton";
 
 const HomePage: React.FC = () => {
-  const [singleQuestionMode, setSingleQuestionMode] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => Math.min(prev + 1, questions.length - 1));
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => Math.max(prev - 1, 0));
-  };
-
-  const renderQuestion = (q: Question) => {
-    return (
-      <div
-        key={q.id}
-        style={{
-          border: "1px solid #ccc",
-          padding: "20px",
-          marginBottom: "20px",
-          minHeight: "200px",
-          borderRadius: "8px",
-          backgroundColor: "#f9f9f9",
-        }}
-      >
-        <h3>{q.questionText}</h3>
-        {q.type === "objective" ? (
-          <ul>
-            {q.options!.map((opt, idx) => (
-              <li key={idx}>
-                <label>
-                  <input type="radio" name={`question-${q.id}`} /> {opt}
-                </label>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <textarea
-            placeholder="Write your answer here..."
-            style={{ width: "100%", height: "100px" }}
-          />
-        )}
-      </div>
-    );
-  };
+  const questionType = useRef<FValue<QuestionType | null>>(new FValue<QuestionType | null>(null));
+  const stt = useRef<STT>(new STT());
+  const editorRef = useRef<{
+    getContent: () => ProseMirrorNode | null;
+    setContent: (doc: ProseMirrorNode) => void;
+  }>(null);
 
   return (
-    <div style={{ maxWidth: 700, margin: "20px auto", fontFamily: "Arial, sans-serif" }}>
-      <h1>Quiz Application</h1>
+    <div className="p-4 flex flex-col bg-surface gap-4 overflow-y-auto h-full">
+      <FListBoxField<QuestionType>
+        label="Question Type"
+        className="w-64"
+        inputSize="sm"
+        required
+        field={questionType.current}
+        items={QuestionType.values}
+        itemRenderer={(item) => item.name}
+        itemKey={(item) => item.type}
+        placeholder="Select question type"
+      />
 
-      <div style={{ marginBottom: 20 }}>
-        <label>
-          <input
-            type="checkbox"
-            checked={singleQuestionMode}
-            onChange={() => {
-              setSingleQuestionMode(!singleQuestionMode);
-              setCurrentIndex(0); // reset on toggle
-            }}
-          />{" "}
-          Single Question Mode
-        </label>
-      </div>
 
-      {singleQuestionMode ? (
-        <div>
-          {renderQuestion(questions[currentIndex])}
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <button onClick={handlePrev} disabled={currentIndex === 0}>
-              Previous
-            </button>
-            <span>
-              Question {currentIndex + 1} of {questions.length}
-            </span>
-            <button onClick={handleNext} disabled={currentIndex === questions.length - 1}>
-              Next
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div style={{ maxHeight: "80vh", overflowY: "auto" }}>
-          {questions.map((q) => renderQuestion(q))}
-        </div>
-      )}
+      <RichPmEditor
+        ref={editorRef}
+        schema={blockSchema}
+        stt={stt.current}
+        onChange={(value) => {
+          const markdownContent = PmToHtml.getContent(value, blockSchema);
+          const reverse = HtmlToPm.parse(markdownContent, blockSchema);
+        }}
+      />
+
+      <FilledButton onClick={() => {
+        const content = editorRef.current?.getContent();
+        console.log("Content:", content ? PmToHtml.getContent(content, blockSchema) : "No content");
+      }}>
+        Get Content
+      </FilledButton>
+
+      <FilledButton onClick={() => {
+        const content = "A sample content to set in the editor";
+        if (content) {
+          editorRef.current?.setContent(HtmlToPm.parse(content, blockSchema));
+          console.log("Content set successfully");
+        } else {
+          console.error("No content to set");
+        }
+      }}>
+        Set Content
+      </FilledButton>
+
     </div>
   );
 };

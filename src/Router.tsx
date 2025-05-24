@@ -2,21 +2,40 @@ import { Route, Routes } from "react-router";
 import { lazy, Suspense } from "react";
 import { PageLoader } from "./ui/components/loaders/PageLoader";
 import "./ui/ds/core/core.css";
+import NotFoundPage from "./ui/pages/error/NotFoundPage";
+import AdminLayout from "./ui/pages/admin/_layout/AdminLayout";
 
 const AppLayout = lazy(() => import("./ui/pages/_layout/AppLayout"));
+const AdminFormsLayout = lazy(() => import("./ui/pages/admin/forms/formdetail/layout/AdminFormLayout"));
 const HomePage = lazy(() => import("./ui/pages/home/HomePage"));
 const SubmitPage = lazy(() => import("./ui/pages/forms/submit/SubmitPage"));
+const QuestionsPage = lazy(() => import("./ui/pages/admin/forms/formdetail/questions/QuestionsPage"));
+const SettingsPage = lazy(() => import("./ui/pages/admin/forms/formdetail/settings/SettingsPage"));
+
 
 export default function Router() {
     return (
         <Suspense fallback={<PageLoader />}>
             <Routes>
+                {/* All routes wrapped inside AppLayout */}
                 <Route element={<AppLayout />}>
+                    {/* Public Routes */}
                     <Route path="/" element={<HomePage />} />
                     <Route path="/forms/:permalink/submit" element={<SubmitPage />} />
-                </Route>
-            </Routes>
 
+                    {/* Admin Routes with AdminLayout */}
+                    <Route path="/admin" element={<AdminLayout />}>
+                        <Route path="forms/:permalink" element={<AdminFormsLayout />}>
+                            <Route index element={<QuestionsPage />} />
+                            <Route path="questions" element={<QuestionsPage />} />
+                            <Route path="settings" element={<SettingsPage />} />
+                        </Route>
+                    </Route>
+                </Route>
+
+                {/* 404 Fallback */}
+                <Route path="*" element={<NotFoundPage />} />
+            </Routes>
         </Suspense>
     );
 }

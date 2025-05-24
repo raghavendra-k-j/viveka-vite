@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { useEffect, useCallback, type ReactNode } from "react";
+import { DialogContext, useDialog } from "./DialogContext";
 
 export type DialogProps = {
     children: ReactNode;
@@ -26,25 +27,27 @@ export function Dialog(props: DialogProps) {
     if (props.isOpen === false) return null;
 
     return (
-        <div className="dialog">
-            {props.children}
-        </div>
+        <DialogContext.Provider value={{ onClose }}>
+            <div className="dialog">
+                {props.children}
+            </div>
+        </DialogContext.Provider>
     );
 }
 
 export type DialogOverlayProps = {
-    onClick?: () => void;
     className?: string;
 };
 
 export function DialogOverlay(props: DialogOverlayProps) {
+    const dialog = useDialog();
     return (
         <div
             className={clsx(
                 "dialog-overlay",
                 props.className
             )}
-            onClick={props.onClick}
+            onClick={dialog.onClose}
         />
     );
 }
@@ -55,8 +58,9 @@ export type DialogScaffoldProps = {
 };
 
 export function DialogScaffold({ children, className, ...rest }: DialogScaffoldProps & React.HTMLAttributes<HTMLDivElement>) {
+    const dialog = useDialog();
     return (
-        <div className={clsx("dialog-scaffold", className)} {...rest}>
+        <div onClick={dialog.onClose} className={clsx("dialog-scaffold", className)} {...rest}>
             {children}
         </div>
     );
@@ -85,6 +89,7 @@ export type DialogContentProps = {
 export function DialogContent(props: DialogContentProps) {
     return (
         <div
+            onClick={(e) => e.stopPropagation()}
             className={clsx(
                 "dialog-content",
                 props.className

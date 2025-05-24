@@ -1,8 +1,8 @@
-.select {
+.fselect {
   --select-px: var(--dimen-input-md-px);
   --select-py: var(--dimen-input-md-py);
-  --select-font-size: var(--dimen-input-md-fontSize);
-  --select-min-height: var(--dimen-input-md-minHeight);
+  --select-font-size: var(--dimen-input-md-font-size);
+  --select-min-height: var(--dimen-input-md-min-height);
   --select-radius: var(--dimen-input-radius);
 
   display: inline-flex;
@@ -33,17 +33,17 @@
   box-shadow: var(--shadow-input);
 }
 
-.select:focus {
+.fselect:focus {
   border-color: var(--color-input-border-focus);
   box-shadow: var(--shadow-input-focused);
 }
 
-.select:hover {
+.fselect:hover {
   border-color: var(--color-input-border-hover);
 }
 
-.select:disabled,
-.select.is-disabled {
+.fselect:disabled,
+.fselect.is-disabled {
   background-color: var(--color-input-bg-disabled);
   border-color: var(--color-input-border);
   color: var(--color-input-text-disabled);
@@ -51,14 +51,14 @@
   background-image: none;
 }
 
-.select--md {
+.fselect--md {
   --select-px: var(--dimen-input-md-px);
   --select-py: var(--dimen-input-md-py);
   --select-font-size: var(--dimen-input-md-font-size);
   --select-min-height: var(--dimen-input-md-min-height);
 }
 
-.select--sm {
+.fselect--sm {
   --select-px: var(--dimen-input-sm-px);
   --select-py: var(--dimen-input-sm-py);
   --select-font-size: var(--dimen-input-sm-font-size);

@@ -1,4 +1,4 @@
-.input {
+.finput {
   --input-px: var(--dimen-input-md-px);
   --input-py: var(--dimen-input-md-py);
   --input-font-size: var(--dimen-input-md-fontSize);
@@ -20,35 +20,35 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.input::placeholder {
+.finput::placeholder {
   color: var(--color-input-placeholder);
 }
 
-.input:focus {
+.finput:focus {
   box-shadow: var(--shadow-input-focused);
   border: 1px solid var(--color-input-border-focus);
 }
 
-.input:hover {
+.finput:hover {
   border-color: var(--color-input-border-hover);
 }
 
-.input:disabled,
-.input.is-disabled {
+.finput:disabled,
+.finput.is-disabled {
   background-color: var(--color-input-bg-disabled);
   border-color: var(--color-input-border-disabled);
   color: var(--color-input-text-disabled);
   cursor: not-allowed;
 }
 
-.input--md {
+.finput--md {
   --input-px: var(--dimen-input-md-px);
   --input-py: var(--dimen-input-md-py);
   --input-font-size: var(--dimen-input-md-font-size);
   --input-min-height: var(--dimen-input-md-min-height);
 }
 
-.input--sm {
+.finput--sm {
   --input-px: var(--dimen-input-sm-px);
   --input-py: var(--dimen-input-sm-py);
   --input-font-size: var(--dimen-input-sm-font-size);

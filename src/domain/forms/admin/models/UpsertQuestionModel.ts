@@ -32,8 +32,8 @@ export type UpsertQuestionReqProps = {
     parentId?: number;
     type: QuestionType;
     question: string;
-    qExtras?: QExtras;
-    answer?: Answer;
+    qExtras: QExtras | null;
+    answer: Answer | null;
     ansHint?: string;
     ansExplanation?: string;
     marks?: number;
@@ -49,8 +49,8 @@ export class UpsertQuestionReq {
     public readonly parentId?: number;
     public readonly type: QuestionType;
     public readonly question: string;
-    public readonly qExtras?: QExtras;
-    public readonly answer?: Answer;
+    public readonly qExtras: QExtras | null;
+    public readonly answer: Answer | null;
     public readonly ansHint?: string;
     public readonly ansExplanation?: string;
     public readonly marks?: number;
@@ -83,8 +83,8 @@ export class UpsertQuestionReq {
             parentId: this.parentId,
             type: this.type.type,
             question: this.question,
-            qExtras: this.qExtras?.toJson(),
-            answer: this.answer?.toJson(),
+            qExtras: this.qExtras?.toJson() || null,
+            answer: this.answer?.toJson() || null,
             ansHint: this.ansHint,
             ansExplanation: this.ansExplanation,
             marks: this.marks,

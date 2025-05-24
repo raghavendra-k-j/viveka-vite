@@ -1,3 +1,4 @@
+import { Bool3 } from "~/core/utils/Bool3";
 import type { FormType } from "../FormType";
 import { AssmntMarksPolicy } from "./AssmntMarksPolicy";
 
@@ -12,6 +13,8 @@ type QuestionTypeProps = {
 };
 
 export class QuestionType {
+
+
     public readonly type: string;
     public readonly name: string;
     public readonly assessmentName?: string;
@@ -118,6 +121,37 @@ export class QuestionType {
         QuestionType.groupQuestion,
     ]);
 
+    // Method to retrieve all QuestionType values based on form type
+    static readonly assmntValues: readonly QuestionType[] = Object.freeze([
+        QuestionType.multipleChoice,
+        QuestionType.checkboxes,
+        QuestionType.textbox,
+        QuestionType.textarea,
+        QuestionType.fillBlanks,
+        QuestionType.pairMatch,
+        QuestionType.trueFalse,
+        QuestionType.groupQuestion,
+    ]);
+
+    static readonly surveyValues: readonly QuestionType[] = Object.freeze([
+        QuestionType.multipleChoice,
+        QuestionType.checkboxes,
+        QuestionType.textbox,
+        QuestionType.textarea,
+    ]);
+
+    static getValues(formType: FormType): readonly QuestionType[] {
+        if (formType.isAssessment) {
+            return QuestionType.assmntValues;
+        }
+        if (formType.isSurvey) {
+            return QuestionType.surveyValues;
+        }
+        return QuestionType.values;
+    }
+
+
+
     // Freezing the map to prevent modification
     static readonly map: Readonly<Map<string, QuestionType>> = Object.freeze(
         new Map<string, QuestionType>(
@@ -185,4 +219,14 @@ export class QuestionType {
         QuestionType.textarea,
         QuestionType.fillBlanks,
     ]);
+
+
+    static canHaveMarks(formType: FormType, questionType: QuestionType): Bool3 {
+        if (!formType.isAssessment) return Bool3.N;
+        if (questionType.assmntMarksPolicy === AssmntMarksPolicy.required) return Bool3.T;
+        if (questionType.assmntMarksPolicy === AssmntMarksPolicy.optional) return Bool3.T;
+        return Bool3.N;
+    }
+
+
 }

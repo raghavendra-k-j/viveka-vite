@@ -1,6 +1,6 @@
 import { Node as ProseMirrorNode } from 'prosemirror-model';
 import { EditorView, NodeView } from 'prosemirror-view';
-import { schema } from './schema';
+import { blockSchema } from './schema';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 
@@ -9,6 +9,7 @@ type LaTexNodeViewProps = {
     view: EditorView;
     getPos: () => number | undefined;
     onClick: OnClickLaTexNodeView;
+    isInline: boolean;
 }
 
 export type OnClickLaTexNodeView = (node: LaTexNodeView) => void;
@@ -20,13 +21,15 @@ export class LaTexNodeView implements NodeView {
     private view: EditorView;
     private getPos: () => number | undefined;
     private onClick: OnClickLaTexNodeView;
+    private isInline: boolean;
 
     constructor(props: LaTexNodeViewProps) {
         this.node = props.node;
         this.view = props.view;
         this.getPos = props.getPos;
         this.onClick = props.onClick;
-        this.dom = document.createElement('span');
+        this.isInline = props.isInline;
+        this.dom = document.createElement(this.isInline ? 'span' : 'div');
         this.dom.classList.add('latex-nodeview');
         this.renderContent();
         this.dom.addEventListener('click', this.handleClick);
@@ -45,7 +48,7 @@ export class LaTexNodeView implements NodeView {
         try {
             katex.render(latexSource, this.dom, {
                 throwOnError: false,
-                displayMode: false,
+                displayMode: !this.isInline,
             });
         }
         catch (e) {
@@ -64,7 +67,7 @@ export class LaTexNodeView implements NodeView {
     };
 
     public update(node: ProseMirrorNode): boolean {
-        if (node.type !== schema.nodes.latex) {
+        if (node.type !== blockSchema.nodes.latex) {
             return false;
         }
         if (node.attrs.latex !== this.node.attrs.latex) {

@@ -1,0 +1,100 @@
+.flistbox {
+  --select-px: var(--dimen-input-md-px);
+  --select-py: var(--dimen-input-md-py);
+  --select-font-size: var(--dimen-input-md-font-size);
+  --select-min-height: var(--dimen-input-md-min-height);
+  --select-radius: var(--dimen-input-radius);
+  position: relative;
+}
+
+.flistbox__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--select-py) var(--select-px);
+  font-size: var(--select-font-size);
+  min-height: var(--select-min-height);
+  border-radius: var(--select-radius);
+  border: 1px solid var(--color-input-border);
+  background-color: var(--color-input-bg);
+  color: var(--color-input-text);
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23777" height="8" width="12" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 12,0 6,7"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 8px;
+  padding-right: calc(var(--select-px) + 20px);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-input);
+}
+
+.flistbox__button:hover {
+  border-color: var(--color-input-border-hover);
+}
+
+.flistbox__button:focus {
+  border-color: var(--color-input-border-focus);
+  box-shadow: var(--shadow-input-focused);
+}
+
+.flistbox__button:disabled,
+.flistbox.is-disabled .flistbox__button {
+  background-color: var(--color-input-bg-disabled);
+  border-color: var(--color-input-border);
+  color: var(--color-input-text-disabled);
+  cursor: not-allowed;
+  background-image: none;
+}
+
+.flistbox__options {
+  position: absolute;
+  z-index: 10;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--select-radius);
+  overflow-y: auto;
+  width: 100%;
+  box-shadow: var(--shadow-xl);
+}
+
+.flistbox__options:focus-visible {
+  outline: none;
+}
+
+.flistbox__option {
+  padding: var(--select-py) var(--select-px);
+  cursor: pointer;
+  color: var(--color-input-text);
+  font-size: var(--select-font-size);
+}
+
+.flistbox__option:hover {
+  background-color: var(--color-listbox-option-bg-hover);
+}
+
+.flistbox__option[data-headlessui-state~="selected"] {
+  background-color: var(--color-listbox-option-bg-selected);
+  color: var(--color-listbox-option-text-selected);
+  font-weight: var(--font-weight-semibold);
+}
+
+.flistbox__option--placeholder {
+  color: var(--color-input-placeholder);
+}
+
+.flistbox--sm {
+  --select-px: var(--dimen-input-sm-px);
+  --select-py: var(--dimen-input-sm-py);
+  --select-font-size: var(--dimen-input-sm-font-size);
+  --select-min-height: var(--dimen-input-sm-min-height);
+}
+
+.flistbox--md {
+  --select-px: var(--dimen-input-md-px);
+  --select-py: var(--dimen-input-md-py);
+  --select-font-size: var(--dimen-input-md-font-size);
+  --select-min-height: var(--dimen-input-md-min-height);
+}

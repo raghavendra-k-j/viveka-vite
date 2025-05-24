@@ -2,7 +2,7 @@ import FilledButton from "~/ui/widgets/button/FilledButton";
 import { useFormAuthStore } from "./FormAuthContext";
 import OutlinedButton from "~/ui/widgets/button/OutlinedButton";
 import { FormAuthCard } from "./FormAuthCard";
-import { TextFormField } from "~/ui/widgets/form/input/TextFormField";
+import { FTextField } from "~/ui/widgets/form/input/FTextField";
 import { HeaderView } from "./HeaderView";
 import { AppEntityConst } from "~/core/const/AppEntityConst";
 import { Observer } from "mobx-react-lite";
@@ -32,7 +32,7 @@ export function VerifyEmailView() {
                 />
 
                 <div className="flex flex-col gap-6 px-6">
-                    <TextFormField
+                    <FTextField
                         id="otp"
                         label="Verification Code"
                         required

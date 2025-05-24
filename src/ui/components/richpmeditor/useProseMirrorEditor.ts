@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { EditorState, TextSelection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import { DOMParser, Fragment, Node as ProseMirrorNode } from 'prosemirror-model';
+import { Fragment, Node as ProseMirrorNode } from 'prosemirror-model';
 import { keymap } from 'prosemirror-keymap';
 import { baseKeymap } from 'prosemirror-commands';
 import { history, undo, redo } from 'prosemirror-history';
-import { schema } from './pm/schema';
+import { RichPmEditorSchema } from './pm/schema';
 import { LaTexNodeView, OnClickLaTexNodeView } from './pm/LaTexNodeView';
 import { DialogEntry, DialogManagerStore, useDialogManager } from '~/ui/widgets/dialogmanager';
 import { AiSTTDialog, AiSTTDialogProps } from '../aisttdialog/AiSTTDialog';
@@ -26,15 +26,15 @@ export type UsePmEditorData = {
     onClickEditableArea: (event: React.MouseEvent<HTMLDivElement>) => void;
     onClickVoiceButton: () => void;
     editorRef: React.RefObject<HTMLDivElement>;
+    getContent: () => ProseMirrorNode | null;
+    setContent: (doc: ProseMirrorNode) => void;
 }
 
 
 function handleInitData(props: RichPmEditorProps) {
     let docNode: ProseMirrorNode | undefined = undefined;
     if (props.initialContent) {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = props.initialContent || '';
-        docNode = DOMParser.fromSchema(schema).parse(tempDiv);
+        docNode = props.initialContent;
     }
     return docNode;
 }
@@ -43,7 +43,7 @@ function handleInitData(props: RichPmEditorProps) {
 function createState(docNode: ProseMirrorNode | undefined, props: RichPmEditorProps) {
     return EditorState.create({
         doc: docNode,
-        schema: schema,
+        schema: props.schema,
         plugins: [
             history(),
             keymap({ 'Mod-z': undo, 'Mod-y': redo }),
@@ -81,8 +81,18 @@ function createView(props: CreateViewProps) {
                     view: viewInstance,
                     getPos: getPos,
                     onClick: (node) => onClickLaTexNode({ node: node, stt: props.props.stt, dialogManager: props.dialogManager }),
+                    isInline: true,
                 });
             },
+            blockLatex(node, viewInstance, getPos) {
+                return new LaTexNodeView({
+                    node: node,
+                    view: viewInstance,
+                    getPos: getPos,
+                    onClick: (node) => onClickLaTexNode({ node: node, stt: props.props.stt, dialogManager: props.dialogManager }),
+                    isInline: false,
+                });
+            }
         },
         attributes: {
             class: 'richPmEditorContent'
@@ -113,21 +123,55 @@ const onClickLaTexNode = ({ node, stt, dialogManager }: { node: LaTexNodeView, s
 }
 
 
-function insertEquation(view: EditorView, expr: LaTexExpr) {
+
+
+export function insertEquation(view: EditorView, expr: LaTexExpr, schema: RichPmEditorSchema) {
     const { state, dispatch } = view;
     const { from, to } = state.selection;
-    const latexNodeType = schema.nodes.latex;
-    const latexNode = latexNodeType.create({ latex: expr.latex });
-    const spaceTextNode = schema.text("  ");
-    const fragmentToInsert = Fragment.fromArray([latexNode, spaceTextNode]);
     let tr = state.tr;
-    tr = tr.replaceWith(from, to, fragmentToInsert);
-    const selectionPos = from + latexNode.nodeSize;
-    tr = tr.setSelection(TextSelection.create(tr.doc, selectionPos));
-    tr = tr.scrollIntoView();
+
+    if (expr.isInline) {
+        const latexNodeType = schema.nodes.latex;
+        if (!latexNodeType) {
+            throw new Error("Inline LaTeX node type is not defined in the schema.");
+        }
+
+        const latexNode = latexNodeType.create({ latex: expr.latex });
+        const spaceTextNode = schema.text(" ");
+        const fragmentToInsert = Fragment.fromArray([latexNode, spaceTextNode]);
+
+        tr = tr.replaceWith(from, to, fragmentToInsert);
+        tr = tr.setSelection(TextSelection.create(tr.doc, from + latexNode.nodeSize));
+        tr = tr.scrollIntoView();
+
+    } else {
+        const blockLatexNodeType = schema.nodes.blockLatex;
+        const paragraphNodeType = schema.nodes.paragraph;
+
+        if (!blockLatexNodeType) {
+            throw new Error("Block LaTeX node type is not defined in the schema.");
+        }
+        if (!paragraphNodeType) {
+            throw new Error("Paragraph node type is required after block-level insertion.");
+        }
+
+        const latexNode = blockLatexNodeType.create({ latex: expr.latex });
+        const paragraphNode = paragraphNodeType.createAndFill();
+
+        const fragmentToInsert = Fragment.fromArray([
+            latexNode,
+            paragraphNode!
+        ]);
+
+        tr = tr.replaceWith(from, to, fragmentToInsert);
+        tr = tr.setSelection(TextSelection.create(tr.doc, from + latexNode.nodeSize + 1));
+        tr = tr.scrollIntoView();
+    }
+
     dispatch(tr);
     view.focus();
 }
+
 
 
 function focusEditor(view: EditorView | null) {
@@ -138,7 +182,7 @@ function focusEditor(view: EditorView | null) {
     }
 }
 
-function insertVoiceContent(viewRef: React.RefObject<EditorView | null>, content: Content) {
+function insertVoiceContent(viewRef: React.RefObject<EditorView | null>, content: Content, schema: RichPmEditorSchema) {
     const fragmentToInsert = ContentToPm.convert(content, schema);
     const view = viewRef.current;
 
@@ -188,6 +232,7 @@ export function usePmEditor(props: RichPmEditorProps) {
         // Handle initial content
         const docNode = handleInitData(props);
         const state = createState(docNode, props);
+
         const view = createView({
             props: props,
             editorRef: editorRef,
@@ -213,7 +258,7 @@ export function usePmEditor(props: RichPmEditorProps) {
                 props: {
                     stt: props.stt,
                     onDone: (expr: LaTexExpr) => {
-                        if (expr) insertEquation(view, expr);
+                        if (expr) insertEquation(view, expr, props.schema);
                         dialogManager.closeById('latex-kb-dialog');
                     },
                     onClose: () => dialogManager.closeById('latex-kb-dialog')
@@ -232,7 +277,7 @@ export function usePmEditor(props: RichPmEditorProps) {
                 stt: props.stt,
                 onDone: (contentFromDialog: Content) => {
                     dialogManager.closeById('ai-voice-dialog');
-                    insertVoiceContent(viewRef, contentFromDialog);
+                    insertVoiceContent(viewRef, contentFromDialog, props.schema);
                 },
                 onCancel: () => {
                     dialogManager.closeById('ai-voice-dialog');
@@ -260,11 +305,33 @@ export function usePmEditor(props: RichPmEditorProps) {
         }
     };
 
+
+    const getContent = () => {
+        if (viewRef.current) {
+            return viewRef.current.state.doc;
+        }
+        return null;
+    }
+
+    const setContent = (doc: ProseMirrorNode) => {
+        if (viewRef.current) {
+            const { state, dispatch } = viewRef.current;
+            const tr = state.tr.replaceWith(0, state.doc.content.size, doc);
+            dispatch(tr);
+            focusEditor(viewRef.current);
+        }
+    };
+
+
+
+
     return {
         onClickEquationButton: onClickEquationButton,
         onClickLaTexNode: onClickEquationButton,
         onClickEditableArea: onClickEditableArea,
         onClickVoiceButton: onClickVoiceButton,
         editorRef: editorRef,
+        getContent: getContent,
+        setContent: setContent,
     };
 }

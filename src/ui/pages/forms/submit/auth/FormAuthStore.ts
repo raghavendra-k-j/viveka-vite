@@ -8,7 +8,7 @@ import { AppError } from "~/core/error/AppError";
 import { logger } from "~/core/utils/logger";
 import { GetAppUserReq } from "~/domain/forms/models/submit/GetAppUserReq";
 import { InstanceId } from "~/core/utils/InstanceId";
-import { FieldValue } from "~/ui/widgets/form/FieldValue";
+import { FValue } from "~/ui/widgets/form/FValue";
 import { AppEntityConst } from "~/core/const/AppEntityConst";
 import validator from 'validator';
 import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
@@ -27,10 +27,10 @@ export class FormAuthStore {
     public readonly instanceId: string = InstanceId.generate("FormAuthStore");
     public readonly parentStore: SubmitStore;
 
-    public name!: FieldValue<string>;
-    public email!: FieldValue<string>;
-    public mobile!: FieldValue<string>;
-    public otp!: FieldValue<string>;
+    public name!: FValue<string>;
+    public email!: FValue<string>;
+    public mobile!: FValue<string>;
+    public otp!: FValue<string>;
 
     public submitState: DataState<undefined> = DataState.init();
     public verifyState: DataState<undefined> = DataState.init();
@@ -48,10 +48,10 @@ export class FormAuthStore {
         logger.debug("Creating", this.instanceId);
         this.parentStore = props.parentStore;
 
-        this.name = new FieldValue<string>("", { validator: this.nameValidator });
-        this.email = new FieldValue<string>("", { validator: this.emailValidator });
-        this.mobile = new FieldValue<string>("", { validator: this.mobileValidator });
-        this.otp = new FieldValue<string>("", { validator: this.otpValidator });
+        this.name = new FValue<string>("", { validator: this.nameValidator });
+        this.email = new FValue<string>("", { validator: this.emailValidator });
+        this.mobile = new FValue<string>("", { validator: this.mobileValidator });
+        this.otp = new FValue<string>("", { validator: this.otpValidator });
 
         makeObservable(this, {
             name: observable,

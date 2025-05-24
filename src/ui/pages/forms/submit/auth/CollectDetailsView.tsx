@@ -1,4 +1,4 @@
-import { TextFormField } from "~/ui/widgets/form/input/TextFormField";
+import { FTextField } from "~/ui/widgets/form/input/FTextField";
 import { FormAuthCard } from "./FormAuthCard";
 import { useFormAuthStore } from "./FormAuthContext";
 import FilledButton from "~/ui/widgets/button/FilledButton";
@@ -26,7 +26,7 @@ export function CollectDetailsView() {
                 />
 
                 <div className="flex flex-col gap-6 px-6 mt-2">
-                    <TextFormField
+                    <FTextField
                         id="name"
                         label="Full Name"
                         required
@@ -35,7 +35,7 @@ export function CollectDetailsView() {
                         field={store.name}
                     />
 
-                    <TextFormField
+                    <FTextField
                         id="email"
                         label="Email Address"
                         required
@@ -44,7 +44,7 @@ export function CollectDetailsView() {
                         field={store.email}
                     />
 
-                    <TextFormField
+                    <FTextField
                         id="mobile"
                         label="Mobile Number"
                         required
