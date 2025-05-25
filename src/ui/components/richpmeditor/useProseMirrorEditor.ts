@@ -19,6 +19,7 @@ import { LatexKb } from '../LaTexKb/LaTexKb';
 import { LaTexExpr } from '~/domain/latexkb/models/LaTexExpr';
 import { RichPmEditorProps } from './RichPmEditor';
 import { STT } from '~/infra/utils/stt/STT';
+import { FillBlankNodeView } from './pm/FillBlankNodeView';
 
 export type UsePmEditorData = {
     onClickEquationButton: () => void;
@@ -28,8 +29,11 @@ export type UsePmEditorData = {
     editorRef: React.RefObject<HTMLDivElement>;
     getContent: () => ProseMirrorNode | null;
     setContent: (doc: ProseMirrorNode) => void;
+    insertBlank: () => void;
+    viewRef: React.RefObject<EditorView | null>;
+    addChangeListener: (listener: (doc: ProseMirrorNode) => void) => void;
+    removeChangeListener: (listener: (doc: ProseMirrorNode) => void) => void;
 }
-
 
 function handleInitData(props: RichPmEditorProps) {
     let docNode: ProseMirrorNode | undefined = undefined;
@@ -60,6 +64,7 @@ type CreateViewProps = {
     viewRef: React.RefObject<EditorView | null>;
     state: EditorState;
     dialogManager: DialogManagerStore;
+    changeListeners: React.RefObject<Set<(doc: ProseMirrorNode) => void>>;
 }
 
 
@@ -70,8 +75,10 @@ function createView(props: CreateViewProps) {
             if (!props.viewRef.current) return;
             const newState = props.viewRef.current.state.apply(transaction);
             props.viewRef.current.updateState(newState);
-            if (props.props.onChange && transaction.docChanged) {
-                props.props.onChange(newState.doc);
+            if (transaction.docChanged) {
+                props.changeListeners.current?.forEach((listener) => {
+                    listener(newState.doc);
+                });
             }
         },
         nodeViews: {
@@ -91,6 +98,13 @@ function createView(props: CreateViewProps) {
                     getPos: getPos,
                     onClick: (node) => onClickLaTexNode({ node: node, stt: props.props.stt, dialogManager: props.dialogManager }),
                     isInline: false,
+                });
+            },
+            fillBlank(node, viewInstance, getPos) {
+                return new FillBlankNodeView({
+                    node: node,
+                    view: viewInstance,
+                    getPos: getPos,
                 });
             }
         },
@@ -142,7 +156,6 @@ export function insertEquation(view: EditorView, expr: LaTexExpr, schema: RichPm
 
         tr = tr.replaceWith(from, to, fragmentToInsert);
         tr = tr.setSelection(TextSelection.create(tr.doc, from + latexNode.nodeSize));
-        tr = tr.scrollIntoView();
 
     } else {
         const blockLatexNodeType = schema.nodes.blockLatex;
@@ -165,14 +178,29 @@ export function insertEquation(view: EditorView, expr: LaTexExpr, schema: RichPm
 
         tr = tr.replaceWith(from, to, fragmentToInsert);
         tr = tr.setSelection(TextSelection.create(tr.doc, from + latexNode.nodeSize + 1));
-        tr = tr.scrollIntoView();
     }
 
     dispatch(tr);
     view.focus();
 }
 
+export function insertBlankNode(view: EditorView, schema: RichPmEditorSchema) {
+    if (!schema.nodes.fillBlank) {
+        throw new Error("Fill Blank node type is not defined in the schema.");
+    }
+    const { state, dispatch } = view;
+    const { from, to } = state.selection;
+    let tr = state.tr;
 
+    const fillBlankNode = schema.nodes.fillBlank.create();
+    const spaceTextNode = schema.text(" ");
+    const fragmentToInsert = Fragment.fromArray([fillBlankNode, spaceTextNode]);
+
+    tr = tr.replaceWith(from, to, fragmentToInsert);
+    tr = tr.setSelection(TextSelection.create(tr.doc, from + fillBlankNode.nodeSize));
+    dispatch(tr);
+    view.focus();
+}
 
 function focusEditor(view: EditorView | null) {
     if (view) {
@@ -215,7 +243,6 @@ function insertVoiceContent(viewRef: React.RefObject<EditorView | null>, content
     });
     const newCursorPos = insertPos;
     tr = tr.setSelection(TextSelection.create(tr.doc, newCursorPos));
-    tr = tr.scrollIntoView();
     dispatch(tr);
     focusEditor(view);
 }
@@ -225,6 +252,16 @@ export function usePmEditor(props: RichPmEditorProps) {
     const editorRef = useRef<HTMLDivElement>(null);
     const viewRef = useRef<EditorView | null>(null);
     const dialogManager = useDialogManager();
+    const changeListeners = useRef(new Set<(doc: ProseMirrorNode) => void>());
+
+
+    const addChangeListener = (listener: (doc: ProseMirrorNode) => void) => {
+        changeListeners.current.add(listener);
+    };
+
+    const removeChangeListener = (listener: (doc: ProseMirrorNode) => void) => {
+        changeListeners.current.delete(listener);
+    };
 
     useEffect(() => {
         if (!editorRef.current) return;
@@ -239,6 +276,7 @@ export function usePmEditor(props: RichPmEditorProps) {
             viewRef: viewRef,
             state: state,
             dialogManager: dialogManager,
+            changeListeners: changeListeners
         });
         viewRef.current = view;
 
@@ -323,6 +361,14 @@ export function usePmEditor(props: RichPmEditorProps) {
     };
 
 
+    const insertBlank = () => {
+        const view = viewRef.current;
+        if (view) {
+            insertBlankNode(view, props.schema);
+        } else {
+            logger.error("Editor view not available for inserting blank.");
+        }
+    }
 
 
     return {
@@ -333,5 +379,9 @@ export function usePmEditor(props: RichPmEditorProps) {
         editorRef: editorRef,
         getContent: getContent,
         setContent: setContent,
+        insertBlank: insertBlank,
+        viewRef: viewRef,
+        addChangeListener: addChangeListener,
+        removeChangeListener: removeChangeListener,
     };
 }

@@ -14,6 +14,8 @@ type QMediaProps = {
 
 export class QMedia {
 
+
+
     public readonly id: number;
     public readonly type: QMediaType;
     public readonly extension: QMediaExt;
@@ -31,7 +33,7 @@ export class QMedia {
         this.caption = props.caption;
     }
 
-    static deserialize(json: JsonObj): QMedia {
+    static fromJson(json: JsonObj): QMedia {
         return new QMedia({
             id: json.id,
             type: QMediaType.fromValue(json.type)!,

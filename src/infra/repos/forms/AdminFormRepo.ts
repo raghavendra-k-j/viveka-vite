@@ -6,6 +6,7 @@ import { logger } from "~/core/utils/logger";
 import { UpsertQuestionReq, UpsertQuestionRes } from "~/domain/forms/admin/models/UpsertQuestionModel";
 import { AdminQuestionListRes } from "~/domain/forms/admin/models/AdminQuestionListRes";
 import { DeleteQuestionDependencies } from "~/domain/forms/admin/models/DeleteQuestionDependencies";
+import { GetQuestionRes } from "~/domain/forms/admin/models/GetQuestionRes";
 
 
 export class AdminFormRepo {
@@ -63,6 +64,20 @@ export class AdminFormRepo {
             return ResEither.error(apiError);
         }
     }
+
+    async getQuestionById({ formId, questionId }: { formId: number, questionId: number }): Promise<ResEither<ApiError, GetQuestionRes>> {
+        try {
+            const response = await this.axios.get(`/api/v1/admin/forms/${formId}/questions/${questionId}`);
+            const question = GetQuestionRes.fromJson(response.data);
+            return ResEither.data(question);
+        }
+        catch (error) {
+            logger.error("Error fetching question by id", error);
+            const apiError = ApiError.fromAny(error);
+            return ResEither.error(apiError);
+        }
+    }
+
 
     async deleteQuestion({ formId, questionId }: { formId: number, questionId: number }): Promise<ResEither<ApiError, void>> {
         try {

@@ -9,7 +9,7 @@ export class PmToHtml {
         ['blockLatex', PmToHtml.serializeBlockLatex],
     ]);
 
-    static getContent(doc: ProseMirrorNode, schema: Schema): string {
+    static convert(doc: ProseMirrorNode, schema: Schema): string {
         let html = '';
         for (const node of doc.children) {
             html += PmToHtml.serializeNode(node, schema);

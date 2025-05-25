@@ -7,6 +7,7 @@ import { ApiError } from "~/infra/errors/ApiError";
 import { UpsertQuestionReq, UpsertQuestionRes } from "~/domain/forms/admin/models/UpsertQuestionModel";
 import { AdminQuestionListRes } from "~/domain/forms/admin/models/AdminQuestionListRes";
 import { DeleteQuestionDependencies } from "~/domain/forms/admin/models/DeleteQuestionDependencies";
+import { GetQuestionRes } from "../models/GetQuestionRes";
 
 export class AdminFormsService {
 
@@ -26,6 +27,10 @@ export class AdminFormsService {
 
     async queryQuestions({ formId, searchQuery }: { formId: number, searchQuery?: string }): Promise<ResEither<ApiError, AdminQuestionListRes>> {
         return await this.adminFormRepo.queryQuestions({ formId, searchQuery });
+    }
+
+    async getQuestionById({ formId, questionId }: { formId: number, questionId: number }): Promise<ResEither<ApiError, GetQuestionRes>> {
+        return await this.adminFormRepo.getQuestionById({ formId, questionId });
     }
 
     async deleteQuestion({ formId, questionId }: { formId: number, questionId: number }): Promise<ResEither<ApiError, void>> {

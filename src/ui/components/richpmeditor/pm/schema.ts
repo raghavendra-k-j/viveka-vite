@@ -61,6 +61,28 @@ const blockLaTex: NodeSpec = {
     }]
 };
 
+
+const fillBlank: NodeSpec = {
+    group: "inline",
+    inline: true,
+    atom: true,
+    attrs: {},
+    toDOM() {
+        return ["span", { "data-fill-blank": "" }, "____"];
+    },
+    parseDOM: [{
+        tag: "span[data-fill-blank]",
+        getAttrs() {
+            return {};
+        }
+    }]
+};
+
+
+
+
+
+
 export const blockSchema = new Schema({
     nodes: {
         doc: {
@@ -69,7 +91,8 @@ export const blockSchema = new Schema({
         paragraph,
         text,
         latex: inlineLaTex,
-        blockLatex: blockLaTex
+        blockLatex: blockLaTex,
+        fillBlank,
     }
 });
 

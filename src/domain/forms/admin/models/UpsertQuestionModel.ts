@@ -28,36 +28,34 @@ export class UpsertQuestionRes {
 
 export type UpsertQuestionReqProps = {
     formId: number;
-    id?: number;
-    parentId?: number;
+    id: number | null;
+    parentId: number | null;
     type: QuestionType;
     question: string;
     qExtras: QExtras | null;
     answer: Answer | null;
-    ansHint?: string;
-    ansExplanation?: string;
-    marks?: number;
-    level?: QuestionLevel;
+    ansHint: string | null;
+    ansExplanation: string | null;
+    marks: number | null;
+    level: QuestionLevel | null;
     isRequired: Bool3;
-    isAiGenerated: Bool3;
-    mediaRefs?: MediaTileRefReq[];
+    mediaRefs: MediaTileRefReq[];
 }
 
 export class UpsertQuestionReq {
     public readonly formId: number;
-    public readonly id?: number;
-    public readonly parentId?: number;
+    public readonly id: number | null;
+    public readonly parentId: number | null;
     public readonly type: QuestionType;
     public readonly question: string;
     public readonly qExtras: QExtras | null;
     public readonly answer: Answer | null;
-    public readonly ansHint?: string;
-    public readonly ansExplanation?: string;
-    public readonly marks?: number;
-    public readonly level?: QuestionLevel;
+    public readonly ansHint: string | null;
+    public readonly ansExplanation: string | null;
+    public readonly marks: number | null;
+    public readonly level: QuestionLevel | null;
     public readonly isRequired: Bool3;
-    public readonly isAiGenerated: Bool3;
-    public readonly mediaRefs?: MediaTileRefReq[];
+    public readonly mediaRefs: MediaTileRefReq[];
 
     constructor(props: UpsertQuestionReqProps) {
         this.formId = props.formId;
@@ -72,7 +70,6 @@ export class UpsertQuestionReq {
         this.marks = props.marks;
         this.level = props.level;
         this.isRequired = props.isRequired;
-        this.isAiGenerated = props.isAiGenerated;
         this.mediaRefs = props.mediaRefs;
     }
 
@@ -83,14 +80,13 @@ export class UpsertQuestionReq {
             parentId: this.parentId,
             type: this.type.type,
             question: this.question,
-            qExtras: this.qExtras?.toJson() || null,
-            answer: this.answer?.toJson() || null,
+            qExtras: this.qExtras?.toJson(),
+            answer: this.answer?.toJson(),
             ansHint: this.ansHint,
             ansExplanation: this.ansExplanation,
             marks: this.marks,
             level: this.level?.level,
             isRequired: this.isRequired.boolValue,
-            isAiGenerated: this.isAiGenerated.boolValue,
             mediaRefs: this.mediaRefs?.map((e) => e.toJson()),
         };
     }

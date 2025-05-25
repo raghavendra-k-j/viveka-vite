@@ -4,28 +4,28 @@ import { makeObservable, observable, runInAction } from "mobx";
 import { QuestionType } from "~/domain/forms/models/question/QuestionType";
 import { QuestionPageStore } from "../questions/QuestionPageStore";
 import { STT } from "~/infra/utils/stt/STT";
-import { FValue } from "~/ui/widgets/form/FValue";
 import { AppError } from "~/core/error/AppError";
 import { UpsertQuestionReq, UpsertQuestionRes } from "~/domain/forms/admin/models/UpsertQuestionModel";
-import { PmToHtml } from "~/ui/components/richpmeditor/utils/PmToHtml";
 import { blockSchema } from "~/ui/components/richpmeditor/pm/schema";
 import { Bool3 } from "~/core/utils/Bool3";
 import { logger } from "~/core/utils/logger";
-import { QuestionLevel } from "~/domain/forms/models/question/QuestionLevel";
 import { withMinDelay } from "~/infra/utils/withMinDelay";
 import { NumFmt } from "~/core/utils/NumFmt";
-import { EnAVmFactory } from "./models/EnAVmFactory";
+import { GetQuestionRes } from "~/domain/forms/admin/models/GetQuestionRes";
+import { UpsertQuestionVmFactory } from "./models/UpsertQuestionVmFactory";
+import { PmConverter } from "~/ui/components/richpmeditor/utils/PmConverter";
 
 export type UpsertQuestionStoreProps = {
-    id?: number;
+    id: number | null;
+    parentId: number | null;
     parentStore: QuestionPageStore;
     onClose: () => void;
     stt: STT;
 }
 
 export class UpsertQuestionStore {
-
-
+    id: number | null;
+    parentId: number | null;
     qvmState: DataState<UpsertQuestionVm> = DataState.init();
     saveState: DataState<void> = DataState.init();
     parentStore: QuestionPageStore;
@@ -33,6 +33,8 @@ export class UpsertQuestionStore {
     stt: STT;
 
     constructor(props: UpsertQuestionStoreProps) {
+        this.id = props.id;
+        this.parentId = props.parentId;
         this.parentStore = props.parentStore;
         this.onClose = props.onClose;
         this.stt = props.stt;
@@ -40,21 +42,60 @@ export class UpsertQuestionStore {
             qvmState: observable.ref,
             saveState: observable.ref,
         });
-        if (props.id) {
-            this.loadQuestion();
-        }
-        else {
-            this.resetState({});
-        }
     }
 
     get vm() {
         return this.qvmState.data!;
     }
 
-    async loadQuestion() {
-
+    get isEdit() {
+        return this.id !== null;
     }
+
+    async loadQuestion() {
+        if (this.id !== null) {
+            this.loadQuestionById(this.id);
+        }
+        else {
+            this.resetState({});
+        }
+    }
+
+    async loadQuestionById(id: number) {
+        try {
+            runInAction(() => {
+                this.qvmState = DataState.loading();
+            });
+            const res = await withMinDelay(
+                this.parentStore.parentStore.adminFormService.getQuestionById({
+                    formId: this.fd.id,
+                    questionId: id,
+                })
+            );
+            const question = res.getOrError();
+            this.onQuestionLoaded(question);
+        }
+        catch (error) {
+            const appError = AppError.fromAny(error);
+            logger.error("Error while loading question", appError);
+            runInAction(() => {
+                this.qvmState = DataState.error(appError);
+            });
+        }
+    }
+
+
+    onQuestionLoaded(res: GetQuestionRes) {
+        const question = res.question;
+        const vm = UpsertQuestionVmFactory.fromQuestion({
+            question: question,
+            storeRef: this,
+        });
+        runInAction(() => {
+            this.qvmState = DataState.data(vm);
+        });
+    }
+
 
     get formType() {
         return this.parentStore.parentStore.fd.type;
@@ -66,8 +107,8 @@ export class UpsertQuestionStore {
 
 
     onQuestionTypeChanged(type: QuestionType) {
-        if (this.vm.id !== undefined) {
-            // not allowed to change type of existing question
+        if(this.vm.id !== null) {
+            logger.warn("Cannot change question type for an existing question");
             return;
         }
         this.vm.type.set(type);
@@ -81,39 +122,10 @@ export class UpsertQuestionStore {
         runInAction(() => {
             this.qvmState = DataState.loading();
         });
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const typeField = new FValue<QuestionType | null>(props.questionType || QuestionType.multipleChoice);
-        const enaVm = EnAVmFactory.empty({
-            type: typeField.value!,
+        const vm = UpsertQuestionVmFactory.empty({
+            type: props.questionType || this.questionTypes[0],
             storeRef: this,
         });
-
-        const scorable = new FValue<Bool3>(Bool3.N);
-        const levelField = new FValue<QuestionLevel | null>(null);
-        const marksField = new FValue<string>("");
-        const canHaveMarks = QuestionType.canHaveMarks(this.fd.type, typeField.value!);
-        const isRequired = new FValue<Bool3>(typeField.value!.isGroup ? Bool3.N : Bool3.F);
-
-
-        if (canHaveMarks.isTrue) {
-            scorable.set(Bool3.T);
-            levelField.set(QuestionLevel.medium);
-            marksField.set("1");
-        }
-
-        const vm = new UpsertQuestionVm({
-            id: undefined,
-            storeRef: this,
-            type: typeField,
-            enaVm: enaVm,
-            scorable: scorable,
-            level: levelField,
-            marks: marksField,
-            isRequired: isRequired,
-        });
-
-
         runInAction(() => {
             this.qvmState = DataState.data(vm);
         });
@@ -127,28 +139,25 @@ export class UpsertQuestionStore {
         return this.parentStore.parentStore.fd;
     }
 
-    getAnsHint(): string | undefined {
-        const ansHintContent = this.vm.ansHintRef.current?.getContent();
-        if (!ansHintContent) {
-            return undefined;
-        }
-        return PmToHtml.getContent(ansHintContent, blockSchema);
+    private getAnsHint(): string | null {
+        return PmConverter.toTextFromRef({
+            ref: this.vm.ansHintRef,
+            schema: blockSchema,
+        });
     }
 
-    getAnsExplanation(): string | undefined {
-        const ansExplanationContent = this.vm.ansExplanationRef.current?.getContent();
-        if (!ansExplanationContent) {
-            return undefined;
-        }
-        return PmToHtml.getContent(ansExplanationContent, blockSchema);
+    private getAnsExplanation(): string | null {
+        return PmConverter.toTextFromRef({
+            ref: this.vm.ansExplanationRef,
+            schema: blockSchema,
+        });
     }
 
-    getQuestionText(): string {
-        const questionTextContent = this.vm.questionTextRef.current?.getContent();
-        if (!questionTextContent) {
-            return "";
-        }
-        return PmToHtml.getContent(questionTextContent, blockSchema);
+    private getQuestionText(): string {
+        return PmConverter.toTextFromRef({
+            ref: this.vm.questionTextRef,
+            schema: blockSchema,
+        }) || "";
     }
 
 
@@ -160,21 +169,7 @@ export class UpsertQuestionStore {
             runInAction(() => {
                 this.saveState = DataState.loading();
             });
-            const req = new UpsertQuestionReq({
-                formId: this.fd.id,
-                id: this.vm.id,
-                parentId: undefined,
-                type: this.vm.type.value!,
-                question: this.getQuestionText(),
-                qExtras: this.vm.enaVm?.getQExtra() || null,
-                answer: this.vm.enaVm?.getAnswer() || null,
-                ansHint: this.getAnsHint(),
-                level: this.vm.level.value || undefined,
-                ansExplanation: this.getAnsExplanation(),
-                marks: this.vm.scorable.value.isTrue ? (NumFmt.toNumber(this.vm.marks.value) ?? undefined) : undefined,
-                isRequired: Bool3.T,
-                isAiGenerated: Bool3.F,
-            });
+            const req = this.getRequest();
             const res = (await withMinDelay(this.adminFormService.upsertQuestion(req))).getOrError();
             runInAction(() => {
                 this.saveState = DataState.data(undefined);
@@ -190,5 +185,24 @@ export class UpsertQuestionStore {
         }
     }
 
+
+    private getRequest() {
+        const req = new UpsertQuestionReq({
+            formId: this.fd.id,
+            id: this.vm.id,
+            parentId: this.parentId,
+            type: this.vm.type.value!,
+            question: this.getQuestionText(),
+            qExtras: this.vm.enaVm?.getQExtra() || null,
+            answer: this.vm.enaVm?.getAnswer() || null,
+            ansHint: this.getAnsHint(),
+            level: this.vm.level.value,
+            ansExplanation: this.getAnsExplanation(),
+            marks: this.vm.scorable.value.isTrue ? (NumFmt.toNumber(this.vm.marks.value) ?? null) : null,
+            isRequired: Bool3.T,
+            mediaRefs: [],
+        });
+        return req;
+    }
 
 }

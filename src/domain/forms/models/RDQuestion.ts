@@ -81,7 +81,7 @@ export class RDQuestion {
         const level = QuestionLevel.fromLevel(json.level);
 
         const mediaFiles = json.mediaFiles
-            ? json.mediaFiles.map((mediaJson: JsonObj) => QMedia.deserialize(mediaJson))
+            ? json.mediaFiles.map((mediaJson: JsonObj) => QMedia.fromJson(mediaJson))
             : undefined;
 
         const answer = json.answer ? Answer.fromTypeAndQExtrasAndMap({ type: type, map: json.answer }) : undefined;

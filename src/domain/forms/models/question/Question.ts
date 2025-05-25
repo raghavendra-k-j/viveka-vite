@@ -60,7 +60,7 @@ export class Question {
             : undefined;
         const level = QuestionLevel.fromLevel(json.level);
         const mediaFiles = json.mediaFiles
-            ? json.mediaFiles.map((mediaJson: JsonObj) => QMedia.deserialize(mediaJson))
+            ? json.mediaFiles.map((mediaJson: JsonObj) => QMedia.fromJson(mediaJson))
             : undefined;
 
         return new Question({

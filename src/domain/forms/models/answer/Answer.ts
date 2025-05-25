@@ -136,6 +136,7 @@ export class FillBlankInputAnswer {
 }
 
 export class FillBlanksAnswer extends Answer {
+
   public static readonly keyAnswers = "answers";
   public answers: FillBlankInputAnswer[];
 
@@ -148,6 +149,14 @@ export class FillBlanksAnswer extends Answer {
     return {
       [FillBlanksAnswer.keyAnswers]: this.answers.map((e) => e.toJson()),
     };
+  }
+
+  toIdMap() {
+    const map: Record<number, string> = {};
+    for (const answer of this.answers) {
+      map[answer.id] = answer.answer;
+    }
+    return map;
   }
 
   static fromMap(map: JsonObj): FillBlanksAnswer {

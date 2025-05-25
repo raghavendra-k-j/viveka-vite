@@ -22,6 +22,8 @@ function Body() {
             id: "upsert-question",
             component: UpsertQuestionDialog,
             props: {
+                id: null,
+                parentId: null,
                 parentStore: store,
                 stt: stt,
                 onClose: () => {
