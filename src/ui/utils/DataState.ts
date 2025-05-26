@@ -4,7 +4,7 @@ import { InstanceId } from "~/core/utils/InstanceId";
 export enum DataStateState {
     INIT = 'INIT',
     LOADING = 'LOADING',
-    LOADED = 'LOADED',
+    DATA = 'LOADED',
     ERROR = 'ERROR',
 }
 
@@ -26,7 +26,7 @@ export class DataState<Data> {
     }
 
     static data<Data>(data: Data): DataState<Data> {
-        return new DataState<Data>(DataStateState.LOADED, data);
+        return new DataState<Data>(DataStateState.DATA, data);
     }
 
     static error<Data>(error: AppError): DataState<Data> {
@@ -45,8 +45,8 @@ export class DataState<Data> {
         return this.stateValue === DataStateState.LOADING;
     }
 
-    get isLoaded(): boolean {
-        return this.stateValue === DataStateState.LOADED;
+    get isData(): boolean {
+        return this.stateValue === DataStateState.DATA;
     }
 
     get isError(): boolean {
@@ -75,7 +75,7 @@ export class DataState<Data> {
                 return handlers.init();
             case DataStateState.LOADING:
                 return handlers.loading();
-            case DataStateState.LOADED:
+            case DataStateState.DATA:
                 return handlers.loaded(this.dataValue as Data);
             case DataStateState.ERROR:
                 return handlers.error(this.errorValue as AppError);
@@ -93,7 +93,7 @@ export class DataState<Data> {
             case DataStateState.INIT:
             case DataStateState.LOADING:
                 return handlers.initOrLoading();
-            case DataStateState.LOADED:
+            case DataStateState.DATA:
                 return handlers.loaded(this.dataValue as Data);
             case DataStateState.ERROR:
                 return handlers.error(this.errorValue as AppError);

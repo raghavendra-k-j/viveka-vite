@@ -5,7 +5,7 @@ export const STTContext = createContext<STT | null>(null);
 
 export const useStt = () => {
     const context = useContext(STTContext);
-    if (context === null) {
+    if (!context) {
         throw new Error("useStt must be used within a STTContext provider");
     }
     return context;

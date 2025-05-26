@@ -1,3 +1,5 @@
+
+
 export enum LogLevel {
     ERROR = 'error',
     WARN = 'warn',
@@ -53,3 +55,4 @@ class Logger {
 const logger = Logger.getInstance();
 
 export { Logger, logger };
+

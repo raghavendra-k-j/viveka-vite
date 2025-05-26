@@ -20,19 +20,21 @@ import { LaTexExpr } from '~/domain/latexkb/models/LaTexExpr';
 import { RichPmEditorProps } from './RichPmEditor';
 import { STT } from '~/infra/utils/stt/STT';
 import { FillBlankNodeView } from './pm/FillBlankNodeView';
+import { InstanceId } from '~/core/utils/InstanceId';
 
 export type UsePmEditorData = {
     onClickEquationButton: () => void;
     onClickLaTexNode: OnClickLaTexNodeView;
     onClickEditableArea: (event: React.MouseEvent<HTMLDivElement>) => void;
     onClickVoiceButton: () => void;
-    editorRef: React.RefObject<HTMLDivElement>;
+    editorRef: React.RefObject<HTMLDivElement | null>;
     getContent: () => ProseMirrorNode | null;
     setContent: (doc: ProseMirrorNode) => void;
     insertBlank: () => void;
     viewRef: React.RefObject<EditorView | null>;
     addChangeListener: (listener: (doc: ProseMirrorNode) => void) => void;
     removeChangeListener: (listener: (doc: ProseMirrorNode) => void) => void;
+    instanceId: string;
 }
 
 function handleInitData(props: RichPmEditorProps) {
@@ -59,6 +61,7 @@ function createState(docNode: ProseMirrorNode | undefined, props: RichPmEditorPr
 
 
 type CreateViewProps = {
+    instanceId: string;
     props: RichPmEditorProps;
     editorRef: React.RefObject<HTMLDivElement | null>;
     viewRef: React.RefObject<EditorView | null>;
@@ -79,6 +82,9 @@ function createView(props: CreateViewProps) {
                 props.changeListeners.current?.forEach((listener) => {
                     listener(newState.doc);
                 });
+                if (props.props.onChange) {
+                    props.props.onChange(newState.doc, props.instanceId);
+                }
             }
         },
         nodeViews: {
@@ -248,11 +254,12 @@ function insertVoiceContent(viewRef: React.RefObject<EditorView | null>, content
 }
 
 
-export function usePmEditor(props: RichPmEditorProps) {
-    const editorRef = useRef<HTMLDivElement>(null);
+export function usePmEditor(props: RichPmEditorProps): UsePmEditorData {
+    const editorRef = useRef<HTMLDivElement | null>(null);
     const viewRef = useRef<EditorView | null>(null);
     const dialogManager = useDialogManager();
     const changeListeners = useRef(new Set<(doc: ProseMirrorNode) => void>());
+    const instanceIdRef = useRef<string>(InstanceId.generate("RichPmEditor"));
 
 
     const addChangeListener = (listener: (doc: ProseMirrorNode) => void) => {
@@ -271,6 +278,7 @@ export function usePmEditor(props: RichPmEditorProps) {
         const state = createState(docNode, props);
 
         const view = createView({
+            instanceId: instanceIdRef.current,
             props: props,
             editorRef: editorRef,
             viewRef: viewRef,
@@ -383,5 +391,6 @@ export function usePmEditor(props: RichPmEditorProps) {
         viewRef: viewRef,
         addChangeListener: addChangeListener,
         removeChangeListener: removeChangeListener,
+        instanceId: InstanceId.generate("RichPmEditor")
     };
 }

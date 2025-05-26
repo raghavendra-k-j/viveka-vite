@@ -29,7 +29,7 @@ function SubmitPageContent() {
   return (
     <Observer>
       {() => {
-        if (!submitStore.formDetailState.isLoaded) {
+        if (!submitStore.formDetailState.isData) {
           return <LoadingOrErrorView />;
         }
         return <ActiveFragment />;

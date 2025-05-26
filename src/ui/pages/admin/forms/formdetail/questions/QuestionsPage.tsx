@@ -24,10 +24,12 @@ function Body() {
             props: {
                 id: null,
                 parentId: null,
-                parentStore: store,
+                formId: store.fd.id,
+                formType: store.fd.type,
                 stt: stt,
+                adminFormsService: store.parentStore.adminFormService,
                 onClose: () => {
-                    dialogManager.closeById("upsert-question");
+                    return dialogManager.closeById("upsert-question");
                 }
             }
         };

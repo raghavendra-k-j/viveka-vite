@@ -12,7 +12,7 @@ import 'prosemirror-view/style/prosemirror.css';
 export interface RichPmEditorProps {
     schema: RichPmEditorSchema;
     initialContent?: ProseMirrorNode | null;
-    onChange?: (node: ProseMirrorNode) => void;
+    onChange?: (node: ProseMirrorNode, instanceId: string) => void;
     stt: STT;
     placeholder?: string;
     minHeight?: string;
@@ -26,6 +26,7 @@ export type RichPmEditorRef = {
     viewRef: React.RefObject<EditorView | null>;
     addChangeListener: (listener: (node: ProseMirrorNode) => void) => void;
     removeChangeListener: (listener: (node: ProseMirrorNode) => void) => void;
+    instanceId: string;
 }
 
 export const RichPmEditor = forwardRef(function RichPmEditor(props: RichPmEditorProps, ref: React.Ref<RichPmEditorRef>) {
@@ -38,6 +39,7 @@ export const RichPmEditor = forwardRef(function RichPmEditor(props: RichPmEditor
         viewRef: pm.viewRef,
         addChangeListener: pm.addChangeListener,
         removeChangeListener: pm.removeChangeListener,
+        instanceId: pm.instanceId,
     }));
 
 

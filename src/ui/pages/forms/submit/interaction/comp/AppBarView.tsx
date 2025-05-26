@@ -43,7 +43,7 @@ const AppBarTrailing = observer(() => {
     const store = useInteractionStore();
     return (
         <div className="flex items-center gap-3">
-            {store.vmState.isLoaded && store.hasTimeLimit && <TimerView />}
+            {store.vmState.isData && store.hasTimeLimit && <TimerView />}
             <ProfileView />
         </div>
     );

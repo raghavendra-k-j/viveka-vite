@@ -102,3 +102,24 @@ export function DialogContent(props: DialogContentProps) {
 
 
 
+
+
+export type FramedDialogProps = {
+    onClose: () => void;
+    scaffoldClassName?: string;
+    contentClassName?: string;
+    children: ReactNode;
+}
+
+export function FramedDialog(props: FramedDialogProps) {
+    return (
+        <Dialog onClose={props.onClose}>
+            <DialogOverlay />
+            <DialogScaffold className={props.scaffoldClassName}>
+                <DialogContent className={props.contentClassName}>
+                    {props.children}
+                </DialogContent>
+            </DialogScaffold>
+        </Dialog>
+    );
+}

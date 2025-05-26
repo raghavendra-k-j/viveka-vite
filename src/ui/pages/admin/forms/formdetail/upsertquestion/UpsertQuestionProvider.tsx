@@ -1,20 +1,24 @@
-import { ReactNode, useEffect, useRef } from "react";
+import { Fragment, ReactNode, useEffect, useRef } from "react";
 import { UpsertQuestionStore } from "./UpsertQuestionStore";
 import { UpsertQuestionContext } from "./UpsertQuestionContext";
-import { QuestionPageStore } from "../questions/QuestionPageStore";
 import { STT } from "~/infra/utils/stt/STT";
 import { Observer } from "mobx-react-lite";
 import { LoaderView } from "~/ui/widgets/loader/LoaderView";
 import { UnknowStateView } from "~/ui/components/errors/UnknowStateView";
 import { SimpleRetryableAppView } from "~/ui/widgets/error/SimpleRetryableAppError";
+import { logger } from "~/core/utils/logger";
+import { FormType } from "~/domain/forms/models/FormType";
+import { AdminFormsService } from "~/domain/forms/admin/services/AdminFormsService";
 
-interface UpsertQuestionProviderProps {
+type UpsertQuestionProviderProps = {
     id: number | null;
     parentId: number | null;
-    parentStore: QuestionPageStore;
-    children: ReactNode;
-    onClose: () => void;
+    formId: number;
+    formType: FormType;
     stt: STT;
+    adminFormsService: AdminFormsService;
+    onClose: () => void;
+    children: ReactNode;
 }
 
 export const UpsertQuestionProvider: React.FC<UpsertQuestionProviderProps> = (props) => {
@@ -23,22 +27,28 @@ export const UpsertQuestionProvider: React.FC<UpsertQuestionProviderProps> = (pr
         storeRef.current = new UpsertQuestionStore({
             id: props.id,
             parentId: props.parentId,
-            parentStore: props.parentStore,
-            onClose: props.onClose,
+            formId: props.formId,
+            formType: props.formType,
             stt: props.stt,
+            adminFormsService: props.adminFormsService,
+            onClose: props.onClose
         });
     }
     const store = storeRef.current;
+    logger.debug("UpsertQuestionProvider: render", store.instanceId);
 
     useEffect(() => {
-        store.loadQuestion();
-    });
+        (async () => {
+            await store.loadQuestion();
+            logger.debug("UpsertQuestionProvider: loadQuestion completed", store.vm.instanceId);
+        })();
+    }, [store]);
 
     return (
         <UpsertQuestionContext.Provider value={storeRef.current!}>
             <Observer>
                 {() => {
-                    if (store.qvmState.isLoaded) {
+                    if (store.qvmState.isData) {
                         return (<>{props.children}</>);
                     }
                     else if (store.qvmState.isInitOrLoading) {

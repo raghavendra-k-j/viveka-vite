@@ -79,7 +79,7 @@ export class SubmitStore {
     }
 
     async onClickStart() {
-        if (!this.formDetailState.isLoaded) return;
+        if (!this.formDetailState.isData) return;
         this.startFormImmediatelyAfterLoadForm = false;
         runInAction(() => {
             this.currentFragment = this.appStore.hasUser ? CurrentFragment.Interaction : CurrentFragment.Auth;

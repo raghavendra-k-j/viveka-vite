@@ -11,6 +11,8 @@ const HomePage = lazy(() => import("./ui/pages/home/HomePage"));
 const SubmitPage = lazy(() => import("./ui/pages/forms/submit/SubmitPage"));
 const QuestionsPage = lazy(() => import("./ui/pages/admin/forms/formdetail/questions/QuestionsPage"));
 const SettingsPage = lazy(() => import("./ui/pages/admin/forms/formdetail/settings/SettingsPage"));
+const RefStudyPage = lazy(() => import("./ui/pages/testing/refstudy/RefStudyPage"));
+const ChatPageView = lazy(() => import("./ui/pages/testing/chat/ChatPageView"));
 
 
 export default function Router() {
@@ -21,7 +23,9 @@ export default function Router() {
                 <Route element={<AppLayout />}>
                     {/* Public Routes */}
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/ref-study" element={<RefStudyPage />} />
                     <Route path="/forms/:permalink/submit" element={<SubmitPage />} />
+                    <Route path="/chat" element={<ChatPageView />} />
 
                     {/* Admin Routes with AdminLayout */}
                     <Route path="/admin" element={<AdminLayout />}>
