@@ -41,7 +41,7 @@ export const FCheckbox = ({
     inputProps = {}
 }: FCheckboxProps) => {
     const labelContent = label ? (
-        <span className="text-sm text-default">{label}</span>
+        <span className="text-sm text-default select-none">{label}</span>
     ) : null;
 
     return (

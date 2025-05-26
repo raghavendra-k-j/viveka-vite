@@ -4,15 +4,20 @@ import { makeObservable, observable, runInAction } from "mobx";
 import { QuestionType } from "~/domain/forms/models/question/QuestionType";
 import { STT } from "~/infra/utils/stt/STT";
 import { AppError } from "~/core/error/AppError";
-import { UpsertQuestionRes } from "~/domain/forms/admin/models/UpsertQuestionModel";
+import { UpsertQuestionReq, UpsertQuestionRes } from "~/domain/forms/admin/models/UpsertQuestionModel";
+import { blockSchema } from "~/ui/components/richpmeditor/pm/schema";
 import { logger } from "~/core/utils/logger";
-import { mockDelay, withMinDelay } from "~/infra/utils/withMinDelay";
+import { withMinDelay } from "~/infra/utils/withMinDelay";
+import { NumFmt } from "~/core/utils/NumFmt";
 import { GetQuestionRes } from "~/domain/forms/admin/models/GetQuestionRes";
 import { UpsertQuestionVmFactory } from "./models/UpsertQuestionVmFactory";
+import { PmConverter } from "~/ui/components/richpmeditor/utils/PmConverter";
 import { waitForNextFrame } from "~/infra/utils/waitForNextFrame";
-import { InstanceId } from "~/core/utils/InstanceId";
 import { AdminFormsService } from "~/domain/forms/admin/services/AdminFormsService";
 import { FormType } from "~/domain/forms/models/FormType";
+import { ThingId } from "~/core/utils/ThingId";
+import { showAppErrorDialog } from "~/ui/components/dialogs/showAppErrorDialog";
+import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
 
 export type UpsertQuestionStoreProps = {
     id: number | null;
@@ -22,10 +27,11 @@ export type UpsertQuestionStoreProps = {
     stt: STT;
     adminFormsService: AdminFormsService;
     onClose: () => void;
+    dialogManager: DialogManagerStore;
 }
 
 export class UpsertQuestionStore {
-    instanceId = InstanceId.generate("UpsertQuestionStore");
+    instanceId = ThingId.generate();
 
     id: number | null;
     parentId: number | null;
@@ -37,6 +43,7 @@ export class UpsertQuestionStore {
 
     qvmState: DataState<UpsertQuestionVm> = DataState.init();
     saveState: DataState<void> = DataState.init();
+    dialogManager: DialogManagerStore;
 
     constructor(props: UpsertQuestionStoreProps) {
         this.id = props.id;
@@ -46,6 +53,7 @@ export class UpsertQuestionStore {
         this.adminFormsService = props.adminFormsService;
         this.formType = props.formType;
         this.formId = props.formId;
+        this.dialogManager = props.dialogManager;
         makeObservable(this, {
             qvmState: observable.ref,
             saveState: observable.ref,
@@ -65,7 +73,7 @@ export class UpsertQuestionStore {
             await this.loadQuestionById(this.id);
         }
         else {
-            await this.resetState({});
+            await this.loadNewEmptyQuestion({});
         }
     }
 
@@ -115,25 +123,36 @@ export class UpsertQuestionStore {
             logger.warn("Cannot change question type for an existing question");
             return;
         }
-        this.resetState({
+        this.loadNewEmptyQuestion({
             questionType: type,
         });
     }
 
 
-    async resetState(props: { questionType?: QuestionType }) {
-        logger.info("Resetting question state", props);
+    async loadNewEmptyQuestion(props: { questionType?: QuestionType }) {
         runInAction(() => {
             this.qvmState = DataState.loading();
         });
-        await waitForNextFrame();
-        await mockDelay(1000);
         const vm = UpsertQuestionVmFactory.empty({
             type: props.questionType || this.questionTypes[0],
             storeRef: this,
         });
         runInAction(() => {
             this.qvmState = DataState.data(vm);
+        });
+    }
+
+    private getAnsHint(): string | null {
+        return PmConverter.toTextFromRef({
+            ref: this.vm.ansHintRef,
+            schema: blockSchema,
+        });
+    }
+
+    private getAnsExplanation(): string | null {
+        return PmConverter.toTextFromRef({
+            ref: this.vm.ansExplanationRef,
+            schema: blockSchema,
         });
     }
 
@@ -153,17 +172,42 @@ export class UpsertQuestionStore {
             });
         }
         catch (error) {
-            logger.error("Error while saving question", error);
             const appError = AppError.fromAny(error);
             runInAction(() => {
                 this.saveState = DataState.error(appError);
+            });
+            showAppErrorDialog({
+                dialogManager: this.dialogManager,
+                dialogId: "upsert-question-error",
+                appError: appError,
+                primaryButton: {
+                    text: "OK",
+                    onClick: () => {
+                        this.dialogManager.closeById("upsert-question-error");
+                    },
+                },
             });
         }
     }
 
 
     private getRequest() {
-        return null!;
+        const req = new UpsertQuestionReq({
+            formId: this.formId,
+            id: this.vm.id,
+            parentId: this.parentId,
+            type: this.vm.type.value!,
+            question: this.qvmState.data?.getQuestionText() ?? "",
+            qExtras: this.vm.enaVm?.getQExtra() || null,
+            answer: this.vm.enaVm?.getAnswer() || null,
+            ansHint: this.getAnsHint(),
+            level: this.vm.level.value,
+            ansExplanation: this.getAnsExplanation(),
+            marks: this.vm.scorable.value.isTrue ? (NumFmt.toNumber(this.vm.marks.value) ?? null) : null,
+            isRequired: this.vm.isRequired.value,
+            mediaRefs: [],
+        });
+        return req;
     }
 
 }

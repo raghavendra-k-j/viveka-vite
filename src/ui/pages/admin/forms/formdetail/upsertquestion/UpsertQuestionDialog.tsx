@@ -1,4 +1,4 @@
-import { FramedDialog } from "~/ui/widgets/dialogmanager";
+import { DialogManagerStore, FramedDialog } from "~/ui/widgets/dialogmanager";
 import { UpsertQuestionProvider } from "./UpsertQuestionProvider";
 import { STTContext } from "~/ui/components/sttcontext/STTContext";
 import { useUpsertQuestionStore } from "./UpsertQuestionContext";
@@ -17,6 +17,7 @@ export type UpsertQuestionDialogProps = {
     formType: FormType;
     stt: STT;
     adminFormsService: AdminFormsService;
+    dialogManager: DialogManagerStore;
     onClose: () => void;
 };
 
@@ -24,19 +25,18 @@ export function UpsertQuestionDialog(props: UpsertQuestionDialogProps) {
     return (
         <STTContext.Provider value={props.stt}>
             <FramedDialog
-                onClose={props.onClose}
+                onClose={() => { }}
                 scaffoldClassName="p-4"
-                contentClassName="w-full max-w-2xl h-full flex flex-col"
-            >
+                contentClassName="w-full max-w-2xl h-full flex flex-col">
                 <UpsertQuestionProvider {...props}>
-                    <Body />
+                    <UpsertQuestionInner />
                 </UpsertQuestionProvider>
             </FramedDialog>
         </STTContext.Provider>
     );
 }
 
-function Body() {
+function UpsertQuestionInner() {
     return (
         <>
             <Header />
@@ -50,8 +50,8 @@ function Header() {
     const store = useUpsertQuestionStore();
     const title = store.vm.id ? "Edit Question" : "New Question";
     return (
-        <div className="flex flex-row rounded-t-sm bg-slate-50 border-b border-default">
-            <h1 className="text-base text-strong font-semibold px-4 py-2">{title}</h1>
+        <div className="flex flex-row rounded-t-sm border-b border-default">
+            <h1 className="text-base text-strong font-semibold px-4 py-3">{title}</h1>
         </div>
     );
 }
@@ -59,14 +59,14 @@ function Header() {
 function Footer() {
     const store = useUpsertQuestionStore();
     return (
-        <div className="flex rounded-b-sm bg-slate-50 justify-end gap-3 px-3 py-2 border-t border-default">
+        <div className="flex rounded-b-sm justify-end gap-3 px-3 py-2 border-t border-default">
             <OutlinedButton onClick={() => store.onClose()}>Close</OutlinedButton>
             <Observer>
                 {() => (
                     <FilledButton
                         isLoading={store.saveState.isLoading}
                         disabled={store.saveState.isLoading}
-                        onClick={store.saveQuestion}
+                        onClick={() => store.saveQuestion()}
                     >
                         Save
                     </FilledButton>

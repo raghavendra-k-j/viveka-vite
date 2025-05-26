@@ -16,7 +16,7 @@ export type QuestionProps = {
     qExtras: QExtras | null;
     answer: Answer | null;
     ansHint: string | null;
-    ansExplanation?: string;
+    ansExplanation: string | null;
     level: QuestionLevel | null;
     marks: number | null;
     mediaFiles: QMedia[] | null;
@@ -38,7 +38,7 @@ export class Question {
     qExtras: QExtras | null;
     answer: Answer | null;
     ansHint: string | null;
-    ansExplanation?: string;
+    ansExplanation: string | null;
     level: QuestionLevel | null;
     marks: number | null;
     mediaFiles: QMedia[];
@@ -87,8 +87,8 @@ export class Question {
             question: map.question,
             qExtras: qExtras,
             answer: answer,
-            ansHint: map.ansHint,
-            ansExplanation: map.ansExplanation,
+            ansHint: map.ansHint ?? null,
+            ansExplanation: map.ansExplanation ?? null,
             level: level,
             marks: map.marks,
             mediaFiles: mediaFiles,

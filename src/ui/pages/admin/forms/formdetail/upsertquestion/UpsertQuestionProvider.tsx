@@ -6,9 +6,9 @@ import { Observer } from "mobx-react-lite";
 import { LoaderView } from "~/ui/widgets/loader/LoaderView";
 import { UnknowStateView } from "~/ui/components/errors/UnknowStateView";
 import { SimpleRetryableAppView } from "~/ui/widgets/error/SimpleRetryableAppError";
-import { logger } from "~/core/utils/logger";
 import { FormType } from "~/domain/forms/models/FormType";
 import { AdminFormsService } from "~/domain/forms/admin/services/AdminFormsService";
+import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
 
 type UpsertQuestionProviderProps = {
     id: number | null;
@@ -18,6 +18,7 @@ type UpsertQuestionProviderProps = {
     stt: STT;
     adminFormsService: AdminFormsService;
     onClose: () => void;
+    dialogManager: DialogManagerStore;
     children: ReactNode;
 }
 
@@ -31,49 +32,53 @@ export const UpsertQuestionProvider: React.FC<UpsertQuestionProviderProps> = (pr
             formType: props.formType,
             stt: props.stt,
             adminFormsService: props.adminFormsService,
-            onClose: props.onClose
+            onClose: props.onClose,
+            dialogManager: props.dialogManager,
         });
     }
     const store = storeRef.current;
-    logger.debug("UpsertQuestionProvider: render", store.instanceId);
 
     useEffect(() => {
-        (async () => {
-            await store.loadQuestion();
-            logger.debug("UpsertQuestionProvider: loadQuestion completed", store.vm.instanceId);
-        })();
+        store.loadQuestion();
     }, [store]);
 
     return (
-        <UpsertQuestionContext.Provider value={storeRef.current!}>
+        <UpsertQuestionContext.Provider value={store}>
             <Observer>
                 {() => {
                     if (store.qvmState.isData) {
-                        return (<>{props.children}</>);
+                        return <Fragment
+                            key={store.vm.instanceId}>
+                            {props.children}
+                        </Fragment>;
                     }
-                    else if (store.qvmState.isInitOrLoading) {
-                        return (<Centered><LoaderView /></Centered>);
+
+                    if (store.qvmState.isInitOrLoading) {
+                        return (
+                            <Centered>
+                                <LoaderView />
+                            </Centered>
+                        );
                     }
-                    else if (store.qvmState.isError) {
-                        return (<Centered><SimpleRetryableAppView
-                            appError={store.qvmState.error}
-                            onRetry={() => store.loadQuestion()}
-                        /></Centered>);
+
+                    if (store.qvmState.isError) {
+                        return (
+                            <Centered>
+                                <SimpleRetryableAppView
+                                    appError={store.qvmState.error}
+                                    onRetry={store.loadQuestion}
+                                />
+                            </Centered>
+                        );
                     }
-                    else {
-                        return (<UnknowStateView />);
-                    }
+
+                    return <UnknowStateView />;
                 }}
             </Observer>
         </UpsertQuestionContext.Provider>
     );
 };
 
-
 function Centered({ children }: { children: ReactNode }) {
-    return (
-        <div className="flex items-center justify-center h-full">
-            {children}
-        </div>
-    );
+    return <div className="flex items-center justify-center h-full">{children}</div>;
 }

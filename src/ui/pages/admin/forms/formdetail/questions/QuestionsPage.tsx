@@ -28,6 +28,7 @@ function Body() {
                 formType: store.fd.type,
                 stt: stt,
                 adminFormsService: store.parentStore.adminFormService,
+                dialogManager: dialogManager,
                 onClose: () => {
                     return dialogManager.closeById("upsert-question");
                 }

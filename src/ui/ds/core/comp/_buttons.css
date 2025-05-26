@@ -35,7 +35,7 @@
 }
 
 .btn-outlined {
-  background-color: transparent;
+  background-color: var(--color-surface);
   border: 1px solid var(--button-border-color);
   color: var(--button-text-color);
 }
@@ -76,7 +76,7 @@
 }
 
 .btn--neutral {
-  --button-bg-color: var(--color-white);
+  --button-bg-color: var(--color-surface);
   --button-bg-color-hover: var(--color-slate-100);
   --button-text-color: var(--color-slate-700);
   --button-text-color-hover: var(--color-slate-900);

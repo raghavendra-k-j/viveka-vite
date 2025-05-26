@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match the Following Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font - Inter is Tailwind's default, but explicitly stated for clarity */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple transition for message area */
+        #messageArea.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #messageArea {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        }
+        /* Styling for list items in generated question for better alignment */
+        #columnAList li, #columnBList li {
+            display: flex;
+            align-items: flex-start; /* Align items to the top if text wraps */
+        }
+        #columnAList li span:first-child, #columnBList li span:first-child {
+            min-width: 2em; /* Ensure numbers/letters have enough space */
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-sky-100 to-indigo-100 min-h-screen py-8 px-4">
+
+    <div class="container mx-auto max-w-3xl">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl sm:text-5xl font-bold text-sky-700">Match the Following</h1>
+            <p class="text-lg text-gray-600 mt-3">Create your custom matching questions with ease!</p>
+        </header>
+
+        <section class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl mb-8 ring-1 ring-gray-200">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-5 border-b pb-3">Add Your Pairs</h2>
+            <div class="grid md:grid-cols-2 gap-x-6 gap-y-4 mb-5">
+                <div>
+                    <label for="itemA" class="block text-sm font-medium text-gray-700 mb-1">Item for Column A (e.g., Term)</label>
+                    <input type="text" id="itemA" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow" placeholder="Enter term or question">
+                </div>
+                <div>
+                    <label for="itemB" class="block text-sm font-medium text-gray-700 mb-1">Matching Item for Column B (e.g., Definition)</label>
+                    <input type="text" id="itemB" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow" placeholder="Enter definition or answer">
+                </div>
+            </div>
+            <button id="addPairBtn" class="w-full sm:w-auto bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 flex items-center justify-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                <span>Add Pair</span>
+            </button>
+        </section>
+
+        <section id="currentPairsSection" class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl mb-8 ring-1 ring-gray-200">
+            <div class="flex justify-between items-center mb-5 border-b pb-3">
+                <h2 class="text-2xl font-semibold text-gray-800">Your Current Pairs</h2>
+                <span id="pairCount" class="text-sm font-medium bg-sky-100 text-sky-700 px-2.5 py-1 rounded-full">0 Pairs</span>
+            </div>
+            <div id="currentPairsList" class="space-y-3 min-h-[50px]">
+                <p class="text-gray-500 italic py-2">No pairs added yet. Use the form above to add items.</p>
+            </div>
+            <div class="mt-8 flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
+                <button id="generateQuestionBtn" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-md flex items-center justify-center space-x-2" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586zM12 6a1 1 0 100-2 1 1 0 000 2zM12 18a1 1 0 100-2 1 1 0 000 2zM6 12a1 1 0 10-2 0 1 1 0 002 0zM18 12a1 1 0 10-2 0 1 1 0 002 0z" />
+                        <path d="M12 14a1 1 0 01-1-1V7a1 1 0 112 0v6a1 1 0 01-1 1z" />
+                    </svg>
+                    <span>Generate Question</span>
+                </button>
+                <button id="resetBtn" class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 flex items-center justify-center space-x-2">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101A7.002 7.002 0 0112.001 4c3.527 0 6.499 2.603 6.93 6.001a1 1 0 11-1.959.308A5.002 5.002 0 0012.001 6C9.345 6 7.056 7.707 6.18 10.001A1 1 0 114.22 9.308C5.087 6.636 8.238 4.5 12.001 4.5a6.963 6.963 0 014.95 2.05l-1.45-1.45a1 1 0 011.414-1.414l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414l1.45-1.45A6.963 6.963 0 0112.001 17.5c-3.762 0-6.913-2.136-7.78-4.808a1 1 0 111.96-.308A5.002 5.002 0 0012.001 16c2.655 0 4.944-1.707 5.82-4.001A1 1 0 1119.78 12.692C18.913 15.364 15.762 17.5 12.001 17.5A7.002 7.002 0 015 12.899V15a1 1 0 11-2 0V3a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Reset All</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="generatedQuestionSection" class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl mb-8 ring-1 ring-gray-200 hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3">Match the Following</h2>
+            <div class="grid md:grid-cols-2 gap-x-8 gap-y-6">
+                <div>
+                    <h3 class="text-xl font-semibold text-sky-700 mb-3 border-b-2 border-sky-200 pb-2">Column A</h3>
+                    <ul id="columnAList" class="space-y-2 text-gray-800">
+                        </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-rose-700 mb-3 border-b-2 border-rose-200 pb-2">Column B</h3>
+                    <ul id="columnBList" class="list-none space-y-2 text-gray-800">
+                        </ul>
+                </div>
+            </div>
+            <div class="mt-10 text-center">
+                <button id="copyQuestionBtn" class="w-full sm:w-auto bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 flex items-center justify-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                        <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                    </svg>
+                    <span>Copy Question Text</span>
+                </button>
+            </div>
+        </section>
+
+        <div id="messageArea" class="fixed bottom-5 right-5 bg-gray-800 text-white p-4 rounded-lg shadow-lg max-w-xs text-sm z-50">
+            </div>
+
+        <footer class="text-center mt-12 text-sm text-gray-500">
+            <p>&copy; <span id="currentYear"></span> Match the Following Generator. Crafted with Tailwind CSS.</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const itemAInput = document.getElementById('itemA');
+        const itemBInput = document.getElementById('itemB');
+        const addPairBtn = document.getElementById('addPairBtn');
+        const currentPairsList = document.getElementById('currentPairsList');
+        const pairCountDisplay = document.getElementById('pairCount');
+        const generateQuestionBtn = document.getElementById('generateQuestionBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const generatedQuestionSection = document.getElementById('generatedQuestionSection');
+        const columnAList = document.getElementById('columnAList');
+        const columnBList = document.getElementById('columnBList');
+        const copyQuestionBtn = document.getElementById('copyQuestionBtn');
+        const messageArea = document.getElementById('messageArea');
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        let pairs = []; // Array to store {id, term, definition} objects
+        let messageTimeout; // To clear previous timeout for messages
+
+        // --- Utility Functions ---
+
+        /**
+         * Shows a temporary message to the user.
+         * @param {string} text - The message to display.
+         * @param {string} type - 'success' (green), 'error' (red), or 'info' (blue/default).
+         * @param {number} duration - How long to show the message in milliseconds.
+         */
+        function showMessage(text, type = 'info', duration = 3000) {
+            clearTimeout(messageTimeout); // Clear any existing message timeout
+            messageArea.textContent = text;
+            messageArea.classList.remove('bg-green-500', 'bg-red-500', 'bg-sky-500', 'bg-gray-800', 'show'); // Reset classes
+
+            switch (type) {
+                case 'success':
+                    messageArea.classList.add('bg-green-500');
+                    break;
+                case 'error':
+                    messageArea.classList.add('bg-red-500');
+                    break;
+                default:
+                    messageArea.classList.add('bg-sky-600'); // Default info color
+                    break;
+            }
+            messageArea.classList.add('show');
+
+            messageTimeout = setTimeout(() => {
+                messageArea.classList.remove('show');
+            }, duration);
+        }
+
+        /**
+         * Shuffles an array in place using the Fisher-Yates algorithm.
+         * @param {Array} array - The array to shuffle.
+         * @returns {Array} The shuffled array.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // ES6 destructuring swap
+            }
+            return array;
+        }
+
+        // --- Core Logic Functions ---
+
+        /**
+         * Renders the current list of pairs in the UI.
+         */
+        function renderCurrentPairs() {
+            currentPairsList.innerHTML = ''; // Clear existing list
+
+            if (pairs.length === 0) {
+                currentPairsList.innerHTML = '<p class="text-gray-500 italic py-2">No pairs added yet. Use the form above to add items.</p>';
+                generateQuestionBtn.disabled = true;
+            } else {
+                pairs.forEach(pair => {
+                    const listItem = document.createElement('div');
+                    listItem.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200 shadow-sm';
+                    listItem.innerHTML = `
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-700">${pair.term}</p>
+                            <p class="text-sm text-sky-600">${pair.definition}</p>
+                        </div>
+                        <button data-id="${pair.id}" class="remove-pair-btn text-red-500 hover:text-red-700 p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    `;
+                    currentPairsList.appendChild(listItem);
+                });
+                generateQuestionBtn.disabled = false;
+            }
+            pairCountDisplay.textContent = `${pairs.length} Pair${pairs.length === 1 ? '' : 's'}`;
+        }
+
+        /**
+         * Adds a new pair from the input fields.
+         */
+        function handleAddPair() {
+            const term = itemAInput.value.trim();
+            const definition = itemBInput.value.trim();
+
+            if (term === '' || definition === '') {
+                showMessage('Both fields are required to add a pair.', 'error');
+                return;
+            }
+
+            const newPair = {
+                id: Date.now(), // Unique ID for removal
+                term: term,
+                definition: definition
+            };
+            pairs.push(newPair);
+
+            renderCurrentPairs();
+            itemAInput.value = ''; // Clear input fields
+            itemBInput.value = '';
+            itemAInput.focus(); // Focus back on the first input
+            showMessage('Pair added successfully!', 'success');
+        }
+
+        /**
+         * Removes a pair based on its ID.
+         * @param {number} id - The ID of the pair to remove.
+         */
+        function handleRemovePair(id) {
+            pairs = pairs.filter(pair => pair.id !== id);
+            renderCurrentPairs();
+            showMessage('Pair removed.', 'info');
+            // If generated question is visible and no pairs left, hide it
+            if (pairs.length === 0 && !generatedQuestionSection.classList.contains('hidden')) {
+                 generatedQuestionSection.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Generates and displays the "Match the Following" question.
+         */
+        function handleGenerateQuestion() {
+            if (pairs.length === 0) {
+                showMessage('Please add at least one pair to generate a question.', 'error');
+                return;
+            }
+
+            columnAList.innerHTML = '';
+            columnBList.innerHTML = '';
+
+            const columnAItems = pairs.map(pair => pair.term);
+            let columnBItems = pairs.map(pair => pair.definition);
+            columnBItems = shuffleArray([...columnBItems]); // Shuffle a copy
+
+            columnAItems.forEach((term, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${index + 1}.</span> <span class="ml-2">${term}</span>`;
+                columnAList.appendChild(li);
+            });
+
+            columnBItems.forEach((definition, index) => {
+                const li = document.createElement('li');
+                // Using letters (A, B, C...) for Column B
+                li.innerHTML = `<span>${String.fromCharCode(65 + index)}.</span> <span class="ml-2">${definition}</span>`;
+                columnBList.appendChild(li);
+            });
+
+            generatedQuestionSection.classList.remove('hidden');
+            showMessage('Matching question generated!', 'success');
+            generatedQuestionSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /**
+         * Resets the entire form and all data.
+         */
+        function handleResetAll() {
+            pairs = [];
+            itemAInput.value = '';
+            itemBInput.value = '';
+            renderCurrentPairs(); // This will also disable generate button and show placeholder
+            generatedQuestionSection.classList.add('hidden'); // Hide generated question
+            columnAList.innerHTML = '';
+            columnBList.innerHTML = '';
+            showMessage('All entries have been reset.', 'info');
+            itemAInput.focus();
+        }
+
+        /**
+         * Copies the generated question text to the clipboard.
+         */
+        function handleCopyQuestion() {
+            if (generatedQuestionSection.classList.contains('hidden') || pairs.length === 0) {
+                showMessage('No question generated to copy.', 'error');
+                return;
+            }
+
+            let textToCopy = "Match the Following:\n\nColumn A\n";
+            pairs.forEach((pair, index) => {
+                textToCopy += `${index + 1}. ${pair.term}\n`;
+            });
+
+            textToCopy += "\nColumn B\n";
+            // Get the shuffled B items as displayed
+            const displayedBItems = Array.from(columnBList.children).map(li => li.textContent.substring(li.textContent.indexOf('.') + 1).trim());
+            displayedBItems.forEach((def, index) => {
+                textToCopy += `${String.fromCharCode(65 + index)}. ${def}\n`;
+            });
+            
+            // Using a temporary textarea to copy
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            textArea.style.position = 'fixed'; // Avoid scrolling to bottom
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showMessage('Question copied to clipboard!', 'success');
+                } else {
+                    showMessage('Failed to copy question. Please try manually.', 'error');
+                }
+            } catch (err) {
+                showMessage('Error copying question: ' + err, 'error');
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+
+        // --- Event Listeners ---
+        addPairBtn.addEventListener('click', handleAddPair);
+        
+        // Allow adding pair with Enter key from input fields
+        itemAInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent form submission if it were in a form
+                itemBInput.focus(); // Move to next input or add pair if B has content
+            }
+        });
+        itemBInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleAddPair();
+            }
+        });
+
+        generateQuestionBtn.addEventListener('click', handleGenerateQuestion);
+        resetBtn.addEventListener('click', handleResetAll);
+        copyQuestionBtn.addEventListener('click', handleCopyQuestion);
+
+        // Event delegation for remove buttons on dynamically added pairs
+        currentPairsList.addEventListener('click', (event) => {
+            const removeButton = event.target.closest('.remove-pair-btn');
+            if (removeButton) {
+                const pairId = parseInt(removeButton.dataset.id, 10);
+                handleRemovePair(pairId);
+            }
+        });
+
+        // Initial render
+        renderCurrentPairs();
+    </script>
+
+</body>
+</html>

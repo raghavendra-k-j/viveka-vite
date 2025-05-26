@@ -3,7 +3,6 @@
   font-size: var(--text-base-m);
   line-height: 1.5;
   color: var(--color-text-default);
-  border-radius: var(--dimen-input-radius);
   outline: none;
   border: none;
   position: relative;

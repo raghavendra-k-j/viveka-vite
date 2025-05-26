@@ -1,4 +1,3 @@
-import { Bool3 } from "~/core/utils/Bool3";
 import type { FormType } from "../FormType";
 import { AssmntMarksPolicy } from "./AssmntMarksPolicy";
 
@@ -219,14 +218,5 @@ export class QuestionType {
         QuestionType.textarea,
         QuestionType.fillBlanks,
     ]);
-
-
-    static canHaveMarks(formType: FormType, questionType: QuestionType): Bool3 {
-        if (!formType.isAssessment) return Bool3.N;
-        if (questionType.assmntMarksPolicy === AssmntMarksPolicy.required) return Bool3.T;
-        if (questionType.assmntMarksPolicy === AssmntMarksPolicy.optional) return Bool3.T;
-        return Bool3.N;
-    }
-
 
 }

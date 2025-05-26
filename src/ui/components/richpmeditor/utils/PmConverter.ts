@@ -7,6 +7,13 @@ import { RichPmEditorSchema } from '../pm/schema';
 
 export class PmConverter {
 
+    static toNodeOrEmpty({ text, schema }: { text: string | null; schema: Schema }): ProseMirrorNode | null {
+        if (!text || text.trim() === "") {
+            return null;
+        }
+        return this.toNode({ text, schema });
+    }
+
     static toText({ doc, schema }: { doc: ProseMirrorNode; schema: Schema }): string | null {
         const string = PmToHtml.convert(doc, schema);
         return string.trim() === "" ? null : string;
@@ -25,5 +32,11 @@ export class PmConverter {
 
         return PmConverter.toText({ doc: content, schema: props.schema });
     }
+
+    static toTextFromRefOrEmpty(props: { ref: React.RefObject<RichPmEditorRef | null>, schema: RichPmEditorSchema }): string {
+        const text = PmConverter.toTextFromRef(props);
+        return text ? text : "";
+    }
+
 
 }

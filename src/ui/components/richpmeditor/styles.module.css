@@ -4,6 +4,7 @@
   width: 100%;
   border-radius: var(--dimen-input-radius);
   box-shadow: var(--shadow-input);
+  background-color: var(--color-input-bg);
 }
 
 .toolbar {

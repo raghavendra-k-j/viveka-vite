@@ -28,6 +28,11 @@
   color: var(--color-text-error);
 }
 
+.text-success {
+  color: var(--color-text-success);
+}
+
+
 /* Text on */
 .text-on-primary {
   color: var(--color-on-primary);

@@ -43,7 +43,6 @@ export const RichPmEditor = forwardRef(function RichPmEditor(props: RichPmEditor
     }));
 
 
-
     return (
         <div className={styles.richPmEditor}>
             <div className={styles.toolbar}>
