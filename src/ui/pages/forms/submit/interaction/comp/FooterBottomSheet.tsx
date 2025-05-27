@@ -18,7 +18,7 @@ export function BottomSheetDialog({ store, onClickClose, children }: BottomSheet
     return (
         <InteractionContext.Provider value={store}>
             <Dialog onClose={onClickClose}>
-                <DialogOverlay onClick={onClickClose} />
+                <DialogOverlay />
                 <DialogBottomSheetScaffold>
                     <DialogContent className="w-full mx-4 p-3">
                         {children}

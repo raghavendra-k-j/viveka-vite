@@ -7,6 +7,7 @@ import { RichPmEditorSchema } from '../pm/schema';
 
 export class PmConverter {
 
+
     static toNodeOrEmpty({ text, schema }: { text: string | null; schema: Schema }): ProseMirrorNode | null {
         if (!text || text.trim() === "") {
             return null;
@@ -37,6 +38,13 @@ export class PmConverter {
         const text = PmConverter.toTextFromRef(props);
         return text ? text : "";
     }
+
+
+    static toTextOrEmpty(props: { doc: ProseMirrorNode; schema: RichPmEditorSchema }): string {
+        const text = PmConverter.toText(props);
+        return text ? text : "";
+    }
+
 
 
 }

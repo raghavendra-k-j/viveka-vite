@@ -35,7 +35,7 @@ function Body() {
     const store = useAiSTTDialogStore();
     return (
         <Dialog onClose={() => store.onClickCancel()}>
-            <DialogOverlay onClick={() => store.onClickCancel()} />
+            <DialogOverlay />
             <DialogScaffold className="p-4">
                 <DialogContent className="w-full max-w-[400px] min-h-[300px] max-h-[400px] flex flex-col">
                     <DialogBody />

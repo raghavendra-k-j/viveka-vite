@@ -3,8 +3,8 @@ import { QuestionVm, type QuestionRendererProps, type QuestionVmProps } from "./
 import { computed, makeObservable, observable, runInAction } from "mobx";
 import { Answer, TextAreaAnswer } from "~/domain/forms/models/answer/Answer";
 import { Node as ProseMirrorNode } from 'prosemirror-model';
-import { PmToMd } from "~/ui/components/richpmeditor/utils/PmToMd";
 import { blockSchema } from "~/ui/components/richpmeditor/pm/schema";
+import { PmConverter } from "~/ui/components/richpmeditor/utils/PmConverter";
 
 type TextAreaQuestionVmProps = QuestionVmProps & {};
 
@@ -48,7 +48,10 @@ export class TextAreaQuestionVm extends QuestionVm {
         if (!this.isAnswered) {
             return undefined;
         }
-        const ansString = PmToMd.getContent(this.ansNode!, blockSchema);
+        const ansString = PmConverter.toTextOrEmpty({
+            doc: this.ansNode!,
+            schema: blockSchema
+        });
         return new TextAreaAnswer({ answer: ansString });
     }
 
