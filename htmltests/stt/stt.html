@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>STT iframe loader</title>
+</head>
+<body>
+
+<button id="loadIframeBtn">Load STT iframe</button>
+<div id="iframeContainer"></div>
+
+<script>
+  document.getElementById('loadIframeBtn').onclick = () => {
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://latestvite.vivekaa.in/stt/stt.html';
+    iframe.width = '600';
+    iframe.height = '200';
+    iframe.allow = 'microphone';  // allow mic in iframe
+    document.getElementById('iframeContainer').appendChild(iframe);
+  };
+</script>
+
+</body>
+</html>

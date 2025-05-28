@@ -187,7 +187,6 @@ function HintAndExplanationSection() {
                                 schema={blockSchema}
                                 stt={store.stt}
                                 initialContent={store.vm.ansHintNode}
-                                minHeight="80px"
                                 maxHeight="100px"
                             />
                             <FError />

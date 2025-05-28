@@ -35,9 +35,9 @@ export class EnAVmFactory {
         if (question.type.isFillBlank) {
             return FillBlankEnAVm.fromQuestion({ question, storeRef });
         }
-        // if (question.type.isPairMatch) {
-        //     return PairMatchEnAVm.fromQuestion({ question, storeRef });
-        // }
+        if (question.type.isPairMatch) {
+            return PairMatchEnAVm.fromQuestion({ question, storeRef });
+        }
         return null;
     }
 

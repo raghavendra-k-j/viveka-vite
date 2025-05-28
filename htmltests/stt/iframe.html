@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>STT in iframe</title>
+</head>
+<body>
+
+<h3>Speech-to-Text inside iframe</h3>
+<button id="startBtn">Start STT</button>
+<p id="output"></p>
+
+<script>
+  const output = document.getElementById('output');
+  const startBtn = document.getElementById('startBtn');
+
+  startBtn.onclick = () => {
+    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+      output.textContent = 'Speech Recognition API not supported';
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      output.textContent = 'Listening... speak now.';
+    };
+
+    recognition.onerror = (e) => {
+      output.textContent = 'Error: ' + e.error;
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      output.textContent = 'You said: ' + transcript;
+    };
+
+    recognition.start();
+  };
+</script>
+
+</body>
+</html>

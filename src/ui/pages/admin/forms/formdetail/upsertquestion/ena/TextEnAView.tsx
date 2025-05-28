@@ -23,6 +23,7 @@ export function TextEnAView(vm: TextEnAVm) {
                                 ref={vm.editorRef}
                                 initialContent={vm.node}
                                 schema={vm.type.isTextBox ? inlineSchema : blockSchema}
+                                minHeight={vm.type.isTextArea ? "80px" : ""}
                             />
                             <FError></FError>
                         </FFieldContainer>

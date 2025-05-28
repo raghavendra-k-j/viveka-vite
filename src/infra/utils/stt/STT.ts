@@ -1,3 +1,5 @@
+import { logger } from "~/core/utils/logger";
+
 /**
  * Enumeration of specific error codes related to speech-to-text (STT) functionality.
  */
@@ -445,6 +447,7 @@ export class STT {
         }
         catch (err) {
             // Handle any error that occurs when starting speech recognition
+            console.error(err);
             const error = new STTError(STTErrorCode.GENERAL_ERROR, "Error starting speech recognition");
             error.stack = err instanceof Error ? err.stack : undefined;
             this.emitError(error);  // Emit the error event
@@ -468,6 +471,7 @@ export class STT {
         }
 
         // If the Permissions API is supported, check microphone permissions
+        navigator.mediaDevices.getUserMedia({ audio: true })
         if (navigator.permissions) {
             try {
                 // Query microphone permission status
@@ -480,6 +484,7 @@ export class STT {
             }
             catch (error) {
                 // Handle any error during permission checking
+                console.error("Error checking microphone permission:", error);
                 const err = new STTError(STTErrorCode.GENERAL_ERROR, "Error checking microphone permission");
                 err.stack = error instanceof Error ? error.stack : undefined;
                 this.emitError(err);  // Emit the error event
