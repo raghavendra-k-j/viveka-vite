@@ -18,6 +18,7 @@ import { FormType } from "~/domain/forms/models/FormType";
 import { ThingId } from "~/core/utils/ThingId";
 import { showAppErrorDialog } from "~/ui/components/dialogs/showAppErrorDialog";
 import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
+import { showErrorDialog } from "~/ui/components/dialogs/showErrorDialog";
 
 export type UpsertQuestionStoreProps = {
     id: number | null;
@@ -93,8 +94,8 @@ export class UpsertQuestionStore {
             this.onQuestionLoaded(question);
         }
         catch (error) {
+            logger.error("Error while loading question", error);
             const appError = AppError.fromAny(error);
-            logger.error("Error while loading question", appError);
             runInAction(() => {
                 this.qvmState = DataState.error(appError);
             });
@@ -170,6 +171,7 @@ export class UpsertQuestionStore {
                 this.saveState = DataState.data(undefined);
                 this.onClose(res);
             });
+            showErrorDialog
         }
         catch (error) {
             const appError = AppError.fromAny(error);

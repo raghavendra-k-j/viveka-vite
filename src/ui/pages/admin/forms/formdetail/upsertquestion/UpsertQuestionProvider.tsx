@@ -66,7 +66,7 @@ export const UpsertQuestionProvider: React.FC<UpsertQuestionProviderProps> = (pr
                             <Centered>
                                 <SimpleRetryableAppView
                                     appError={store.qvmState.error}
-                                    onRetry={store.loadQuestion}
+                                    onRetry={() => store.loadQuestion()}
                                 />
                             </Centered>
                         );

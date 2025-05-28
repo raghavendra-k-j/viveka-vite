@@ -1,7 +1,6 @@
 import { UpsertQuestionProvider } from "./UpsertQuestionProvider";
 import { STTContext, useStt } from "~/ui/components/sttcontext/STTContext";
 import { useUpsertQuestionStore } from "./UpsertQuestionContext";
-import OutlinedButton from "~/ui/widgets/button/OutlinedButton";
 import FilledButton from "~/ui/widgets/button/FilledButton";
 import { Observer } from "mobx-react-lite";
 import { UpsertQuestionForm } from "./UpsertQuestionForm";
@@ -41,7 +40,7 @@ export default function UpsertQuestionPage() {
 
 function UpsertQuestionInner() {
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full bg-surface">
             <UpsertQuestionForm />
             <Footer />
         </div>
@@ -53,7 +52,6 @@ function Footer() {
     const store = useUpsertQuestionStore();
     return (
         <div className="flex rounded-b-sm justify-end gap-3 px-3 py-2 border-t border-default">
-            <OutlinedButton onClick={() => store.onClose()}>Close</OutlinedButton>
             <Observer>
                 {() => (
                     <FilledButton
