@@ -3,8 +3,7 @@ import type { InteractionVm } from "./InteractionVm";
 import { GroupQuestionVm } from "./GroupQuestionVm";
 import type { QuestionVm } from "./QuestionVm";
 import { ObjectiveQuestionVm } from "./ObjectiveQuestionVm";
-import { TextboxQuestionVm } from "./TextboxQuestionVm";
-import { TextAreaQuestionVm } from "./TextAreaQuestionVm";
+import { TextQuestionVm } from "./TextQuestionVm";
 import { FillBlanksQuestionVm } from "./FillBlanksQuestionVm";
 import { PairMatchQuestionVm } from "./PairMatchQuestionVm";
 
@@ -17,11 +16,11 @@ export class QuestionVmFactory {
             return objectiveQuestion;
         }
         if (type.isTextBox) {
-            const textboxQuestion = new TextboxQuestionVm({ question: question, store: store });
+            const textboxQuestion = new TextQuestionVm({ question: question, store: store });
             return textboxQuestion;
         }
         if (type.isTextArea) {
-            const textAreadQuestion = new TextAreaQuestionVm({ question: question, store: store });
+            const textAreadQuestion = new TextQuestionVm({ question: question, store: store });
             return textAreadQuestion;
         }
         if (type.isFillBlank) {

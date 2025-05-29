@@ -15,15 +15,15 @@ export const SpeakButton = observer(({ vm }: SpeakButtonProps) => {
     };
 
     const Icon = isSpeaking ? CircleStop : Volume2;
-    const iconColor = isSpeaking ? colors.primary : colors.textDefault;
+    const iconClass = isSpeaking ? "text-error" : "text-tertiary";
 
     return (
         <button
             onClick={handleClick}
             aria-label={isSpeaking ? "Stop Speaking" : "Play Question"}
-            className={`flex cursor-pointer items-center justify-center rounded-sm p-2 transition-colors duration-200`}
+            className={`flex cursor-pointer items-center justify-center rounded-sm p-2 transition-colors duration-200 hover:bg-slate-100`}
         >
-            <Icon size={20} color={iconColor} />
+            <Icon size={20} className={iconClass} />
         </button>
     );
 });

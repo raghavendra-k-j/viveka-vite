@@ -113,7 +113,7 @@ export class AppStore {
             this._appUser = null;
             this.authState = DataState.init();
         });
-        this.navigateToLogin();
+        window.location.reload();
     }
 
 

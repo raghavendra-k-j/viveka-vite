@@ -6,8 +6,11 @@ import { QuestionHeaderView } from "./QuestionHeaderView";
 export function GroupQuestionView({ vm }: { vm: GroupQuestionVm }) {
     return (
         <QuestionCardView>
-            <QuestionHeaderView vm={vm} />
-            <hr className="border-slate-200 mt-4" />
+            <QuestionHeaderView
+                vm={vm}
+                parentVm={undefined}
+            />
+            <hr className="border-default mt-4" />
             <Observer>
                 {() => (
                     <>
@@ -16,7 +19,7 @@ export function GroupQuestionView({ vm }: { vm: GroupQuestionVm }) {
                                 id={`question-${subQuestion.base.id}`}
                                 key={subQuestion.base.id}
                             >
-                                {index > 0 && <hr className="border-slate-200" />}
+                                {index > 0 && <hr className="border-default" />}
                                 {subQuestion.render({ vm: subQuestion, parentVm: vm })}
                             </div>
                         ))}

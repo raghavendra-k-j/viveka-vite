@@ -3,7 +3,7 @@ export function Title({ children }: { children: React.ReactNode }) {
 }
 
 export function Message({ children }: { children: React.ReactNode }) {
-    return <p className="text-secondary text-base-m mt-2 text-center">{children}</p>;
+    return <p className="text-secondary text-base mt-2 text-center">{children}</p>;
 }
 
 export function Card({ children }: { children: React.ReactNode }) {

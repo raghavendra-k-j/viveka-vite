@@ -26,7 +26,7 @@ function TabBar({
 }) {
     const store = useResponseViewStore();
     return (
-        <div className="flex border-b border-slate-200">
+        <div className="flex border-b border-default">
             <div className="flex flex-grow">
                 <TabButton
                     active={activeTab === "details"}

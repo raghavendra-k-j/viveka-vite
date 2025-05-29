@@ -1,19 +1,28 @@
 import { InfoCard, InfoCardHeader, InfoCardItem } from "./InfoCard";
 import { useResponseViewStore } from "../../ResponseViewContext";
 import { NumFmt } from "~/core/utils/NumFmt";
+import { QuestionType } from "~/domain/forms/models/question/QuestionType";
 
 export function QuestionsOverview() {
 
     const store = useResponseViewStore();
     const formResponse = store.formDetail.formResponse!;
 
+    const hasGroupQuestions = store.formDetailExtras.hasGroupQuestions;
+
+
     return (
         <InfoCard>
             <InfoCardHeader title="Questions Overview" />
             {/* Total Questions */}
+            {hasGroupQuestions && (
+                <div className="bg-blue-50 text-blue-600 px-4 py-2 font-semibold mb-3 text-sm">
+                    This count also includes sub-questions in <b>{QuestionType.groupQuestion.getName(store.formDetail.type)}</b> Questions.
+                </div>
+            )}
             <InfoCardItem
-                label="Total"
-                value={NumFmt.padZero(store.formDetail.totalQuestions)}
+                label="Total Questions"
+                value={NumFmt.padZero(store.formDetailExtras.totalAnswerableQuestions)}
             />
             {/* Answered */}
             <InfoCardItem
@@ -38,7 +47,7 @@ export function QuestionsOverview() {
             {/* Not Answered */}
             <InfoCardItem
                 label="Not Answered"
-                value={NumFmt.padZero(store.formDetail.totalQuestions - formResponse.attemptedQCount)}
+                value={NumFmt.padZero(store.formDetailExtras.totalAnswerableQuestions - formResponse.attemptedQCount)}
             />
         </InfoCard>
     );

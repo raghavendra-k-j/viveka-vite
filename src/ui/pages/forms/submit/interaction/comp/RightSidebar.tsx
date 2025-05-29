@@ -25,7 +25,7 @@ const QuestionPanelFooter = () => {
             {() => {
                 return (
                     <div className="mt-3">
-                        <FilledButton className="w-full" isLoading={store.submitState.isLoading} disabled={store.submitState.isLoading} onClick={() => store.onClickSubmitForm()}>Submit {store.formType.name}</FilledButton>
+                        <FilledButton className="w-full" isLoading={store.submitState.isLoading} disabled={store.submitState.isLoading} onClick={() => store.onClickSubmitButton()}>Submit {store.formType.name}</FilledButton>
                     </div>
                 );
             }}

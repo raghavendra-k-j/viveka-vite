@@ -5,7 +5,7 @@ type FErrorProps = React.HTMLAttributes<HTMLElement> & {
 
 export function FError({ as: Component = "div", children, ...props }: FErrorProps) {
     return (
-        <Component {...props} className={`text-sm-m text-error ${props.className || ""}`}>
+        <Component {...props} className={`text-sm text-error ${props.className || ""}`}>
             {children}
         </Component>
     );

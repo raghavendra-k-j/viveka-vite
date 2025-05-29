@@ -24,7 +24,7 @@ const AppBarLeading = observer(() => {
     const store = useInteractionStore();
 
     const handleOnBack = () => {
-        window.location.reload();
+        store.onExitForm();
     };
 
     return (

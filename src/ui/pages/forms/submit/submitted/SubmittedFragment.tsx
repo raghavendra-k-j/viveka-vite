@@ -72,7 +72,7 @@ function Assessment() {
 
             <div className="flex flex-col gap-3 mt-8">
                 <FilledButton onClick={viewResponse} disabled={!isEvaluated}>
-                    View Response
+                    {store.formDetail.type.isAssessment ? "View Result" : "View Response"}
                 </FilledButton>
                 <ReturnToHomeButton />
             </div>

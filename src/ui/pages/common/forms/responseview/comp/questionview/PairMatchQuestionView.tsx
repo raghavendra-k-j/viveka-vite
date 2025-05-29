@@ -31,8 +31,8 @@ export function PairMatchQuestionView({ question }: PairMatchQuestionViewProps) 
     });
 
     return (
-        <div className="overflow-x-auto px-3">
-            <table className="min-w-full border-collapse border border-slate-200 text-sm text-left">
+        <div className="overflow-x-auto">
+            <table className="min-w-full border-collapse border border-default text-sm text-left">
                 <thead>
                     <tr className="bg-slate-50 text-default">
                         <TableHeaderCell className="whitespace-nowrap">Column A</TableHeaderCell>
@@ -42,15 +42,24 @@ export function PairMatchQuestionView({ question }: PairMatchQuestionViewProps) 
                 </thead>
                 <tbody>
                     {qExtras.items.map((item) => (
-                        <tr key={item.rowId} className="even:bg-surface">
+                        <tr key={item.rowId}>
                             <TableBodyCell>
-                                <div dangerouslySetInnerHTML={{ __html: MdQRenderer.pairMatchText(item.colAText) }}></div>
+                                <div
+                                    dangerouslySetInnerHTML={{ __html: MdQRenderer.pairMatchText(item.colAText) }}
+                                    className="whitespace-nowrap" // allow normal wrapping for content if needed
+                                ></div>
                             </TableBodyCell>
                             <TableBodyCell>
-                                <div dangerouslySetInnerHTML={{ __html: MdQRenderer.pairMatchText(correctAnswerMap[item.rowId] || "-") }}></div>
+                                <div
+                                    dangerouslySetInnerHTML={{ __html: MdQRenderer.pairMatchText(correctAnswerMap[item.rowId] || "-") }}
+                                    className="whitespace-nowrap"
+                                ></div>
                             </TableBodyCell>
                             <TableBodyCell>
-                                <div dangerouslySetInnerHTML={{ __html: MdQRenderer.pairMatchText(userAnswerMap[item.rowId] || "-") }}></div>
+                                <div
+                                    dangerouslySetInnerHTML={{ __html: MdQRenderer.pairMatchText(userAnswerMap[item.rowId] || "-") }}
+                                    className="whitespace-nowrap"
+                                ></div>
                             </TableBodyCell>
                         </tr>
                     ))}
@@ -67,7 +76,7 @@ type CellProps = {
 
 function TableHeaderCell({ children, className = "" }: CellProps) {
     return (
-        <th className={`border border-slate-200 px-2 py-1 font-semibold ${className}`}>
+        <th className={`border border-default px-2 py-1 font-semibold ${className}`}>
             {children}
         </th>
     );
@@ -75,7 +84,7 @@ function TableHeaderCell({ children, className = "" }: CellProps) {
 
 function TableBodyCell({ children, className = "" }: CellProps) {
     return (
-        <td className={`border border-slate-200 px-2 py-1 ${className}`}>
+        <td className={`border border-default px-2 py-1 ${className}`}>
             {children}
         </td>
     );

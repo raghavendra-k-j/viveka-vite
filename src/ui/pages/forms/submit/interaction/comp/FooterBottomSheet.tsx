@@ -2,9 +2,9 @@ import { Dialog, DialogBottomSheetScaffold, DialogContent, DialogOverlay } from 
 import { QIndexPanel } from "./QIndexPanel";
 import { InteractionStore } from "../InteractionStore";
 import { InteractionContext } from "../InteractionContext";
-import { scrollToQuestion } from "../utils/questionScrollUtil";
 import OutlinedButton from "~/ui/widgets/button/OutlinedButton";
 import { FormDetailSection } from "./FormDetailComponent";
+import { QuestionVm } from "../models/QuestionVm";
 
 
 
@@ -20,9 +20,14 @@ export function BottomSheetDialog({ store, onClickClose, children }: BottomSheet
             <Dialog onClose={onClickClose}>
                 <DialogOverlay />
                 <DialogBottomSheetScaffold>
-                    <DialogContent className="w-full mx-4 p-3">
-                        {children}
-                        <div className="p-4">
+                    <DialogContent className="w-full mx-4 pt-3 pb-0 max-h-[80vh] flex flex-col">
+                        {/* Scrollable content area */}
+                        <div className="overflow-y-auto flex-1 p-4">
+                            {children}
+                        </div>
+
+                        {/* Fixed button at the bottom */}
+                        <div className="p-4 border-t border-gray-200 bg-white">
                             <OutlinedButton className="w-full" onClick={onClickClose}>
                                 Close
                             </OutlinedButton>
@@ -35,18 +40,19 @@ export function BottomSheetDialog({ store, onClickClose, children }: BottomSheet
 }
 
 
-type QuestionsBottomSheetProps = {
+
+export type QuestionsBottomSheetProps = {
     store: InteractionStore;
     onClickClose: () => void;
+    onClickQuestion: (vm: QuestionVm) => void;
 };
 
 export function QuestionsBottomSheet(props: QuestionsBottomSheetProps) {
     return (
         <BottomSheetDialog store={props.store} onClickClose={props.onClickClose}>
             <QIndexPanel
-                onClickQuestion={(vm) => {
-                    scrollToQuestion(vm);
-                    props.onClickClose();
+                onClickQuestion={async (vm) => {
+                    props.onClickQuestion(vm);
                 }}
             />
         </BottomSheetDialog>
@@ -54,7 +60,7 @@ export function QuestionsBottomSheet(props: QuestionsBottomSheetProps) {
 }
 
 
-type FormDetailBottomSheetProps = {
+export type FormDetailBottomSheetProps = {
     store: InteractionStore;
     onClickClose: () => void;
 };

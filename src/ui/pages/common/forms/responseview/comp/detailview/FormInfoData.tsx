@@ -10,7 +10,7 @@ export function FormInfoData() {
     return (
         <div className="flex flex-col gap-2">
             <ReadMoreText
-                className="text-base-m text-default font-semibold"
+                className="text-base text-default font-semibold"
                 text={formDetail.title}
             />
             <InfoCard>
@@ -24,7 +24,7 @@ export function FormInfoData() {
                 />)}
                 {formDetail.timeLimit && (<InfoCardItem
                     label="Time Limit"
-                    value={TimeFmt.format(formDetail.timeLimit)}
+                    value={TimeFmt.formatLong(formDetail.timeLimit)}
                 />)}
             </InfoCard>
         </div>

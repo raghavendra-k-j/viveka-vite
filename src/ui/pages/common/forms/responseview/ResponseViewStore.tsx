@@ -1,6 +1,6 @@
 import { FormService } from "~/domain/forms/services/FormsService";
 import { ResponseDialogViewer } from "./models/ResponseViewViewer";
-import { makeObservable, observable, runInAction } from "mobx";
+import { action, makeObservable, observable, runInAction } from "mobx";
 import { DataState } from "~/ui/utils/DataState";
 import { RDQuestionsReq, RDQuestionsReqFilter } from "~/domain/forms/models/RDQuestionsReq";
 import { withMinDelay } from "~/infra/utils/withMinDelay";
@@ -14,9 +14,10 @@ import { FormDetailExtras } from "~/domain/forms/models/FormDetailExtras";
 import { RDQuestionVm } from "./models/QuestionVm";
 import { QuestionType } from "~/domain/forms/models/question/QuestionType";
 import { ObjQuestionView } from "./comp/questionview/ObjQuestionView";
-import { TextQuestionView } from "./comp/questionview/TextboxQuestionView";
+import { TextQuestionView } from "./comp/questionview/TextQuestionView";
 import { FillBlanksQuestionView } from "./comp/questionview/FillBlankQuestionView";
 import { PairMatchQuestionView } from "./comp/questionview/PairMatchQuestionView";
+import { createDebounce } from "~/core/utils/debouce";
 
 type RendererFunction = (questionVm: RDQuestionVm) => React.ReactElement;
 
@@ -29,7 +30,6 @@ export type ResponseViewStoreProps = {
 }
 
 export class ResponseViewStore {
-
 
     formId: number;
     responseUid: string;
@@ -46,6 +46,10 @@ export class ResponseViewStore {
         return this.detailsState.data!.formDetail;
     }
 
+    get totalQuestions(): number {
+        return this.formDetail.totalQuestions;
+    }
+
     get formType() {
         return this.formDetail.type;
     }
@@ -56,6 +60,13 @@ export class ResponseViewStore {
 
     get questions(): RDQuestionVm[] {
         return this.questionState.data!.questions;
+    }
+
+    get showUserDetail(): boolean {
+        if (this.viewer === ResponseDialogViewer.admin) {
+            return true;
+        }
+        return false;
     }
 
     constructor({ formId, responseUid, viewer, formService, onClose }: ResponseViewStoreProps) {
@@ -70,6 +81,7 @@ export class ResponseViewStore {
             questionState: observable.ref,
             searchQuery: observable,
             detailsState: observable.ref,
+            onSearchQueryChanged: action,
         });
     }
 
@@ -108,6 +120,15 @@ export class ResponseViewStore {
             });
         }
     }
+
+    onSearchQueryChanged(value: string): void {
+        if (this.searchQuery === value) return;
+        this.searchQuery = value;
+        this.debouncedSearch();
+    }
+
+    debouncedSearch = createDebounce(() => this.loadQuestions(), 500);
+
 
 
     async loadDetails() {

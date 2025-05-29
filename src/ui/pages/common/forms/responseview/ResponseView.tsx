@@ -8,7 +8,7 @@ import { ResponseDialogViewer } from "./models/ResponseViewViewer";
 import { DesktopView } from "./comp/DesktopView";
 import { MobileView } from "./comp/MobileView";
 import { SimpleRetryableAppView } from "~/ui/widgets/error/SimpleRetryableAppError";
-import { Dialog, DialogContent, DialogOverlay, DialogScaffold } from "~/ui/widgets/dialogmanager";
+import { FramedDialog } from "~/ui/widgets/dialogmanager";
 
 export type ResponseViewProps = {
     formId: number;
@@ -18,24 +18,27 @@ export type ResponseViewProps = {
     onClose: () => void;
 };
 
+
+
 export function ResponseView({ formId, responseUid, viewer, formService, onClose }: ResponseViewProps) {
     return (
-        <Dialog>
-            <DialogOverlay />
-            <DialogScaffold className="p-4">
-                <DialogContent className="w-full h-full flex flex-col">
-                    <ResponseViewProvider
-                        formId={formId}
-                        responseUid={responseUid}
-                        viewer={viewer}
-                        formService={formService}
-                        onClose={onClose}
-                    >
-                        <ResponseBody />
-                    </ResponseViewProvider>
-                </DialogContent>
-            </DialogScaffold>
-        </Dialog>
+        <FramedDialog
+            onClose={() => {
+                onClose();
+            }}
+            scaffoldClassName="p-0 lg:p-4"
+            contentClassName="w-full h-full flex flex-col max-w-[1200px] max-h-[800px]"
+        >
+            <ResponseViewProvider
+                formId={formId}
+                responseUid={responseUid}
+                viewer={viewer}
+                formService={formService}
+                onClose={onClose}
+            >
+                <ResponseBody />
+            </ResponseViewProvider>
+        </FramedDialog>
     );
 }
 

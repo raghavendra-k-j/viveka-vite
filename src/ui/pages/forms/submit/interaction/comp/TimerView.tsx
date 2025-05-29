@@ -1,7 +1,8 @@
 import { observer } from "mobx-react-lite";
 import { useInteractionStore } from "../InteractionContext";
-import { Timer } from "lucide-react";
 import styles from "./../styles.module.css";
+import { Timer } from "lucide-react";
+
 
 export const TimerView = observer(() => {
     const store = useInteractionStore();
@@ -10,7 +11,7 @@ export const TimerView = observer(() => {
 
     return (
         <div className={styles.timer}>
-            <Timer strokeWidth={2.5} className={styles.timerIcon} />
+            <Timer  strokeWidth={2.5} className={styles.timerIcon} />
             <div className={styles.timerText}>
                 <span className={styles.timerNumber}>{minutes}</span>
                 <span className={styles.timerColon}>:</span>

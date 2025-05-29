@@ -18,7 +18,7 @@ export function ChoiceListView({
     isMultiSelect,
 }: ChoiceListProps) {
     return (
-        <div className="flex flex-col gap-3 px-3">
+        <div className="flex flex-col gap-1">
             {choices.map((choice, index) => {
                 const isSelected = selectedChoices.includes(index);
                 const isCorrect = correctChoices?.includes(index);
@@ -79,11 +79,11 @@ function ChoiceItemReadonly({
 
     return (
         <div
-            className={`flex items-center gap-3 px-2 py-1 justify-between rounded-sm ${backgroundClass}`}
+            className={`flex items-center gap-3 p-2 justify-between rounded-sm ${backgroundClass}`}
         >
             <div className="flex items-center gap-3">
                 <Icon size={20} className={iconColor} />
-                <div className={`text-sm ${textColorClass}`} dangerouslySetInnerHTML={{ __html: MdQRenderer.choiceText(choice.text) }} />
+                <div className={`text-base-m ${textColorClass}`} dangerouslySetInnerHTML={{ __html: MdQRenderer.choiceText(choice.text) }} />
             </div>
             {correctnessIcon && <div>{correctnessIcon}</div>}
         </div>

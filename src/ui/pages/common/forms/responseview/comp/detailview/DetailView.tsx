@@ -7,13 +7,12 @@ import { UserDetailsView } from "./UserInfoView";
 export function DetailView() {
     const store = useResponseViewStore();
     return (
-        <div className="flex flex-col bg-slate-50 gap-2 p-4">
+        <div className="flex flex-col bg-slate-50 gap-4 p-4">
             <FormInfoData />
-            <div className="flex flex-col gap-4 mt-4">
-                <UserDetailsView />
-                <ResponseOverview />
-                {store.formDetail.type.isAssessment && (<QuestionsOverview />)}
-            </div>
+            {store.showUserDetail && (
+                <UserDetailsView />)}
+            <ResponseOverview />
+            {store.formDetail.type.isAssessment && (<QuestionsOverview />)}
         </div>
     );
 }

@@ -36,7 +36,7 @@ function MainCard() {
 function Header({ title, description }: { title: string; description?: string }) {
     return (
         <div className="flex flex-col p-4">
-            <ReadMoreText text={title} maxChars={120} className="font-semibold text-base text-default" />
+            <ReadMoreText text={title} maxChars={120} className="font-semibold text-lg text-default" />
             {description && (
                 <ReadMoreText text={description} maxChars={120} className="text-secondary text-sm mt-1" />
             )}
