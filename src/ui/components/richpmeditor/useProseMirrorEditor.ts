@@ -156,12 +156,33 @@ export function insertEquation(view: EditorView, expr: LaTexExpr, schema: RichPm
             throw new Error("Inline LaTeX node type is not defined in the schema.");
         }
 
+        // Only insert a space before if not at the very beginning and previous char is not a space and not at start of block
+        let insertSpaceBefore = false;
+        if (from > 0) {
+            const prevChar = state.doc.textBetween(from - 1, from, '\uFFFC');
+            if (prevChar !== ' ') {
+                const $pos = state.doc.resolve(from);
+                if ($pos.parentOffset > 0) {
+                    insertSpaceBefore = true;
+                }
+            }
+        }
+
         const latexNode = latexNodeType.create({ latex: expr.latex });
         const spaceTextNode = schema.text(" ");
-        const fragmentToInsert = Fragment.fromArray([latexNode, spaceTextNode]);
+        const nodesToInsert = [];
+        if (insertSpaceBefore) {
+            nodesToInsert.push(schema.text(" "));
+        }
+        nodesToInsert.push(latexNode);
+        nodesToInsert.push(spaceTextNode); // Always add space after equation
+
+        const fragmentToInsert = Fragment.fromArray(nodesToInsert);
 
         tr = tr.replaceWith(from, to, fragmentToInsert);
-        tr = tr.setSelection(TextSelection.create(tr.doc, from + latexNode.nodeSize));
+        // Set selection after the equation (after the space)
+        let selectionPos = from + nodesToInsert.reduce((acc, node) => acc + node.nodeSize, 0);
+        tr = tr.setSelection(TextSelection.create(tr.doc, selectionPos));
 
     } else {
         const blockLatexNodeType = schema.nodes.blockLatex;
@@ -174,16 +195,33 @@ export function insertEquation(view: EditorView, expr: LaTexExpr, schema: RichPm
             throw new Error("Paragraph node type is required after block-level insertion.");
         }
 
+        // Only insert a space before if not at the very beginning and previous char is not a space and not at start of block
+        let insertSpaceBefore = false;
+        if (from > 0) {
+            const prevChar = state.doc.textBetween(from - 1, from, '\uFFFC');
+            if (prevChar !== ' ') {
+                const $pos = state.doc.resolve(from);
+                if ($pos.parentOffset > 0) {
+                    insertSpaceBefore = true;
+                }
+            }
+        }
+
         const latexNode = blockLatexNodeType.create({ latex: expr.latex });
         const paragraphNode = paragraphNodeType.createAndFill();
+        const nodesToInsert = [];
+        if (insertSpaceBefore) {
+            nodesToInsert.push(schema.text(" "));
+        }
+        nodesToInsert.push(latexNode);
+        if (paragraphNode) nodesToInsert.push(paragraphNode);
 
-        const fragmentToInsert = Fragment.fromArray([
-            latexNode,
-            paragraphNode!
-        ]);
+        const fragmentToInsert = Fragment.fromArray(nodesToInsert);
 
         tr = tr.replaceWith(from, to, fragmentToInsert);
-        tr = tr.setSelection(TextSelection.create(tr.doc, from + latexNode.nodeSize + 1));
+        // Set selection after the block equation and paragraph
+        let selectionPos = from + nodesToInsert.reduce((acc, node) => acc + node.nodeSize, 0);
+        tr = tr.setSelection(TextSelection.create(tr.doc, selectionPos));
     }
 
     dispatch(tr);
@@ -198,12 +236,34 @@ export function insertBlankNode(view: EditorView, schema: RichPmEditorSchema) {
     const { from, to } = state.selection;
     let tr = state.tr;
 
+    // Only insert a space before if not at the very beginning (from > 0) and previous char is not a space
+    let insertSpaceBefore = false;
+    if (from > 0) {
+        const prevChar = state.doc.textBetween(from - 1, from, '\uFFFC');
+        if (prevChar !== ' ') {
+            // But also check that we're not at the start of a block node (e.g., paragraph)
+            const $pos = state.doc.resolve(from);
+            if ($pos.parentOffset > 0) {
+                insertSpaceBefore = true;
+            }
+        }
+    }
+
     const fillBlankNode = schema.nodes.fillBlank.create();
     const spaceTextNode = schema.text(" ");
-    const fragmentToInsert = Fragment.fromArray([fillBlankNode, spaceTextNode]);
+    const nodesToInsert = [];
+    if (insertSpaceBefore) {
+        nodesToInsert.push(schema.text(" "));
+    }
+    nodesToInsert.push(fillBlankNode);
+    nodesToInsert.push(spaceTextNode); // Always add space after blank
+
+    const fragmentToInsert = Fragment.fromArray(nodesToInsert);
 
     tr = tr.replaceWith(from, to, fragmentToInsert);
-    tr = tr.setSelection(TextSelection.create(tr.doc, from + fillBlankNode.nodeSize));
+    // Set selection after the blank node (after the space)
+    let selectionPos = from + nodesToInsert.reduce((acc, node) => acc + node.nodeSize, 0);
+    tr = tr.setSelection(TextSelection.create(tr.doc, selectionPos));
     dispatch(tr);
     view.focus();
 }

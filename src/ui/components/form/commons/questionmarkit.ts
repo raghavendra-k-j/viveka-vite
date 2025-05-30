@@ -1,34 +1,98 @@
 import katex from "katex";
+import { FormQuestionConst } from "~/domain/forms/const/FormQuestionConst";
+import DOMPurify from 'dompurify';
 
 export class MdQRenderer {
 
-    /**
-    * Replace <span data-latex="..."></span> with inline-rendered LaTeX using KaTeX.
-    * This keeps the LaTeX inline within surrounding text.
-    */
+    private static domParser = new DOMParser();
+
+
     static renderInline(text: string): string {
-        return text.replace(/<span[^>]*data-latex="([^"]+)"[^>]*><\/span>/g, (_, latex) => {
-            return katex.renderToString(latex, {
-                throwOnError: false,
-                output: 'html',
-                displayMode: false
-            });
+        const doc = this.domParser.parseFromString(text, 'text/html');
+
+        // Replace blanks: <span data-tag-fill-blank></span>
+        const blanks = doc.querySelectorAll('span[data-tag-fill-blank]');
+        blanks.forEach(blank => {
+            const underline = FormQuestionConst.FILL_BLANKS_UNDERLINE;
+            const textNode = document.createTextNode(underline);
+            blank.replaceWith(textNode);
         });
+
+        // Replace inline LaTeX: <span data-tag-ilatex="..."></span>
+        const inlineSpans = doc.querySelectorAll('span[data-tag-ilatex]');
+        inlineSpans.forEach(span => {
+            const latex = span.getAttribute('data-tag-ilatex') || '';
+            try {
+                const rendered = katex.renderToString(latex, {
+                    throwOnError: false,
+                    output: 'html',
+                    displayMode: false
+                });
+                const temp = document.createElement('span');
+                temp.innerHTML = rendered;
+                span.replaceWith(...Array.from(temp.childNodes));
+            } catch {
+                // If rendering fails, keep original or replace with plain text
+            }
+        });
+        return DOMPurify.sanitize(doc.body.innerHTML);
     }
 
-    /**
-     * Replace <span data-latex="..."></span> or <div data-latex="..."></div>
-     * with block-rendered LaTeX using KaTeX.
-     */
+
     static renderBlock(text: string): string {
-        return text.replace(/<(span|div)[^>]*data-latex="([^"]+)"[^>]*><\/\1>/g, (_, tag, latex) => {
-            return katex.renderToString(latex, {
-                throwOnError: false,
-                output: 'html',
-                displayMode: tag === 'div'
-            });
+        // 1. Parse the string into a DOM
+        const doc = this.domParser.parseFromString(text, 'text/html');
+
+        // 2. Replace inline LaTeX spans
+        const inlineSpans = doc.querySelectorAll('span[data-tag-ilatex]');
+        inlineSpans.forEach(span => {
+            const latex = span.getAttribute('data-tag-ilatex') || '';
+            try {
+                const rendered = katex.renderToString(latex, {
+                    throwOnError: false,
+                    output: 'html',
+                    displayMode: false
+                });
+                // Replace the entire span content with rendered HTML
+                // Here we can either replace innerHTML or replace the whole element
+                // To avoid nested tags issues, replace the whole span element
+                const temp = document.createElement('span');
+                temp.innerHTML = rendered;
+                span.replaceWith(...Array.from(temp.childNodes));
+            } catch {
+                // fallback: leave original latex text or do nothing
+            }
         });
+
+        // 3. Replace block LaTeX divs
+        const blockDivs = doc.querySelectorAll('div[data-tag-blatex]');
+        blockDivs.forEach(div => {
+            const latex = div.getAttribute('data-tag-blatex') || '';
+            try {
+                const rendered = katex.renderToString(latex, {
+                    throwOnError: false,
+                    output: 'html',
+                    displayMode: true
+                });
+                const temp = document.createElement('div');
+                temp.innerHTML = rendered;
+                div.replaceWith(...Array.from(temp.childNodes));
+            } catch {
+                // fallback
+            }
+        });
+
+        // 4. Replace blanks spans/divs with underscore strings or desired content
+        const blanks = doc.querySelectorAll('[data-tag-fill-blank]');
+        blanks.forEach(blank => {
+            const textNode = document.createTextNode(FormQuestionConst.FILL_BLANKS_UNDERLINE);
+            blank.replaceWith(textNode);
+        });
+
+        // 5. Sanitize and return the HTML
+        return DOMPurify.sanitize(doc.body.innerHTML);
     }
+
 
     static question(question: string): string {
         return this.renderBlock(question);

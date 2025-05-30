@@ -4,7 +4,6 @@ import { RichPmEditorSchema } from "../pm/schema";
 type NodeParser = (elem: HTMLElement, schema: RichPmEditorSchema) => ProseMirrorNode | null;
 
 export class HtmlToPm {
-
     private static blockParsers: Map<string, NodeParser> = new Map([
         ["p", HtmlToPm.parseParagraph],
         ["div", HtmlToPm.parseDiv],
@@ -17,12 +16,13 @@ export class HtmlToPm {
     static parse(html: string, schema: RichPmEditorSchema): ProseMirrorNode {
         const container = document.createElement("div");
         container.innerHTML = html;
+
         const nodes: ProseMirrorNode[] = [];
 
-        container.childNodes.forEach((domNode) => {
+        for (const domNode of Array.from(container.childNodes)) {
             const node = HtmlToPm.parseNode(domNode, schema);
             if (node) nodes.push(node);
-        });
+        }
 
         return schema.nodes.doc.createChecked(null, nodes);
     }
@@ -37,49 +37,80 @@ export class HtmlToPm {
 
         const tag = domNode.tagName.toLowerCase();
 
-        // Treat <br> as an empty paragraph
         if (tag === "br") {
-            return schema.nodes.paragraph.createChecked(); // empty paragraph node
+            return schema.nodes.paragraph.createChecked(); // Empty paragraph
         }
 
-        const parser = HtmlToPm.blockParsers.get(tag);
-        return parser ? parser(domNode, schema) : null;
+        const blockParser = HtmlToPm.blockParsers.get(tag);
+        if (blockParser) {
+            return blockParser(domNode, schema);
+        }
+
+        const inlineParser = HtmlToPm.inlineParsers.get(tag);
+        if (inlineParser) {
+            return inlineParser(domNode, schema);
+        }
+
+        // Fallback: recursively parse children and wrap them in a paragraph
+        const children: ProseMirrorNode[] = [];
+
+        for (const child of Array.from(domNode.childNodes)) {
+            const childNode = HtmlToPm.parseNode(child, schema);
+            if (childNode) children.push(childNode);
+        }
+
+        return children.length > 0
+            ? schema.nodes.paragraph.createChecked(null, children)
+            : null;
     }
 
     static parseParagraph(elem: HTMLElement, schema: RichPmEditorSchema): ProseMirrorNode | null {
         const content: ProseMirrorNode[] = [];
 
-        elem.childNodes.forEach((child) => {
-            if (child.nodeType === Node.TEXT_NODE && child.textContent?.length) {
+        for (const child of Array.from(elem.childNodes)) {
+            if (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()) {
                 content.push(schema.text(child.textContent));
             } else if (child instanceof HTMLElement) {
-                const parser = HtmlToPm.inlineParsers.get(child.tagName.toLowerCase());
-                if (parser) {
-                    const parsed = parser(child, schema);
+                const inlineParser = HtmlToPm.inlineParsers.get(child.tagName.toLowerCase());
+                if (inlineParser) {
+                    const parsed = inlineParser(child, schema);
                     if (parsed) content.push(parsed);
+                } else {
+                    // Fallback: parse recursively
+                    const nested = HtmlToPm.parseNode(child, schema);
+                    if (nested) content.push(nested);
                 }
             }
-        });
+        }
 
         return schema.nodes.paragraph.createChecked(null, content);
     }
 
     static parseDiv(elem: HTMLElement, schema: RichPmEditorSchema): ProseMirrorNode | null {
-        const hasLatex = elem.hasAttribute("data-latex");
-        const isBlockLatex = hasLatex && elem.classList.contains("block-latex");
-        if (isBlockLatex) {
+        if (elem.hasAttribute("data-tag-blatex")) {
             return HtmlToPm.parseBlockLatex(elem, schema);
         }
-        return null;
+
+        // Fallback to parse content recursively if not a known div
+        const children: ProseMirrorNode[] = [];
+
+        for (const child of Array.from(elem.childNodes)) {
+            const childNode = HtmlToPm.parseNode(child, schema);
+            if (childNode) children.push(childNode);
+        }
+
+        return children.length > 0
+            ? schema.nodes.paragraph.createChecked(null, children)
+            : null;
     }
 
     static parseInlineSpan(elem: HTMLElement, schema: RichPmEditorSchema): ProseMirrorNode | null {
-        if (elem.hasAttribute("data-latex")) {
-            const latex = elem.getAttribute("data-latex");
+        if (elem.hasAttribute("data-tag-ilatex")) {
+            const latex = elem.getAttribute("data-tag-ilatex");
             return latex ? schema.nodes.latex.createChecked({ latex }) : null;
         }
 
-        if (elem.hasAttribute("data-fill-blank")) {
+        if (elem.hasAttribute("data-tag-fill-blank")) {
             return schema.nodes.fillBlank.createChecked();
         }
 
@@ -87,7 +118,7 @@ export class HtmlToPm {
     }
 
     static parseBlockLatex(elem: HTMLElement, schema: RichPmEditorSchema): ProseMirrorNode | null {
-        const latex = elem.getAttribute("data-latex");
+        const latex = elem.getAttribute("data-tag-blatex");
         return latex ? schema.nodes.blockLatex.createChecked({ latex }) : null;
     }
 

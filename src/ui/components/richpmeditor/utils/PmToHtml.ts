@@ -1,26 +1,27 @@
 import { Node as ProseMirrorNode, Schema } from 'prosemirror-model';
 
 export interface NodeSerializer {
-    serialize(node: ProseMirrorNode, schema: Schema): string;
+    serialize(node: ProseMirrorNode, schema: Schema): Node | null;
 }
 
 class ParagraphSerializer implements NodeSerializer {
-    serialize(node: ProseMirrorNode, schema: Schema): string {
+
+    serialize(node: ProseMirrorNode, schema: Schema): Node | null {
         if (this.isEmptyParagraph(node)) {
-            // Empty paragraph -> render as line break
-            return '<br/>';
+            // Empty paragraph -> render as line break <br/>
+            return document.createElement('br');
         }
-        let html = '<p>';
+        const p = document.createElement('p');
         node.forEach(child => {
-            html += this.serializeChildNode(child, schema);
+            const childNode = this.serializeChildNode(child, schema);
+            if (childNode) {
+                p.appendChild(childNode);
+            }
         });
-        html += '</p>';
-        return html;
+        return p;
     }
 
     private isEmptyParagraph(node: ProseMirrorNode): boolean {
-        // Paragraph is empty if it has no text or inline content
-        // (children all empty or zero length text)
         if (node.childCount === 0) return true;
 
         let nonEmpty = false;
@@ -28,16 +29,15 @@ class ParagraphSerializer implements NodeSerializer {
             if (child.isText && child.text && child.text.trim().length > 0) {
                 nonEmpty = true;
             } else if (!child.isText) {
-                // Non-text inline node (latex, fill blank, etc) counts as non-empty
                 nonEmpty = true;
             }
         });
         return !nonEmpty;
     }
 
-    private serializeChildNode(child: ProseMirrorNode, schema: Schema): string {
+    private serializeChildNode(child: ProseMirrorNode, schema: Schema): Node | null {
         if (child.isText) {
-            return this.serializeTextNode(child);
+            return document.createTextNode(child.text || '');
         }
 
         if (child.type === schema.nodes.latex && typeof child.attrs?.latex === 'string') {
@@ -48,68 +48,73 @@ class ParagraphSerializer implements NodeSerializer {
             return this.serializeFillBlankNode();
         }
 
-        // fallback for unknown node types - output text if present
-        return child.text || '';
+        // fallback for unknown node types - output text node if text is present
+        return document.createTextNode(child.text || '');
     }
 
-    private serializeTextNode(child: ProseMirrorNode): string {
-        return child.text || '';
+    private serializeLatexNode(child: ProseMirrorNode): Element {
+        const span = document.createElement('span');
+        span.setAttribute('data-tag-ilatex', child.attrs.latex);
+        return span;
     }
 
-    private serializeLatexNode(child: ProseMirrorNode): string {
-        return `<span data-latex="${child.attrs.latex}"></span>`;
-    }
-
-    private serializeFillBlankNode(): string {
-        return `<span data-fill-blank></span>`;
+    private serializeFillBlankNode(): Element {
+        const span = document.createElement('span');
+        span.setAttribute('data-tag-fill-blank', '');
+        return span;
     }
 }
 
 class BlockLatexSerializer implements NodeSerializer {
-    serialize(node: ProseMirrorNode): string {
+    serialize(node: ProseMirrorNode): Node | null {
         if (typeof node.attrs?.latex === 'string') {
-            return `<div data-latex="${node.attrs.latex}" class="block-latex"></div>`;
+            const div = document.createElement('div');
+            div.setAttribute('data-tag-blatex', node.attrs.latex);
+            return div;
         }
-        return '';
+        return null;
     }
 }
 
 export class PmToHtml {
+
     private static serializers = new Map<string, NodeSerializer>([
         ['paragraph', new ParagraphSerializer()],
         ['blockLatex', new BlockLatexSerializer()],
     ]);
 
     static convert(doc: ProseMirrorNode, schema: Schema): string {
-        const htmlParts: string[] = [];
+        const fragment = document.createDocumentFragment();
+        console.log(JSON.stringify(doc.toJSON()));
 
         doc.content.forEach(node => {
-            const serialized = this.serializeNode(node, schema);
-            if (serialized) {
-                htmlParts.push(serialized);
+            const serializedNode = this.serializeNode(node, schema);
+            if (serializedNode) {
+                fragment.appendChild(serializedNode);
             }
         });
 
-        // Join parts with new lines
-        let html = htmlParts.join('\n');
+        // Use a temporary container to get clean HTML string
+        const temp = document.createElement('div');
+        temp.appendChild(fragment.cloneNode(true));
+        let html = temp.innerHTML;
 
-        // Trim leading/trailing <br/> tags as line breaks
         html = this.trimLineBreaks(html);
 
-        // If content is only <br/> or empty, return empty string
         if (this.isOnlyLineBreaks(html)) {
             return '';
         }
+        console.log('HTML output:', html);
 
         return html.trim();
     }
 
-    static serializeNode(node: ProseMirrorNode, schema: Schema): string {
+    static serializeNode(node: ProseMirrorNode, schema: Schema): Node | null {
         const serializer = this.serializers.get(node.type.name);
         if (serializer) {
             return serializer.serialize(node, schema);
         }
-        return '';
+        return null;
     }
 
     static registerSerializer(nodeType: string, serializer: NodeSerializer) {
@@ -117,15 +122,12 @@ export class PmToHtml {
     }
 
     private static trimLineBreaks(html: string): string {
-        // Remove all leading <br/> tags
         html = html.replace(/^(<br\s*\/?>\s*)+/i, '');
-        // Remove all trailing <br/> tags
         html = html.replace(/(<br\s*\/?>\s*)+$/i, '');
         return html;
     }
 
     private static isOnlyLineBreaks(html: string): boolean {
-        // Check if html is empty or consists only of line breaks (possibly with whitespace)
         const cleaned = html.replace(/<br\s*\/?>/gi, '').trim();
         return cleaned.length === 0;
     }

@@ -30,7 +30,6 @@ export class LaTexNodeView implements NodeView {
         this.onClick = props.onClick;
         this.isInline = props.isInline;
         this.dom = document.createElement(this.isInline ? 'span' : 'div');
-        this.dom.classList.add('latex-nodeview');
         this.renderContent();
         this.dom.addEventListener('click', this.handleClick);
     }
@@ -55,7 +54,12 @@ export class LaTexNodeView implements NodeView {
             this.dom.textContent = `${latexSource}`;
             console.error("Katex rendering error:", e);
         }
-        this.dom.setAttribute('data-latex', latexSource);
+        if (this.isInline) {
+            this.dom.setAttribute('data-tag-ilatex', latexSource);
+        }
+        else {
+            this.dom.setAttribute('data-tag-blatex', latexSource);
+        }
         this.dom.title = `Click to Edit`;
     }
 
