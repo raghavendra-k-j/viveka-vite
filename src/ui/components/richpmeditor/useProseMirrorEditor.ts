@@ -10,8 +10,7 @@ import { LaTexNodeView, OnClickLaTexNodeView } from './pm/LaTexNodeView';
 import { DialogEntry, DialogManagerStore, useDialogManager } from '~/ui/widgets/dialogmanager';
 import { AiSTTDialog, AiSTTDialogProps } from '../aisttdialog/AiSTTDialog';
 import { logger } from '~/core/utils/logger';
-import { ContentToPm } from './utils/ContentToPm';
-import { Content } from '~/domain/aistt/models/Content';
+import { AiSTTParaListContentToPm } from './utils/AiSTTParaListContentToPm';
 import './RichPmEditor.css';
 import { placeholderPlugin } from './pm/placeholderPlugin';
 import { LaTexKbProps } from '../LaTexKb/LaTexKbProvider';
@@ -21,6 +20,7 @@ import { RichPmEditorProps } from './RichPmEditor';
 import { STT } from '~/infra/utils/stt/STT';
 import { FillBlankNodeView } from './pm/FillBlankNodeView';
 import { InstanceId } from '~/core/utils/InstanceId';
+import { AiSTTContent, AiSTTContentType, AiSTTParaListContent } from '~/domain/aistt/models/AiSTTContent';
 
 export type UsePmEditorData = {
     onClickEquationButton: () => void;
@@ -276,8 +276,8 @@ function focusEditor(view: EditorView | null) {
     }
 }
 
-function insertVoiceContent(viewRef: React.RefObject<EditorView | null>, content: Content, schema: RichPmEditorSchema) {
-    const fragmentToInsert = ContentToPm.convert(content, schema);
+function insertVoiceContent(viewRef: React.RefObject<EditorView | null>, content: AiSTTParaListContent, schema: RichPmEditorSchema) {
+    const fragmentToInsert = AiSTTParaListContentToPm.convert(content, schema);
     const view = viewRef.current;
 
     if (!view || !fragmentToInsert) {
@@ -380,9 +380,17 @@ export function usePmEditor(props: RichPmEditorProps): UsePmEditorData {
             id: 'ai-voice-dialog',
             component: AiSTTDialog,
             props: {
+                contentType: AiSTTContentType.PARA_LIST,
+                contentTypeProps: {
+                    allowAi: true,
+                    enableAi: true,
+                },
                 stt: props.stt,
-                onDone: (contentFromDialog: Content) => {
+                onDone: (contentFromDialog: AiSTTContent) => {
                     dialogManager.closeById('ai-voice-dialog');
+                    if (!(contentFromDialog instanceof AiSTTParaListContent)) {
+                        throw new Error("Expected contentFromDialog to be an instance of AiSTTParaListContent");
+                    }
                     insertVoiceContent(viewRef, contentFromDialog, props.schema);
                 },
                 onCancel: () => {
@@ -393,8 +401,6 @@ export function usePmEditor(props: RichPmEditorProps): UsePmEditorData {
                         }
                     }, 0);
                 },
-                allowAi: true,
-                enableAi: true,
             },
         };
         dialogManager.show(dialogEntry);

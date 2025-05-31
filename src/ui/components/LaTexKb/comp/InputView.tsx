@@ -7,7 +7,9 @@ import { useCallback } from "react";
 import type { STT } from "~/infra/utils/stt/STT";
 import { useDialogManager, type DialogEntry } from "~/ui/widgets/dialogmanager";
 import { Mic } from "lucide-react";
-import { STTLaTexDialog, STTLaTexDialogProps } from "../../sttlatexdialog/STTLaTexDialog";
+import { AiSTTDialog, AiSTTDialogProps } from "../../aisttdialog/AiSTTDialog";
+import { AiSTTContent, AiSTTContentType, AiSTTLatextContent } from "~/domain/aistt/models/AiSTTContent";
+import { LaTextContentTypeProps } from "../../aisttdialog/AiSTTDialogStore";
 
 type InputViewProps = {
     stt: STT;
@@ -66,15 +68,25 @@ export function LaTexKbListenButton({ stt, onResult }: LaTexKbListenButtonProps)
     const dialogManager = useDialogManager();
 
     const openVoiceDialog = useCallback(() => {
-        const dialogEntry: DialogEntry<STTLaTexDialogProps> = {
+        const dialogEntry: DialogEntry<AiSTTDialogProps> = {
             id: "voice-input-dialog",
-            component: STTLaTexDialog,
+            component: AiSTTDialog,
             props: {
-                stt,
-                onClose: (result: string) => {
-                    onResult(result);
+                contentType: AiSTTContentType.LATEX,
+                contentTypeProps: {} as LaTextContentTypeProps,
+                stt: stt,
+                onDone(content: AiSTTContent) {
+                    let latext = "";
+                    if (content.isLatex) {
+                        latext = (content as AiSTTLatextContent).latex;
+                    }
+                    onResult(latext);
                     dialogManager.pop();
-                }
+                },
+                onCancel: () => {
+                    onResult("");
+                    dialogManager.pop();
+                },
             }
         };
         dialogManager.show(dialogEntry);

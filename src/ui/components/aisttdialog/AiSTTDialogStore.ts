@@ -1,29 +1,49 @@
-import { computed, makeObservable, observable, runInAction } from "mobx";
+import { action, computed, makeObservable, observable, runInAction } from "mobx";
 import { STT, STTError } from "~/infra/utils/stt/STT";
 import { AiSTTReq } from "~/domain/aistt/models/AiSTTModels";
 import { logger } from "~/core/utils/logger";
 import { STTDataState } from "../../utils/STTDataState";
 import { DataState } from "~/ui/utils/DataState";
 import { AiSTTService } from "~/domain/aistt/services/AiSTTService";
-import { Content } from "~/domain/aistt/models/Content";
 import { AppError } from "~/core/error/AppError";
-import { Paragraph } from "~/domain/aistt/models/Paragraph";
-import { TextRun } from "~/domain/aistt/models/TextRun";
 import { OS } from "~/infra/utils/deviceinfo/DeviceInfo";
 import { DeviceInfoUtil } from "~/infra/utils/deviceinfo/DeviceInfoUtil";
+import { AiSTTContent, AiSTTContentType, AiSTTLatextContent, AiSTTParaListContent, Paragraph, TextRun } from "~/domain/aistt/models/AiSTTContent";
+
+export type ParaListContentTypeProps = {
+    enableAi: boolean;
+    allowAi: boolean;
+}
+
+export type LaTextContentTypeProps = {
+
+}
+
+export type ContentTypeOptions = ParaListContentTypeProps | LaTextContentTypeProps;
+
+
+export type AiSTTDialogStoreProps = {
+    contentType: AiSTTContentType;
+    contentTypeProps: ContentTypeOptions;
+    stt: STT;
+    aiService: AiSTTService;
+    onDone: (content: AiSTTContent) => void;
+    onCancel: () => void;
+}
+
 
 export class AiSTTDialogStore {
 
     // Dependencies
     private _stt: STT;
     private _aiService: AiSTTService;
-    private _onDone: (content: Content) => void;
+    private _onDone: (content: AiSTTContent) => void;
     private _onCancel: () => void;
-    public enableAi: boolean;
-    public allowAi: boolean;
+    public contentType: AiSTTContentType;
+    public contentTypeProps: ContentTypeOptions;
 
     // Observable State Variables
-    public content = Content.empty();
+    public content: AiSTTContent;
     public sttState = STTDataState.init();
     public processingState = DataState.init<undefined>();
     public transcriptionBuffer: string = "";
@@ -35,28 +55,31 @@ export class AiSTTDialogStore {
 
     // Computed Variables
     public supportsContinuousSpeechInput: boolean;
+    public _allowAi: boolean = false;
+    public _enableAi: boolean = false;
 
-    constructor({
-        stt,
-        aiService,
-        onDone,
-        onCancel,
-        enableAi,
-        allowAi,
-    }: {
-        stt: STT;
-        aiService: AiSTTService;
-        onDone: (content: Content) => void;
-        onCancel: () => void;
-        enableAi: boolean;
-        allowAi: boolean;
-    }) {
-        this._stt = stt;
-        this._aiService = aiService;
-        this.enableAi = enableAi;
-        this.allowAi = allowAi;
-        this._onDone = onDone;
-        this._onCancel = onCancel;
+    constructor(props: AiSTTDialogStoreProps) {
+        this._stt = props.stt;
+        this._aiService = props.aiService;
+
+        this.contentType = props.contentType;
+        if (this.contentType === AiSTTContentType.PARA_LIST) {
+            this.contentTypeProps = props.contentTypeProps as ParaListContentTypeProps;
+            this.content = AiSTTParaListContent.newEmpty();
+            this._allowAi = (this.contentTypeProps as ParaListContentTypeProps).allowAi;
+            this._enableAi = (this.contentTypeProps as ParaListContentTypeProps).enableAi;
+        }
+        else if (this.contentType === AiSTTContentType.LATEX) {
+            this.contentTypeProps = props.contentTypeProps as LaTextContentTypeProps;
+            this.content = AiSTTParaListContent.newEmpty();
+            this._enableAi = true; // LaTeX content type always has AI enabled
+        }
+        else {
+            throw new Error("Unsupported content type: " + this.contentType);
+        }
+
+        this._onDone = props.onDone;
+        this._onCancel = props.onCancel;
 
         // Check if the device supports continuous speech input
         const deviceInfo = DeviceInfoUtil.getDeviceInfo();
@@ -67,19 +90,32 @@ export class AiSTTDialogStore {
             this.supportsContinuousSpeechInput = true;
         }
 
-
         makeObservable(this, {
             sttState: observable,
             processingState: observable,
             content: observable,
-            enableAi: observable,
+            enableAi: computed,
+            allowAi: computed,
+            _allowAi: observable,
+            _enableAi: observable,
             transcriptionBuffer: observable,
             liveTranscription: observable,
             isAttemptingDone: observable,
             isSttActive: computed,
             isSomethingInProgress: computed,
             isDoneButtonEnabled: computed,
+            toggleEnableAi: action,
+            clearAiTranscription: action,
         });
+    }
+
+
+    get allowAi(): boolean {
+        return this._allowAi;
+    }
+
+    get enableAi(): boolean {
+        return this._enableAi;
     }
 
     public get isSttActive() {
@@ -87,9 +123,7 @@ export class AiSTTDialogStore {
     }
 
     toggleEnableAi() {
-        runInAction(() => {
-            this.enableAi = !this.enableAi;
-        });
+        this._enableAi = !this._enableAi;
     }
 
     public get isSomethingInProgress() {
@@ -103,23 +137,16 @@ export class AiSTTDialogStore {
     }
 
     onClickMainButton() {
-        logger.debug("onClickMainButton");
         if (this.processingState.isLoading) {
-            // Ignore silently
-            logger.debug("onClickMainButton: processing is loading");
             return;
         }
         if (this.sttState.isListening) {
-            // Stop STT
-            logger.debug("onClickMainButton: stopping stt");
             runInAction(() => {
                 this.sttState = STTDataState.waitingToEnd();
             });
             this._stt.stop();
         }
         else if (!this.sttState.isWaiting) {
-            // If not waiting for any action, start STT
-            logger.debug("onClickMainButton: starting stt");
             this.isAttemptingDone = false; // Reset the flag: Since explicitly starting the STT
             runInAction(() => {
                 this.sttState = STTDataState.waitingToStart();
@@ -130,7 +157,6 @@ export class AiSTTDialogStore {
     }
 
     private onSTTStart = () => {
-        logger.debug("STT started");
         runInAction(() => {
             this.transcriptionBuffer = this.liveTranscription = "";
             this.sttState = STTDataState.listening();
@@ -138,7 +164,6 @@ export class AiSTTDialogStore {
     }
 
     private onEnd = () => {
-        logger.debug("STT stopped");
         runInAction(() => {
             const trimmed = this.transcriptionBuffer.trim();
             if (!trimmed) {
@@ -159,14 +184,12 @@ export class AiSTTDialogStore {
     }
 
     onResult = (result: string) => {
-        logger.debug("STT result", result);
         runInAction(() => {
             this.liveTranscription = this.transcriptionBuffer = result;
         });
     };
 
     onPartialResult = (result: string) => {
-        logger.debug("STT partial result", result);
         runInAction(() => {
             if (this.transcriptionBuffer.length > 0) {
                 this.liveTranscription = this.transcriptionBuffer + " " + result;
@@ -193,13 +216,26 @@ export class AiSTTDialogStore {
     }
 
 
+
+    private getPreviousContext(): string {
+        if (this.contentType === AiSTTContentType.PARA_LIST) {
+            return (this.content as AiSTTParaListContent).toMarkdown();
+        }
+        if (this.contentType === AiSTTContentType.LATEX) {
+            return "";
+        }
+        throw new Error("Unsupported content type: " + this.contentType);
+    }
+
+
     public async startAiTranscription() {
         try {
             runInAction(() => {
                 this.processingState = DataState.loading();
             });
             const aiReq = new AiSTTReq({
-                previousContext: this.content.toMarkdown(),
+                contentType: this.contentType,
+                previousContext: this.getPreviousContext(),
                 transcription: this.currentProcessingTranscription,
             });
             const data = (await this._aiService.generateResponse(aiReq)).getOrError();
@@ -259,10 +295,8 @@ export class AiSTTDialogStore {
 
 
     public clearAiTranscription() {
-        runInAction(() => {
-            this.content = Content.empty();
-            this.processingState = DataState.init();
-        });
+        this.content = this.newEmptyContent();
+        this.processingState = DataState.init();
     }
 
     dispose() {
@@ -271,11 +305,23 @@ export class AiSTTDialogStore {
         this.resetState();
     }
 
+
+    private newEmptyContent(): AiSTTContent {
+        if (this.contentType === AiSTTContentType.PARA_LIST) {
+            return AiSTTParaListContent.newEmpty();
+        }
+        if (this.contentType === AiSTTContentType.LATEX) {
+            return AiSTTParaListContent.newEmpty();
+        }
+        throw new Error("Unsupported content type: " + this.contentType);
+    }
+
+
     resetState() {
         runInAction(() => {
             this.sttState = STTDataState.init();
             this.processingState = DataState.init();
-            this.content = Content.empty();
+            this.content = this.newEmptyContent();
             this.transcriptionBuffer = "";
             this.liveTranscription = "";
             this.isAttemptingDone = false;
@@ -318,7 +364,7 @@ export class AiSTTDialogStore {
         runInAction(() => {
             this.transcriptionBuffer = "";
             this.liveTranscription = "";
-            this.content = Content.empty();
+            this.content = this.newEmptyContent();
             this.sttState = STTDataState.init();
             this.processingState = DataState.init();
         });
@@ -342,8 +388,9 @@ export class AiSTTDialogStore {
         this.isAttemptingDone = false;
     }
 
-    getNewContent(text: string): Content {
-        const lastParagraph = this.content.paragraphs.length > 0 ? this.content.paragraphs[this.content.paragraphs.length - 1] : null;
+    getNewContent(text: string): AiSTTContent {
+        const paraListContent = this.content as AiSTTParaListContent;
+        const lastParagraph = paraListContent.paragraphs.length > 0 ? paraListContent.paragraphs[paraListContent.paragraphs.length - 1] : null;
         if (lastParagraph) {
             const lastRun = lastParagraph.runs.length > 0 ? lastParagraph.runs[lastParagraph.runs.length - 1] : null;
             const newRun = TextRun.fromText(text);
@@ -354,34 +401,33 @@ export class AiSTTDialogStore {
                 // Replace the last run in the paragraph
                 const updatedRuns = [...lastParagraph.runs.slice(0, -1), updatedRun];
                 const updatedParagraph = new Paragraph({ ...lastParagraph, runs: updatedRuns });
-                updatedParagraphs = [...this.content.paragraphs.slice(0, -1), updatedParagraph];
-            } else {
+                updatedParagraphs = [...paraListContent.paragraphs.slice(0, -1), updatedParagraph];
+            }
+            else {
                 // Add new run to the last paragraph
                 const updatedRuns = [...lastParagraph.runs, newRun];
                 const updatedParagraph = new Paragraph({ ...lastParagraph, runs: updatedRuns });
-                updatedParagraphs = [...this.content.paragraphs.slice(0, -1), updatedParagraph];
+                updatedParagraphs = [...paraListContent.paragraphs.slice(0, -1), updatedParagraph];
             }
-            return new Content({ paragraphs: updatedParagraphs });
+            return new AiSTTParaListContent(updatedParagraphs);
         }
         else {
             const newParagraph = Paragraph.fromText(text);
-            return new Content({ paragraphs: [...this.content.paragraphs, newParagraph] });
+            return new AiSTTParaListContent([...paraListContent.paragraphs, newParagraph]);
         }
     }
 
 
 
-
     removeParagraph(paragraph: Paragraph): void {
-        const idx = this.content.paragraphs.findIndex(p => p.uuid === paragraph.uuid);
+        const idx = (this.content as AiSTTParaListContent).paragraphs.findIndex(p => p.uuid === paragraph.uuid);
         if (idx === -1) return;
         runInAction(() => {
-            this.content = new Content({
-                paragraphs: [
-                    ...this.content.paragraphs.slice(0, idx),
-                    ...this.content.paragraphs.slice(idx + 1)
-                ]
-            });
+            const paraContent = this.content as AiSTTParaListContent;
+            this.content = new AiSTTParaListContent([
+                ...paraContent.paragraphs.slice(0, idx),
+                ...paraContent.paragraphs.slice(idx + 1)
+            ]);
         });
     }
 

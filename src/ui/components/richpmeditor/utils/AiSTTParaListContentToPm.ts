@@ -1,25 +1,23 @@
-import { Fragment, Node as ProseMirrorNode, Schema } from 'prosemirror-model';
-import { Content } from '~/domain/aistt/models/Content';
-import { TextRunType } from '~/domain/aistt/models/TextRunType';
+import { Fragment, Node as ProseMirrorNode } from 'prosemirror-model';
+import { AiSTTParaListContent, TextRun, TextRunType } from '~/domain/aistt/models/AiSTTContent';
+import { RichPmEditorSchema } from '../pm/schema';
 
-type Run = { type: TextRunType; content: string };
+type RunConverter = (run: TextRun, schema: RichPmEditorSchema) => ProseMirrorNode;
 
-type RunConverter = (run: Run, schema: Schema) => ProseMirrorNode;
-
-export class ContentToPm {
+export class AiSTTParaListContentToPm {
 
     private static runHandlers: Record<TextRunType, RunConverter> = {
         [TextRunType.TEXT]: (run, schema) => schema.text(run.content),
         [TextRunType.LATEX]: (run, schema) => schema.nodes.latex.create({ latex: run.content }),
     };
 
-    private static convertRun(run: Run, schema: Schema): ProseMirrorNode {
+    private static convertRun(run: TextRun, schema: RichPmEditorSchema): ProseMirrorNode {
         const handler = this.runHandlers[run.type];
         if (!handler) throw new Error(`Unsupported run type: ${run.type}`);
         return handler(run, schema);
     }
 
-    private static convertParagraphRuns(runs: Run[], schema: Schema): ProseMirrorNode[] {
+    private static convertParagraphRuns(runs: TextRun[], schema: RichPmEditorSchema): ProseMirrorNode[] {
         const nodes: ProseMirrorNode[] = [];
 
         runs.forEach((run, index) => {
@@ -34,7 +32,7 @@ export class ContentToPm {
         return nodes;
     }
 
-    static convert(content: Content, schema: Schema): Fragment {
+    static convert(content: AiSTTParaListContent, schema: RichPmEditorSchema): Fragment {
         const { paragraphs } = content;
 
         if (paragraphs.length === 1) {

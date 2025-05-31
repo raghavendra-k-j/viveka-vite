@@ -1,13 +1,25 @@
 import katex from "katex";
-import { Content } from "../models/Content";
-import { Paragraph } from "../models/Paragraph";
-import { TextRun } from "../models/TextRun";
-import { TextRunType } from "../models/TextRunType";
+import { AiSTTLatextContent, AiSTTParaListContent, Paragraph, TextRun, TextRunType } from "../models/AiSTTContent";
+import DomPurify from "dompurify";
 
 export class ContentsToHtmlService {
 
 
-    public static toHtml(contents: Content): string {
+    static convertLaTex(content: AiSTTLatextContent): string {
+        const katexHtml = katex.renderToString(
+            content.latex,
+            {
+                throwOnError: false,
+                output: "html",
+                displayMode: false,
+            }
+        );
+        const span = document.createElement("span");
+        span.innerHTML = DomPurify.sanitize(katexHtml);
+        return span.outerHTML;
+    }
+
+    public static toHtml(contents: AiSTTParaListContent): string {
         return contents.paragraphs
             .map(paragraph => this.convertParagraph(paragraph))
             .join("\n");
@@ -32,17 +44,9 @@ export class ContentsToHtmlService {
                 }
             );
             return `<span>${katexHtml}</span>`;
-        } else {
-            return this.escapeHtml(run.content);
         }
-    }
-
-    public static escapeHtml(unsafe: string): string {
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+        else {
+            return run.content;
+        }
     }
 }
