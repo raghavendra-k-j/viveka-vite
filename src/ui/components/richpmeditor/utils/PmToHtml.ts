@@ -85,7 +85,7 @@ export class PmToHtml {
 
     static convert(doc: ProseMirrorNode, schema: Schema): string {
         const fragment = document.createDocumentFragment();
-        console.log(JSON.stringify(doc.toJSON()));
+        console.log(doc.textContent);
 
         doc.content.forEach(node => {
             const serializedNode = this.serializeNode(node, schema);

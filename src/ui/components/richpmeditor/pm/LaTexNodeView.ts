@@ -96,6 +96,7 @@ export class LaTexNodeView implements NodeView {
     public destroy(): void {
         this.dom.removeEventListener('click', this.handleClick);
     }
+    
 
 
     public ignoreMutation(mutation: globalThis.MutationRecord | { type: "selection"; target: Node }): boolean {

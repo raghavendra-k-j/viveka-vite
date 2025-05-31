@@ -35,7 +35,8 @@ const inlineLaTex: NodeSpec = {
                 latex: (dom as HTMLElement).getAttribute("data-tag-ilatex")
             };
         }
-    }]
+    }],
+    
 };
 
 

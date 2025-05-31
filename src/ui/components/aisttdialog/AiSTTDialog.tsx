@@ -13,6 +13,7 @@ import { Loader, Mic, MicOff, X } from "lucide-react";
 import styles from "./styles.module.css";
 import OutlinedButton from "~/ui/widgets/button/OutlinedButton";
 import clsx from "clsx";
+import { ErrorBanner } from "./ErrorBanner";
 
 export type AiSTTDialogProps = {
     stt: STT;
@@ -112,7 +113,6 @@ function DialogBody() {
 }
 
 
-import { ErrorBanner } from "./ErrorBanner"; // adjust path as needed
 
 function AiOutputView() {
     const store = useAiSTTDialogStore();

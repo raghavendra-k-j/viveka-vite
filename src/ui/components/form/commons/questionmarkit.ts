@@ -6,7 +6,6 @@ export class MdQRenderer {
 
     private static domParser = new DOMParser();
 
-
     static renderInline(text: string): string {
         const doc = this.domParser.parseFromString(text, 'text/html');
 
