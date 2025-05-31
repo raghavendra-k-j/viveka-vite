@@ -1,11 +1,11 @@
 import { Bool3 } from "~/core/utils/Bool3";
 import { QExtras } from "./question/QExtras";
-import { QMedia } from "./question/QMedia";
 import { QuestionLevel } from "./question/QuestionLevel";
 import { QuestionType } from "./question/QuestionType";
 import type { JsonObj } from "~/core/types/Json";
 import { Answer } from "./answer/Answer";
 import { MEvaluationStatus } from "./MEvaluationStatus";
+import { QMedia } from "./qmedia/QMedia";
 
 export class RDQuestion {
     id: number;

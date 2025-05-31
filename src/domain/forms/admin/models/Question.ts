@@ -1,10 +1,10 @@
 import { JsonObj } from "~/core/types/Json";
 import { Answer } from "../../models/answer/Answer";
 import { QExtras } from "../../models/question/QExtras";
-import { QMedia } from "../../models/question/QMedia";
 import { QuestionLevel } from "../../models/question/QuestionLevel";
 import { QuestionType } from "../../models/question/QuestionType";
 import { Bool3 } from "~/core/utils/Bool3";
+import { QMedia } from "../../models/qmedia/QMedia";
 
 export type QuestionProps = {
     id: number;
