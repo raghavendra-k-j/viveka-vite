@@ -8,7 +8,7 @@ import { AiSTTService } from "~/domain/aistt/services/AiSTTService";
 import { AppError } from "~/core/error/AppError";
 import { OS } from "~/infra/utils/deviceinfo/DeviceInfo";
 import { DeviceInfoUtil } from "~/infra/utils/deviceinfo/DeviceInfoUtil";
-import { AiSTTContent, AiSTTContentType, AiSTTLatextContent, AiSTTParaListContent, Paragraph, TextRun } from "~/domain/aistt/models/AiSTTContent";
+import { AiSTTContent, AiSTTContentType, AiSTTParaListContent, Paragraph, TextRun } from "~/domain/aistt/models/AiSTTContent";
 
 export type ParaListContentTypeProps = {
     enableAi: boolean;

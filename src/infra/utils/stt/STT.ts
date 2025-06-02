@@ -1,5 +1,3 @@
-import { logger } from "~/core/utils/logger";
-
 /**
  * Enumeration of specific error codes related to speech-to-text (STT) functionality.
  */
