@@ -5,7 +5,7 @@ import { RDQuestionVm } from "../../models/QuestionVm";
 import { LoaderView } from "~/ui/widgets/loader/LoaderView";
 import { SimpleRetryableAppView } from "~/ui/widgets/error/SimpleRetryableAppError";
 import { QuestionCard } from "../questionview/QuestionCard";
-import { QuestionHeader } from "../questionview/QuestionHeader";
+import { QuestionHeader } from "../questionview/QuestionHeaderView";
 import { QuestionExplanationView } from "~/ui/components/form/commons/ExplanationText";
 
 export function QuestionList() {

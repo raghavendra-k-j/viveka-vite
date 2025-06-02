@@ -79,6 +79,7 @@ export class UpsertQuestionVmFactory {
             text: props.question.question,
             schema: blockSchema,
         });
+        const mediaFiles = props.question.mediaFiles.map(m => m.toTile());
 
         const scorable = new FValue<Bool3>(Bool3.N);
         const marksField = new FValue<string>("");
@@ -121,6 +122,7 @@ export class UpsertQuestionVmFactory {
             ansHintNode: ansHintNode,
             ansExplanationNode: ansExplanationNode,
             isRequired: isRequired,
+            mediaFiles: mediaFiles,
         });
     }
 }

@@ -2,12 +2,12 @@ import { JsonObj } from "~/core/types/Json";
 
 export type MediaTileRefReqProps = {
     id: number;
-    caption?: string;
+    caption: string | null
 }
 
 export class MediaTileRefReq {
     public readonly id: number;
-    public readonly caption?: string;
+    public readonly caption: string | null;
 
     constructor(props: MediaTileRefReqProps) {
         this.id = props.id;

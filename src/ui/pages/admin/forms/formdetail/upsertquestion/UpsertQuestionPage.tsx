@@ -8,6 +8,7 @@ import { useSearchParams } from "react-router";
 import { UpsertQuestionDialogProps } from "./UpsertQuestionDialog";
 import { useAdminFormStore } from "../layout/AdminFormContext";
 import { useDialogManager } from "~/ui/widgets/dialogmanager";
+import { useAppStore } from "~/ui/pages/_layout/AppContext";
 
 
 export default function UpsertQuestionPage() {
@@ -17,6 +18,7 @@ export default function UpsertQuestionPage() {
     const stt = useStt();
     const formStore = useAdminFormStore();
     const dialogManager = useDialogManager();
+    const appStore = useAppStore();
 
     const props: UpsertQuestionDialogProps = {
         id: questionId ? parseInt(questionId) : null,
@@ -27,6 +29,7 @@ export default function UpsertQuestionPage() {
         adminFormsService: formStore.adminFormService,
         onClose: () => { },
         dialogManager: dialogManager,
+        appStore: appStore,
     }
 
     return (

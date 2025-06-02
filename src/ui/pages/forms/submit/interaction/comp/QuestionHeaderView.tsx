@@ -49,6 +49,7 @@ export const QuestionHeaderView = (props: QuestionHeaderProps) => {
       <QuestionText
         asterisk={props.vm.base.isRequired.isTrue}
         question={props.vm.base.question}
+        mediaFiles={props.vm.base.mediaFiles}
       />
 
       <QuestionErrorMessage vm={props.vm} />

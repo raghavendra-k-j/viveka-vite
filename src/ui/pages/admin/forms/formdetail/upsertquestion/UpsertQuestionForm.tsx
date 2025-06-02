@@ -13,6 +13,7 @@ import { RichPmEditor } from "~/ui/components/richpmeditor/RichPmEditor";
 import { blockSchema } from "~/ui/components/richpmeditor/pm/schema";
 import { Node as ProseMirrorNode } from "prosemirror-model";
 import { FReqMark } from "~/ui/widgets/form/FReqMark";
+import { QuestionTextOptions } from "./QuestionTextOptions";
 
 
 export function UpsertQuestionForm() {
@@ -104,8 +105,9 @@ function QuestionSection() {
                     maxHeight="120px"
                 />
                 <FError />
+                <QuestionTextOptions/>
             </FFieldContainer>
-            {store.vm.questionOptionsVm ? store.vm.questionOptionsVm.render() : null}
+            
         </div>
     );
 }
@@ -132,7 +134,7 @@ function MarksAndLevelSection() {
                         />
                         <FTextField
                             label="Marks"
-                            required
+                            required={true}
                             placeholder="Enter Marks"
                             field={store.vm.marks}
                             type="number"

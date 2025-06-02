@@ -52,6 +52,7 @@ export function QuestionHeader({ question }: { question: RDQuestionVm }) {
                 className="mt-2"
                 question={question.question}
                 asterisk={question.isRequired.boolValue}
+                mediaFiles={question.mediaFiles}
             />
             {question.ansHint && <HintTextView className="mt-2" hint={question.ansHint} />}
         </div>

@@ -28,8 +28,6 @@ export enum QMediaPickerCurrentTab {
 }
 
 export class QMediaPickerStore {
-
-
     onClose: () => void;
     onSelect: (items: QMediaTile) => void;
     appStore: AppStore;
@@ -43,7 +41,8 @@ export class QMediaPickerStore {
     searchQuery: string = "";
     loadState: DataState<QMediaQueryResponseVm> = DataState.init();
     currentPage: number = 1;
-    pageSize: number = 24;
+    pageSize: number = 100;
+    // TODO: Implement pagination
     selectedItem: QMedia | null = null;
     uploadState: DataState<QMedia> = DataState.init();
 
@@ -263,8 +262,8 @@ export class QMediaPickerStore {
                 this.uploadState = DataState.error(appError);
             });
             showErrorToast({
-                message: "Upload Failed",
-                description: appError.message,
+                message: appError.message,
+                description: appError.description,
             });
         }
     }

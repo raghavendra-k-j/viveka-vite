@@ -12,7 +12,6 @@ export type QMediaTileProps = {
 }
 
 export class QMediaTile {
-
     id: number;
     type: QMediaType;
     extension: QMediaExtension;

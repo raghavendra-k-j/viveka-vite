@@ -6,6 +6,7 @@ import { OrgConfig } from "~/domain/common/models/OrgConfig";
 import { ConfigService } from "~/domain/common/services/ConfigService";
 import { ApiClient } from "~/infra/datasources/ApiClient";
 import { BaseApiClient } from "~/infra/datasources/BaseApiClient";
+import { ServiceURL } from "~/infra/datasources/ServiceURL";
 
 let hasBooted = false;
 let orgConfigData: OrgConfig | null = null;
@@ -27,6 +28,9 @@ export async function bootApp(): Promise<void> {
     // Create Config Service
     const configService = new ConfigService();
     orgConfigData = (await configService.getOrgConfig(appEnv.tenant)).data;
+
+    // ServiceURL
+    ServiceURL.createInstance({ baseUrl: appEnv.apiBase });
 
     hasBooted = true;
 }

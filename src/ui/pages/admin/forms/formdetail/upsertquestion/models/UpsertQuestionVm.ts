@@ -12,6 +12,7 @@ import { EnAVm } from "../ena/EnAVm";
 import { PmConverter } from "~/ui/components/richpmeditor/utils/PmConverter";
 import { blockSchema } from "~/ui/components/richpmeditor/pm/schema";
 import { ThingId } from "~/core/utils/ThingId";
+import { QMediaTile } from "~/domain/forms/models/qmedia/QMediaTile";
 
 export type UpsertQuestionVmProps = {
   id: number | null;
@@ -26,10 +27,12 @@ export type UpsertQuestionVmProps = {
   ansHintNode: ProseMirrorNode | null;
   ansExplanationNode: ProseMirrorNode | null;
   isRequired: FValue<Bool3>;
+  mediaFiles?: QMediaTile[];
 }
 
 
 export class UpsertQuestionVm {
+
   readonly instanceId = ThingId.generate();
   readonly id: number | null;
   readonly storeRef: UpsertQuestionStore;
@@ -46,6 +49,7 @@ export class UpsertQuestionVm {
   ansExplanationRef: React.RefObject<RichPmEditorRef | null>;
   ansExplanationNode: ProseMirrorNode | null = null;
   isRequired: FValue<Bool3>;
+  mediaFiles: QMediaTile[] = [];
 
   constructor(props: UpsertQuestionVmProps) {
     this.id = props.id;
@@ -63,11 +67,15 @@ export class UpsertQuestionVm {
     this.ansExplanationRef = createRef<RichPmEditorRef>();
     this.ansExplanationNode = props.ansExplanationNode;
     this.isRequired = props.isRequired;
+    this.mediaFiles = props.mediaFiles || [];
     makeObservable(this, {
       questionTextRef: observable.ref,
       onQuestionNodeChange: action,
       questionNode: observable.ref,
       showScorable: computed,
+      mediaFiles: observable.shallow,
+      addMediaFile: action,
+      removeMediaFile: action,
     });
   }
 
@@ -116,8 +124,22 @@ export class UpsertQuestionVm {
   onAnsExplanationNodeChange(node: ProseMirrorNode | null) {
     this.ansExplanationNode = node;
   }
+
   onAnsHintNodeChange(node: ProseMirrorNode | null) {
     this.ansHintNode = node;
+  }
+
+  addMediaFile(file: QMediaTile): void {
+    if (!this.mediaFiles.some(f => f.id === file.id)) {
+      this.mediaFiles.push(file);
+    }
+  }
+
+  removeMediaFile(file: QMediaTile): void {
+    const index = this.mediaFiles.findIndex(f => f.id === file.id);
+    if (index !== -1) {
+      this.mediaFiles.splice(index, 1);
+    }
   }
 
 }

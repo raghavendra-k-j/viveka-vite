@@ -24,20 +24,6 @@ export function BrowseMediaView() {
     });
 
     return <MainContent />
-
-    return (<Observer>
-        {() => {
-            return store.loadState.stateWhen({
-                initOrLoading: () => (<Centered>
-                    <LoaderView />
-                </Centered>),
-                error: (error: AppError) => (<Centered>
-                    <SimpleRetryableAppView onRetry={() => store.loadFiles()} appError={error} />
-                </Centered>),
-                loaded: () => <MainContent />
-            });
-        }}
-    </Observer>);
 }
 
 
@@ -129,6 +115,7 @@ function SearchBar() {
         <div className="p-4 bg-surface border-b border-default">
             <Observer>
                 {() => (<FInput
+                    maxLength={100}
                     placeholder="Search media files..."
                     value={store.searchQuery}
                     onChange={(e) => store.onSearchQueryChange(e.target.value)}
