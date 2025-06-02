@@ -15,6 +15,7 @@ const SettingsPage = lazy(() => import("./ui/pages/admin/forms/formdetail/settin
 const RefStudyPage = lazy(() => import("./ui/pages/testing/refstudy/RefStudyPage"));
 const ChatPageView = lazy(() => import("./ui/pages/testing/chat/ChatPageView"));
 const TokenLoginPage = lazy(() => import("./ui/pages/tokenlogin/TokenLoginPage"));
+const AutoLoginPage = lazy(() => import("./ui/pages/autologin/AutoLoginPage"));
 const QMediaTestPage = lazy(() => import("./ui/pages/testing/qmedia/QMediaTestPage"));
 
 
@@ -30,6 +31,7 @@ export default function Router() {
                     <Route path="/forms/:permalink/submit" element={<SubmitPage />} />
                     <Route path="/chat" element={<ChatPageView />} />
                     <Route path="/token-login" element={<TokenLoginPage />} />
+                    <Route path="/auto-login" element={<AutoLoginPage />} />
                     <Route path="/testing/qmedia" element={<QMediaTestPage />} />
 
                     {/* Admin Routes */}
