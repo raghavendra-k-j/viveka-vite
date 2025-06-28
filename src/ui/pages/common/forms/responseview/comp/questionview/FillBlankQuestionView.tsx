@@ -13,51 +13,35 @@ export function FillBlanksQuestionView({ question }: FillBlanksQuestionViewProps
     const userAnswer = question.userAnswer as FillBlanksAnswer | undefined;
 
     return (
-        <div className="overflow-x-auto px-3">
-            <table className="min-w-full border-collapse border border-slate-200 text-sm text-left">
-                <thead>
-                    <tr className="bg-slate-50 text-default">
-                        <TableHeaderCell className="whitespace-nowrap">Fill Up</TableHeaderCell>
-                        <TableHeaderCell className="text-green-700 whitespace-nowrap">Correct Answer</TableHeaderCell>
-                        <TableHeaderCell className="text-primary-700 whitespace-nowrap">Your Answer</TableHeaderCell>
-                    </tr>
-                </thead>
-                <tbody>
-                    {qExtras.inputs.map((blank, i) => (
-                        <tr key={blank.id} className="even:bg-surface">
-                            <TableBodyCell className="whitespace-nowrap">Fill up {blank.id}</TableBodyCell>
-                            <TableBodyCell>
-                                <div>{MdQRenderer.fillBlanksText(correctAnswer?.answers[i].answer || "-")}</div>
-                            </TableBodyCell>
-                            <TableBodyCell>
-                                <div dangerouslySetInnerHTML={{ __html: MdQRenderer.fillBlanksText(userAnswer?.answers[i].answer || "-") }} />
-                            </TableBodyCell>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+        <div className="bg-slate-50 rounded-sm border border-default divide-y divide-default">
+            {qExtras.inputs.map((blank, i) => {
+                const correctAnswerStr = correctAnswer.answers?.[i]?.answer || "-";
+                const userAnswerStr = userAnswer?.answers?.[i]?.answer || "-";
+
+                return (
+                    <div key={blank.id} className="px-3 py-4 first:pt-3 last:pb-3">
+                        <div className="text-sm font-semibold mb-2">Fill up {i + 1}</div>
+
+                        <div className="text-sm mb-1 flex flex-col gap-1">
+                            <span className="font-semibold text-green-700">Correct Answer:</span>{" "}
+                            <span
+                                dangerouslySetInnerHTML={{
+                                    __html: MdQRenderer.fillBlanksText(correctAnswerStr),
+                                }}
+                            />
+                        </div>
+
+                        <div className="text-sm flex flex-col gap-1">
+                            <span className="font-semibold text-primary-700">Your Answer:</span>{" "}
+                            <span
+                                dangerouslySetInnerHTML={{
+                                    __html: MdQRenderer.fillBlanksText(userAnswerStr),
+                                }}
+                            />
+                        </div>
+                    </div>
+                );
+            })}
         </div>
-    );
-}
-
-type CellProps = {
-    children: React.ReactNode;
-    className?: string;
-};
-
-
-function TableHeaderCell({ children, className = "" }: CellProps) {
-    return (
-        <th className={`border border-slate-200 px-2 py-1 font-semibold ${className}`}>
-            {children}
-        </th>
-    );
-}
-
-function TableBodyCell({ children, className = "" }: CellProps) {
-    return (
-        <td className={`border border-slate-200 px-2 py-1 text-default ${className}`}>
-            {children}
-        </td>
     );
 }

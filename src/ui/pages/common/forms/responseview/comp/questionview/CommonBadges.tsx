@@ -7,7 +7,7 @@ export function MarksGainedBadge({ vm }: { vm: RDQuestionVm }) {
     const color = vm.hasPositiveGainedMarks ? "green" : "red";
     return (
         <Badge color={color}>
-            Marks: {NumFmt.roundToStr(vm.gainedMarks!, 2)} / {NumFmt.roundToStr(vm.marks!, 2)}
+            Marks: {NumFmt.roundToStr(vm.gainedMarks!, 2)}/{NumFmt.roundToStr(vm.marks!, 2)}
         </Badge>
     );
 }

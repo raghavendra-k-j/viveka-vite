@@ -28,6 +28,10 @@ export class AppStore {
         return this._appUser!;
     }
 
+    get apiBaseUrl(): string {
+        return this.appEnv.apiBase;
+    }
+
     get hasUser(): boolean {
         return this._appUser !== null;
     }
@@ -113,7 +117,7 @@ export class AppStore {
             this._appUser = null;
             this.authState = DataState.init();
         });
-        this.navigateToLogin();
+        window.location.reload();
     }
 
 

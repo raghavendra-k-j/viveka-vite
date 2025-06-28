@@ -17,7 +17,12 @@ import { AdminFormsService } from "~/domain/forms/admin/services/AdminFormsServi
 import { FormType } from "~/domain/forms/models/FormType";
 import { ThingId } from "~/core/utils/ThingId";
 import { showAppErrorDialog } from "~/ui/components/dialogs/showAppErrorDialog";
-import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
+import { DialogEntry, DialogManagerStore } from "~/ui/widgets/dialogmanager";
+import { QMediaPicker, QMediaPickerProps } from "../qmediapicker/QMediaPicker";
+import { AppStore } from "~/ui/pages/_layout/AppStore";
+import { FormQuestionConst } from "~/domain/forms/const/FormQuestionConst";
+import { showErrorToast } from "~/ui/widgets/toast/toast";
+import { MediaTileRefReq } from "~/domain/forms/admin/models/MediaTileRefReq";
 
 export type UpsertQuestionStoreProps = {
     id: number | null;
@@ -28,6 +33,7 @@ export type UpsertQuestionStoreProps = {
     adminFormsService: AdminFormsService;
     onClose: () => void;
     dialogManager: DialogManagerStore;
+    appStore: AppStore;
 }
 
 export class UpsertQuestionStore {
@@ -40,6 +46,7 @@ export class UpsertQuestionStore {
     stt: STT;
     adminFormsService: AdminFormsService;
     onClose: (res?: UpsertQuestionRes) => void;
+    appStore: AppStore;
 
     qvmState: DataState<UpsertQuestionVm> = DataState.init();
     saveState: DataState<void> = DataState.init();
@@ -54,6 +61,7 @@ export class UpsertQuestionStore {
         this.formType = props.formType;
         this.formId = props.formId;
         this.dialogManager = props.dialogManager;
+        this.appStore = props.appStore;
         makeObservable(this, {
             qvmState: observable.ref,
             saveState: observable.ref,
@@ -93,8 +101,8 @@ export class UpsertQuestionStore {
             this.onQuestionLoaded(question);
         }
         catch (error) {
+            logger.error("Error while loading question", error);
             const appError = AppError.fromAny(error);
-            logger.error("Error while loading question", appError);
             runInAction(() => {
                 this.qvmState = DataState.error(appError);
             });
@@ -205,9 +213,42 @@ export class UpsertQuestionStore {
             ansExplanation: this.getAnsExplanation(),
             marks: this.vm.scorable.value.isTrue ? (NumFmt.toNumber(this.vm.marks.value) ?? null) : null,
             isRequired: this.vm.isRequired.value,
-            mediaRefs: [],
+            mediaRefs: this.vm.mediaFiles.map((file) => new MediaTileRefReq({
+                id: file.id,
+                caption: file.caption || null,
+            })),
         });
         return req;
     }
+
+
+    handleOnAddMedia() {
+        const entry: DialogEntry<QMediaPickerProps> = {
+            id: "upsert-question-add-media",
+            component: QMediaPicker,
+            props: {
+                onClose: () => {
+                    this.dialogManager.closeById("upsert-question-add-media");
+                },
+                onSelect: (media) => {
+                    this.dialogManager.closeById("upsert-question-add-media");
+                    if (this.vm.mediaFiles.length >= FormQuestionConst.MAX_MEDIA_FILES_PER_QUESTION) {
+                        showErrorToast({
+                            message: "Media Limit Reached",
+                            description: `You can only add up to ${FormQuestionConst.MAX_MEDIA_FILES_PER_QUESTION} media files per question.`,
+                        });
+                        return;
+                    }
+                    this.vm.addMediaFile(media);
+                },
+                appStore: this.appStore,
+            }
+        };
+        this.dialogManager.show(entry);
+    }
+
+
+
+
 
 }

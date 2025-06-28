@@ -1,9 +1,9 @@
 import type { JsonObj } from "~/core/types/Json";
 import { QExtras } from "./QExtras";
-import { QMedia } from "./QMedia";
 import { QuestionLevel } from "./QuestionLevel";
 import { QuestionType } from "./QuestionType";
 import { Bool3 } from "~/core/utils/Bool3";
+import { QMedia } from "../qmedia/QMedia";
 
 
 type QuestionProps = {

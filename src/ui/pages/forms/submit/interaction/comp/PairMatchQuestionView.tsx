@@ -5,6 +5,7 @@ import { QuestionHeaderView } from "./QuestionHeaderView";
 import { QuestionCardView } from "./QuestionCardView";
 import { GroupQuestionVm } from "../models/GroupQuestionVm";
 import { MdQRenderer } from "~/ui/components/form/commons/questionmarkit";
+import { FSelect } from "~/ui/widgets/form/input/FSelect";
 
 interface Props {
     vm: PairMatchQuestionVm;
@@ -12,49 +13,72 @@ interface Props {
 }
 
 export const PairMatchQuestionView: React.FC<Props> = observer(({ vm, parentVm }) => {
-    const handleSelectionChange = (index: number, selectedRowId: number | null) => {
-        vm.setSelectedRowIdForItem(index, selectedRowId);
+    return (
+        <QuestionCardView parent={parentVm}>
+            <QuestionHeaderView vm={vm} parentVm={parentVm} />
+            <PairMatchTable vm={vm} />
+        </QuestionCardView>
+    );
+});
+
+const PairMatchTable: React.FC<{ vm: PairMatchQuestionVm }> = observer(({ vm }) => {
+    return (
+        <div className="mt-4">
+            {/* Header (visible on larger screens) */}
+            <div className="hidden sm:flex bg-slate-50 text-sm font-semibold text-default px-3 py-2">
+                <div className="w-1/2">Column A</div>
+                <div className="w-1/2">Column B</div>
+            </div>
+
+            {/* Rows */}
+            <div className="divide-y divide-default border border-default">
+                {vm.items.map((_, index) => (
+                    <PairMatchRow key={vm.items[index].rowId} vm={vm} index={index} />
+                ))}
+            </div>
+        </div>
+    );
+});
+
+const PairMatchRow: React.FC<{ vm: PairMatchQuestionVm; index: number }> = observer(({ vm, index }) => {
+    const item = vm.items[index];
+    return (
+        <div className="flex flex-col sm:flex-row gap-3 p-3">
+            <div className="sm:w-1/2">
+                <div
+                    className="text-default"
+                    dangerouslySetInnerHTML={{
+                        __html: MdQRenderer.pairMatchText(item.colAText),
+                    }}
+                />
+            </div>
+            <div className="sm:w-1/2">
+                <PairMatchSelect vm={vm} index={index} />
+            </div>
+        </div>
+    );
+});
+
+const PairMatchSelect: React.FC<{ vm: PairMatchQuestionVm; index: number }> = observer(({ vm, index }) => {
+    const item = vm.items[index];
+
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        vm.setSelectedRowIdForItem(index, value ? Number(value) : null);
     };
 
     return (
-        <QuestionCardView parent={parentVm}>
-            <QuestionHeaderView vm={vm} />
-            <table className="w-full mt-4 border border-gray-300 text-sm rounded-md">
-                <thead>
-                    <tr className="bg-gray-100 text-left">
-                        <th className="p-3 border-b border-gray-300">Column A</th>
-                        <th className="p-3 border-b border-gray-300">Column B</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {vm.items.map((item, index) => (
-                        <tr key={item.rowId} className="hover:bg-gray-50 transition">
-                            <td className="p-3 align-top border-t border-gray-200">
-                                <div className="text-default"><div dangerouslySetInnerHTML={{ __html: MdQRenderer.pairMatchText(item.colAText) }} /></div>
-                            </td>
-                            <td className="p-3 align-top border-t border-gray-200">
-                                <div className="flex flex-col gap-2">
-                                    <select
-                                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                                        value={item.selectedRowId ?? ""}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            handleSelectionChange(index, value ? Number(value) : null);
-                                        }}
-                                    >
-                                        <option value="">Select Correct Match</option>
-                                        {vm.items.map(option => (
-                                            <option key={option.rowId} value={option.rowId}>
-                                                {option.colBText}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </QuestionCardView>
+        <FSelect
+            className="w-full"
+            value={item.selectedRowId ?? ""}
+            onChange={handleChange}
+        >
+            <option value="">Select Correct Match</option>
+            {vm.items.map((option) => (
+                <option key={option.rowId} value={option.rowId}>
+                    {option.colBText}
+                </option>
+            ))}
+        </FSelect>
     );
 });

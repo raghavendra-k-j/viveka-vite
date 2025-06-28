@@ -1,7 +1,4 @@
-import { Content } from "../models/Content";
-import { Paragraph } from "../models/Paragraph";
-import { TextRun } from "../models/TextRun";
-import { TextRunType } from "../models/TextRunType";
+import { AiSTTContent, AiSTTContentType, AiSTTLatextContent, AiSTTParaListContent, Paragraph, TextRun, TextRunType } from "../models/AiSTTContent";
 
 export class ModelResponseParser {
 
@@ -10,9 +7,9 @@ export class ModelResponseParser {
      * @param response The model's response as a string.
      * @returns The parsed content as a `Content` object.
      */
-    public static parse(response: string): Content {
-        const cleanedMarkdown = this.cleanMarkdown(response);
-        const content = this.parseContentFromMarkdown(cleanedMarkdown);
+    public static parse({ rawContent, contentType }: { rawContent: string; contentType: AiSTTContentType; }): AiSTTContent {
+        const cleanedMarkdown = this.cleanMarkdown(rawContent);
+        const content = this.parseContentFromMarkdown(cleanedMarkdown, contentType);
         return content;
     }
 
@@ -44,15 +41,22 @@ export class ModelResponseParser {
      * @param markdown The cleaned markdown string.
      * @returns The parsed content as a `Content` object.
      */
-    private static parseContentFromMarkdown(markdown: string): Content {
+    private static parseContentFromMarkdown(markdown: string, contentType: AiSTTContentType): AiSTTContent {
         // Split the markdown into paragraphs
         const rawParagraphs = this.splitMarkdownIntoParagraphs(markdown);
 
         // Convert each paragraph to a `Paragraph` object
         const paragraphs = rawParagraphs.map(this.parseParagraph.bind(this));
 
+        if (contentType === AiSTTContentType.LATEX) {
+            // find the first latex run
+            const latexRuns: TextRun[] = paragraphs.flatMap(p => p.runs.filter(r => r.type === TextRunType.LATEX));
+            const latexString = latexRuns.length > 0 ? latexRuns[0].content : "";
+            return new AiSTTLatextContent(latexString);
+        }
+
         // Return the content model containing the paragraphs
-        return new Content({ paragraphs });
+        return new AiSTTParaListContent(paragraphs);
     }
 
     /**

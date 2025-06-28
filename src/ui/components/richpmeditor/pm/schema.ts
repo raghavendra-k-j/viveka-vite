@@ -1,4 +1,5 @@
 import { Schema, NodeSpec } from "prosemirror-model";
+import { FormQuestionConst } from "~/domain/forms/const/FormQuestionConst";
 
 export type RichPmEditorSchema = typeof blockSchema | typeof inlineSchema;
 
@@ -23,18 +24,19 @@ const inlineLaTex: NodeSpec = {
     toDOM(node) {
         return [
             "span",
-            { "data-latex": node.attrs.latex },
+            { "data-tag-ilatex": node.attrs.latex },
             node.attrs.latex
         ];
     },
     parseDOM: [{
-        tag: "span[data-latex]",
+        tag: "span[data-tag-ilatex]",
         getAttrs(dom) {
             return {
-                latex: (dom as HTMLElement).getAttribute("data-latex")
+                latex: (dom as HTMLElement).getAttribute("data-tag-ilatex")
             };
         }
-    }]
+    }],
+    
 };
 
 
@@ -47,15 +49,15 @@ const blockLaTex: NodeSpec = {
     toDOM(node) {
         return [
             "div",
-            { "data-latex": node.attrs.latex, class: "block-latex" },
+            { "data-tag-blatex": node.attrs.latex,},
             node.attrs.latex
         ];
     },
     parseDOM: [{
-        tag: "div[data-latex]",
+        tag: "div[data-tag-blatex]",
         getAttrs(dom) {
             return {
-                latex: (dom as HTMLElement).getAttribute("data-latex")
+                latex: (dom as HTMLElement).getAttribute("data-tag-blatex")
             };
         }
     }]
@@ -68,10 +70,10 @@ const fillBlank: NodeSpec = {
     atom: true,
     attrs: {},
     toDOM() {
-        return ["span", { "data-fill-blank": "" }, "____"];
+        return ["span", { "data-tag-fill-blank": "" }, "_".repeat(FormQuestionConst.FILL_BLANKS_UNDERLINE_LENGTH)];
     },
     parseDOM: [{
-        tag: "span[data-fill-blank]",
+        tag: "span[data-tag-fill-blank]",
         getAttrs() {
             return {};
         }

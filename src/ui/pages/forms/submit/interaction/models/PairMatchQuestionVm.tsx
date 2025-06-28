@@ -54,6 +54,13 @@ export class PairMatchQuestionVm extends QuestionVm {
 
     setSelectedRowIdForItem(index: number, rowId: number | null) {
         if (index >= 0 && index < this.items.length) {
+            if (rowId !== null) {
+                this.items.forEach((item, i) => {
+                    if (i !== index && item.selectedRowId === rowId) {
+                        item.setSelectedRowId(null);
+                    }
+                });
+            }
             this.items[index].setSelectedRowId(rowId);
         }
         this.validate();

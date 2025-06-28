@@ -1,7 +1,6 @@
-import { Content } from "~/domain/aistt/models/Content";
 import { STT } from "~/infra/utils/stt/STT"
 import { AiSTTDialogProvider } from "./AiSTTDialogProvider";
-import { Dialog, DialogContent, DialogOverlay, DialogScaffold } from "~/ui/widgets/dialogmanager";
+import { FramedDialog } from "~/ui/widgets/dialogmanager";
 import FilledButton from "~/ui/widgets/button/FilledButton";
 import { useAiSTTDialogStore } from "./AiSTTDialogContext";
 import { Observer } from "mobx-react-lite";
@@ -13,18 +12,27 @@ import { Loader, Mic, MicOff, X } from "lucide-react";
 import styles from "./styles.module.css";
 import OutlinedButton from "~/ui/widgets/button/OutlinedButton";
 import clsx from "clsx";
+import { ErrorBanner } from "./ErrorBanner";
+import { AiSTTContent, AiSTTContentType, AiSTTLatextContent, AiSTTParaListContent, Paragraph } from "~/domain/aistt/models/AiSTTContent";
+import { ContentTypeOptions } from "./AiSTTDialogStore";
 
 export type AiSTTDialogProps = {
+    contentType: AiSTTContentType;
+    contentTypeProps: ContentTypeOptions;
     stt: STT;
-    allowAi: boolean;
-    enableAi: boolean;
-    onDone: (content: Content) => void;
+    onDone: (content: AiSTTContent) => void;
     onCancel: () => void;
 }
 
 export function AiSTTDialog(props: AiSTTDialogProps) {
     return (
-        <AiSTTDialogProvider stt={props.stt} onDone={props.onDone} onCancel={props.onCancel} allowAi={props.allowAi} enableAi={props.enableAi}>
+        <AiSTTDialogProvider
+            contentType={props.contentType}
+            contentTypeProps={props.contentTypeProps}
+            stt={props.stt}
+            onDone={props.onDone}
+            onCancel={props.onCancel}
+        >
             <Body />
         </AiSTTDialogProvider>
     );
@@ -34,15 +42,14 @@ export function AiSTTDialog(props: AiSTTDialogProps) {
 function Body() {
     const store = useAiSTTDialogStore();
     return (
-        <Dialog onClose={() => store.onClickCancel()}>
-            <DialogOverlay onClick={() => store.onClickCancel()} />
-            <DialogScaffold className="p-4">
-                <DialogContent className="w-full max-w-[400px] min-h-[300px] max-h-[400px] flex flex-col">
-                    <DialogBody />
-                    <DialogFooter />
-                </DialogContent>
-            </DialogScaffold>
-        </Dialog>
+        <FramedDialog
+            scaffoldClassName="p-4"
+            contentClassName="w-full max-w-[400px] min-h-[300px] max-h-[400px] flex flex-col"
+            onClose={() => store.onClickCancel()}
+        >
+            <DialogBody />
+            <DialogFooter />
+        </FramedDialog>
     );
 }
 
@@ -112,7 +119,6 @@ function DialogBody() {
 }
 
 
-import { ErrorBanner } from "./ErrorBanner"; // adjust path as needed
 
 function AiOutputView() {
     const store = useAiSTTDialogStore();
@@ -134,7 +140,7 @@ function AiOutputView() {
     return (
         <div ref={containerRef} className="flex-1 overflow-auto px-6">
             <Observer>
-                {() => <ContentView content={store.content} />}
+                {() => <AiSTTContentView content={store.content} />}
             </Observer>
 
             <Observer>
@@ -166,15 +172,30 @@ function AiOutputView() {
     );
 }
 
-
-
-
-function ContentView(props: { content: Content }) {
-    const store = useAiSTTDialogStore();
+function AiSTTContentView(props: { content: AiSTTContent }) {
     if (props.content.isEmpty) return null;
+    if (props.content.isLatex) {
+        return <LatextContentView content={props.content as AiSTTLatextContent} />;
+    } else {
+        return <ParagraphsContentView content={props.content as AiSTTParaListContent} />;
+    }
+}
+
+function LatextContentView({ content }: { content: AiSTTLatextContent }) {
+    const html = ContentsToHtmlService.convertLaTex(content);
     return (
         <div className="text-base-m text-default space-y-2">
-            {props.content.paragraphs.map((paragraph) => {
+            <div dangerouslySetInnerHTML={{ __html: html }} />
+        </div>
+    );
+}
+
+
+function ParagraphsContentView({ content }: { content: AiSTTParaListContent }) {
+    const store = useAiSTTDialogStore();
+    return (
+        <div className="text-base-m text-default space-y-2">
+            {content.paragraphs.map((paragraph: Paragraph) => {
                 const html = ContentsToHtmlService.convertParagraph(paragraph);
                 return (
                     <div
@@ -202,14 +223,13 @@ function ContentView(props: { content: Content }) {
 
 
 
-
 function DialogFooter() {
     const store = useAiSTTDialogStore();
     return (
         <Observer>
             {() => (
                 <div className="flex flex-row gap-2 px-4 py-3 items-center justify-between">
-                    {store.allowAi ? (
+                    {(store.contentType === AiSTTContentType.PARA_LIST && store.allowAi) ? (
                         <div className="flex items-center">
                             <input
                                 type="checkbox"

@@ -6,6 +6,7 @@ import { QuestionVmFactory } from "./QuestionVmFactory";
 import type { QuestionVm } from "./QuestionVm";
 import { logger } from "~/core/utils/logger";
 import { getTTS } from "~/infra/utils/tts/TTSService";
+import { ThingId } from "~/core/utils/ThingId";
 
 type InteractionVmProps = {
     questionRes: QuestionRes;
@@ -23,6 +24,7 @@ export class InteractionFormVm {
 }
 
 export class InteractionVm {
+    thingId: string = ThingId.generate();
     formDetail: InteractionFormVm;
     questions!: QuestionVm[];
     parentStore: InteractionStore;
@@ -49,6 +51,10 @@ export class InteractionVm {
             currentSpeechTag: observable,
             cachedVoice: observable,
         });
+    }
+
+    get totalQuestions() {
+        return this.questions.length;
     }
 
     private getTTSCode() {

@@ -44,13 +44,11 @@ export function ObjQuestionView({ question }: ObjQuestionViewProps) {
 
         const answer = question.answer as CheckBoxesAnswer | undefined;
         if (answer) {
-            // correctChoices = answer.ids ?? [];
             correctChoices = answer.ids?.map((id) => id - 1) ?? [];
         }
 
         const userAnswer = question.userAnswer as CheckBoxesAnswer | undefined;
         if (userAnswer) {
-            // selectedChoices = userAnswer.ids ?? [];
             selectedChoices = userAnswer.ids?.map((id) => id - 1) ?? [];
         }
 
@@ -64,13 +62,11 @@ export function ObjQuestionView({ question }: ObjQuestionViewProps) {
 
         const answer = question.answer as TrueFalseAnswer | undefined;
         if (answer) {
-            // correctChoices = [answer.value ? 1 : 2];
             correctChoices = [answer.value ? 0 : 1];
         }
 
         const userAnswer = question.userAnswer as TrueFalseAnswer | undefined;
         if (userAnswer) {
-            // selectedChoices = [userAnswer.value ? 1 : 2];
             selectedChoices = [userAnswer.value ? 0 : 1];
         }
     }

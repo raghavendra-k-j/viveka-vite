@@ -15,6 +15,7 @@ type FTextFieldProps = React.HTMLAttributes<HTMLDivElement> & {
     placeholder?: string;
     field: FValue<string>;
     inputSize?: FInputSize;
+    maxLength?: number;
 };
 
 export function FTextField({
@@ -25,6 +26,7 @@ export function FTextField({
     placeholder,
     field,
     inputSize = "md",
+    maxLength,
     ...divProps
 }: FTextFieldProps) {
     const handleChange = (newVal: string) => {
@@ -44,6 +46,7 @@ export function FTextField({
                     <FInput
                         id={id}
                         type={type}
+                        maxLength={maxLength}
                         placeholder={placeholder}
                         value={field.value}
                         inputSize={inputSize}

@@ -1,42 +1,81 @@
-import { Node as ProseMirrorNode, Schema } from 'prosemirror-model';
+import { Node as ProseMirrorNode } from 'prosemirror-model';
 import { PmToHtml } from './PmToHtml';
 import { HtmlToPm } from './HtmlToPm';
 import { RichPmEditorRef } from '../RichPmEditor';
 import { RichPmEditorSchema } from '../pm/schema';
 
+interface ToNodeParams {
+    text: string | null;
+    schema: RichPmEditorSchema;
+}
+
+interface ToTextParams {
+    doc: ProseMirrorNode | null;
+    schema: RichPmEditorSchema;
+}
+
+interface ToTextFromRefParams {
+    ref: React.RefObject<RichPmEditorRef | null>;
+    schema: RichPmEditorSchema;
+}
 
 export class PmConverter {
 
-    static toNodeOrEmpty({ text, schema }: { text: string | null; schema: Schema }): ProseMirrorNode | null {
-        if (!text || text.trim() === "") {
+    /**
+     * Converts an HTML string to a ProseMirror node.
+     * Returns null if input text is empty or invalid.
+     */
+    static toNode({ text, schema }: ToNodeParams): ProseMirrorNode | null {
+        const trimmed = text?.trim();
+        if (!trimmed) return null;
+        try {
+            return HtmlToPm.parse(trimmed, schema);
+        } catch (error) {
+            console.warn('Failed to parse HTML to ProseMirror node:', error);
             return null;
         }
-        return this.toNode({ text, schema });
     }
 
-    static toText({ doc, schema }: { doc: ProseMirrorNode; schema: Schema }): string | null {
-        const string = PmToHtml.convert(doc, schema);
-        return string.trim() === "" ? null : string;
+    /**
+     * Converts a ProseMirror node to an HTML string.
+     * Returns null if result is empty or input doc is null.
+     */
+    static toText({ doc, schema }: ToTextParams): string | null {
+        if (!doc) return null;
+        try {
+            const html = PmToHtml.convert(doc, schema).trim();
+            return html === '' ? null : html;
+        } catch (error) {
+            console.warn('Failed to convert ProseMirror node to HTML:', error);
+            return null;
+        }
     }
 
-    static toNode({ text, schema }: { text: string; schema: Schema }): ProseMirrorNode | null {
-        return HtmlToPm.parse(text, schema);
+    /**
+     * Converts a ProseMirror node to an HTML string.
+     * Returns empty string if result is empty or input doc is null.
+     */
+    static toTextOrEmpty({ doc, schema }: ToTextParams): string {
+        return this.toText({ doc, schema }) ?? '';
     }
 
-    static toTextFromRef(props: { ref: React.RefObject<RichPmEditorRef | null>, schema: RichPmEditorSchema }): string | null {
-        const editor = props.ref.current;
+    /**
+     * Gets content from an editor ref and converts it to an HTML string.
+     * Returns null if editor or content is missing.
+     */
+    static toTextFromRef({ ref, schema }: ToTextFromRefParams): string | null {
+        const editor = ref.current;
         if (!editor) return null;
-
         const content = editor.getContent();
         if (!content) return null;
-
-        return PmConverter.toText({ doc: content, schema: props.schema });
+        return this.toText({ doc: content, schema });
     }
 
-    static toTextFromRefOrEmpty(props: { ref: React.RefObject<RichPmEditorRef | null>, schema: RichPmEditorSchema }): string {
-        const text = PmConverter.toTextFromRef(props);
-        return text ? text : "";
+    /**
+     * Gets content from an editor ref and converts it to an HTML string.
+     * Returns empty string if editor or content is missing.
+     */
+    static toTextFromRefOrEmpty({ ref, schema }: ToTextFromRefParams): string {
+        return this.toTextFromRef({ ref, schema }) ?? '';
     }
-
-
 }

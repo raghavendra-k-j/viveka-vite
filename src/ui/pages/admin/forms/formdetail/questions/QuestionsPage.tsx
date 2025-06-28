@@ -4,6 +4,7 @@ import { useQuestionPageStore } from "./QuestionPageContext";
 import { DialogEntry, useDialogManager } from "~/ui/widgets/dialogmanager";
 import { UpsertQuestionDialog, UpsertQuestionDialogProps } from "../upsertquestion/UpsertQuestionDialog";
 import { useStt } from "~/ui/components/sttcontext/STTContext";
+import { useAppStore } from "~/ui/pages/_layout/AppContext";
 
 export default function QuestionsPage() {
     return (<QuestionPageProvider>
@@ -15,6 +16,7 @@ export default function QuestionsPage() {
 function Body() {
     const store = useQuestionPageStore();
     const dialogManager = useDialogManager();
+    const appStore = useAppStore();
     const stt = useStt();
 
     const handleOnClickQuestion = () => {
@@ -31,7 +33,8 @@ function Body() {
                 dialogManager: dialogManager,
                 onClose: () => {
                     return dialogManager.closeById("upsert-question");
-                }
+                },
+                appStore: appStore,
             }
         };
         dialogManager.show(entry);

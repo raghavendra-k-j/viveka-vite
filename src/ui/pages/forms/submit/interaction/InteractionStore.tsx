@@ -10,8 +10,13 @@ import { InstanceId } from "~/core/utils/InstanceId";
 import { SubmitFormQuestion } from "~/domain/forms/models/SubmitFormQuestion";
 import { GroupQuestionVm } from "./models/GroupQuestionVm";
 import { SubmitFormReq, SubmitFormRes } from "~/domain/forms/models/submit/SubmitFormModels";
-import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
+import { DialogEntry, DialogManagerStore } from "~/ui/widgets/dialogmanager";
+import { SubmitConfirmDialog, SubmitConfirmDialogProps } from "./comp/SubmitConfirmDialog";
+import { QuitFormDialog, QuitFormDialogProps } from "./comp/QuitFormDialog";
+import { showErrorDialog } from "~/ui/components/dialogs/showErrorDialog";
 import { showErrorToast } from "~/ui/widgets/toast/toast";
+import { TimesUpDialog } from "./comp/TimesUpDialog";
+import { showLoadingDialog } from "~/ui/components/dialogs/showLoadingDialog";
 
 type InteractionStoreProps = {
     parentStore: SubmitStore;
@@ -42,7 +47,6 @@ export class InteractionStore {
             remainingSeconds: observable,
             submitState: observable.ref,
         });
-        this.loadQuestions();
     }
 
     get stt(): STT {
@@ -114,11 +118,11 @@ export class InteractionStore {
     }
 
     private startTimerIfNeeded() {
+        this.stopTimer();
         if (!this.hasTimeLimit) return;
         runInAction(() => {
             this.remainingSeconds = this.formDetail.timeLimit!;
         });
-
         this.timer = setInterval(() => {
             runInAction(() => {
                 this.remainingSeconds -= 1;
@@ -139,7 +143,21 @@ export class InteractionStore {
     }
 
     onTimerCompleted() {
-        console.log("Time is up.");
+        this.endTimer();
+        this.dialogManager.closeAll();
+        this.dialogManager.show({
+            id: "times-up-dialog",
+            component: TimesUpDialog,
+            props: {
+                store: this,
+                onSubmit: async () => {
+                    await this.onSubmitConfirmedByUser();
+                },
+                onQuit: () => {
+                    this.onExitForm();
+                },
+            },
+        });
     }
 
     get selectedLanguageId() {
@@ -147,16 +165,76 @@ export class InteractionStore {
     }
 
 
-    async onClickSubmitForm() {
-        this.stopTimer();
+    async onClickSubmitButton() {
+        const hasErrors = await this.hasErrors();
+        if (hasErrors) {
+            showErrorToast({
+                message: "Unable to submit the " + this.formDetail.type.name.toLocaleLowerCase(),
+                description: "Please answer all questions marked with a star (*), and review the remaining questions to ensure there are no errors."
+            });
+            return;
+        }
+
+        const dialogEntry: DialogEntry<SubmitConfirmDialogProps> = {
+            id: "submit-confirm-dialog",
+            component: SubmitConfirmDialog,
+            props: {
+                store: this,
+                onConfirm: async () => {
+                    this.dialogManager.closeById("submit-confirm-dialog");
+                    this.onSubmitConfirmedByUser();
+                },
+                onCancel: () => {
+                    this.dialogManager.closeById("submit-confirm-dialog");
+                },
+            }
+        }
+        this.dialogManager.show(dialogEntry);
+    }
+
+    async hasErrors(): Promise<boolean> {
+        let hasError = false;
+
+        for (const question of this.questions) {
+            if (question.base.type.isGroup) {
+                const groupQuestion = question as GroupQuestionVm;
+                for (const subQuestion of groupQuestion.subQuestions) {
+                    if (subQuestion.validate()) {
+                        hasError = true;
+                    }
+                }
+            } else {
+                if (question.validate()) {
+                    hasError = true;
+                }
+            }
+        }
+        return hasError;
+    }
+
+    async endTimer() {
         this.endedOn = new Date();
+        this.stopTimer();
+    }
+
+    async onSubmitConfirmedByUser() {
+        await this.endTimer();
         await this.submitDataToServer();
     }
 
 
+    async onClickRetrySubmitForm() {
+        await this.submitDataToServer();
+    }
 
     private async submitDataToServer() {
         try {
+            if (this.submitState.isLoading) return false;
+            showLoadingDialog({
+                dialogId: "submit-form-overlay",
+                dialogManager: this.dialogManager,
+                message: "Submitting...",
+            });
             runInAction(() => {
                 this.submitState = DataState.loading();
             });
@@ -174,20 +252,31 @@ export class InteractionStore {
                 this.parentStore.setCurrentFragmentPreview();
                 this.parentStore.loadFormDetail();
             });
+            this.dialogManager.closeById("times-up-dialog");
         }
         catch (error) {
             logger.error("Error submitting form", error);
             const appError = AppError.fromAny(error);
             runInAction(() => {
-                this.vmState = DataState.error(appError);
+                this.submitState = DataState.error(appError);
             });
-            showErrorToast({
+            showErrorDialog({
+                dialogId: "submit-form-error",
+                dialogManager: this.dialogManager,
                 message: appError.message,
                 description: appError.description,
                 primaryButton: {
                     text: "Retry",
                     onClick: () => {
-                        this.onClickSubmitForm();
+                        this.dialogManager.closeById("submit-form-error");
+                        this.onClickRetrySubmitForm();
+                    },
+                },
+                secondaryButton: {
+                    text: "Quit",
+                    onClick: () => {
+                        this.dialogManager.closeById("submit-form-error");
+                        this.onExitForm();
                     },
                 }
             });
@@ -225,15 +314,33 @@ export class InteractionStore {
     }
 
     onExitForm() {
-
+        const dialogEntry: DialogEntry<QuitFormDialogProps> = {
+            id: "quit-form-dialog",
+            component: QuitFormDialog,
+            props: {
+                store: this,
+                onConfirmQuit: () => {
+                    this.dialogManager.closeById("quit-form-dialog");
+                    this.doFinalQuit();
+                },
+                onCancel: () => {
+                    this.dialogManager.closeById("quit-form-dialog");
+                },
+            }
+        };
+        this.dialogManager.show(dialogEntry);
     }
 
+    private doFinalQuit() {
+        this.dialogManager.closeById("times-up-dialog");
+        this.parentStore.setCurrentFragmentPreview();
+        this.parentStore.loadFormDetail();
+    }
 
     dispose() {
-        this.vmState.data?.dispose();
+        this.vmState.data?.dispose?.();
         this.stopTimer();
-        this.stt.dispose();
-        logger.debug("Disposed STT: ", this.stt.instanceId);
+        this._stt?.dispose?.();
     }
 
 }

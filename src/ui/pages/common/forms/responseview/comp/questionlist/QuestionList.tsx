@@ -5,7 +5,7 @@ import { RDQuestionVm } from "../../models/QuestionVm";
 import { LoaderView } from "~/ui/widgets/loader/LoaderView";
 import { SimpleRetryableAppView } from "~/ui/widgets/error/SimpleRetryableAppError";
 import { QuestionCard } from "../questionview/QuestionCard";
-import { QuestionHeader } from "../questionview/QuestionHeader";
+import { QuestionHeader } from "../questionview/QuestionHeaderView";
 import { QuestionExplanationView } from "~/ui/components/form/commons/ExplanationText";
 
 export function QuestionList() {
@@ -21,7 +21,7 @@ function Body() {
     const store = useResponseViewStore();
 
     return (
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto bg-background">
             <Observer>
                 {() =>
                     store.questionState.stateWhen({
@@ -61,7 +61,7 @@ function Centered({ children }: { children: React.ReactNode }) {
 function ListView() {
     const store = useResponseViewStore();
     return (
-        <div className="divide-y divide-gray-200 flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
             {store.questions.map((q, idx) => (
                 <QuestionView key={idx} question={q} />
             ))}
@@ -80,7 +80,7 @@ function QuestionView({ question }: QuestionViewProps) {
             <QuestionHeader question={question} />
             {renderer?.(question)}
             {question.ansExplanation && (
-                <QuestionExplanationView explanation={question.ansExplanation} />
+                <QuestionExplanationView className="pt-2 pb-4" explanation={question.ansExplanation} />
             )}
         </QuestionCard>
     );

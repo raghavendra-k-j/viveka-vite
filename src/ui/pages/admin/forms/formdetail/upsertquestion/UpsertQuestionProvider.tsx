@@ -9,6 +9,7 @@ import { SimpleRetryableAppView } from "~/ui/widgets/error/SimpleRetryableAppErr
 import { FormType } from "~/domain/forms/models/FormType";
 import { AdminFormsService } from "~/domain/forms/admin/services/AdminFormsService";
 import { DialogManagerStore } from "~/ui/widgets/dialogmanager";
+import { AppStore } from "~/ui/pages/_layout/AppStore";
 
 type UpsertQuestionProviderProps = {
     id: number | null;
@@ -20,6 +21,7 @@ type UpsertQuestionProviderProps = {
     onClose: () => void;
     dialogManager: DialogManagerStore;
     children: ReactNode;
+    appStore: AppStore;
 }
 
 export const UpsertQuestionProvider: React.FC<UpsertQuestionProviderProps> = (props) => {
@@ -34,6 +36,7 @@ export const UpsertQuestionProvider: React.FC<UpsertQuestionProviderProps> = (pr
             adminFormsService: props.adminFormsService,
             onClose: props.onClose,
             dialogManager: props.dialogManager,
+            appStore: props.appStore,
         });
     }
     const store = storeRef.current;
@@ -66,7 +69,7 @@ export const UpsertQuestionProvider: React.FC<UpsertQuestionProviderProps> = (pr
                             <Centered>
                                 <SimpleRetryableAppView
                                     appError={store.qvmState.error}
-                                    onRetry={store.loadQuestion}
+                                    onRetry={() => store.loadQuestion()}
                                 />
                             </Centered>
                         );

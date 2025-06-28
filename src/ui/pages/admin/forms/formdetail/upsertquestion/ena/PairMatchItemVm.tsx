@@ -1,34 +1,33 @@
 import { action, makeObservable, observable } from "mobx";
 import { createRef } from "react";
-import { UUIDUtil } from "~/core/utils/UUIDUtil";
 
 export type PairMatchItemProps = {
-    rowId: number;
+    rowUid: string;
     colAText: string;
     colBText: string;
-    correctRowId: number | null;
+    correctRowUid: string | null;
 }
 
 export class PairMatchItemVm {
-    uid: string = UUIDUtil.compact;
-    rowId: number;
+    rowUid: string;
     colAText: string;
     colARef: React.RefObject<HTMLInputElement | null> = createRef();
     colBText: string;
     colBRef: React.RefObject<HTMLInputElement | null> = createRef();
-    correctRowId: number | null;
+    correctRowUid: string | null;
 
     constructor(props: PairMatchItemProps) {
-        this.rowId = props.rowId;
+        this.rowUid = props.rowUid;
         this.colAText = props.colAText;
         this.colBText = props.colBText;
-        this.correctRowId = props.correctRowId;
+        this.correctRowUid = props.correctRowUid;
         makeObservable(this, {
             colAText: observable,
             colBText: observable,
             onColATextChange: action,
             onColBTextChange: action,
-            correctRowId: observable,
+            correctRowUid: observable,
+            setCorrectRowUid: action,
         });
     }
 
@@ -39,4 +38,9 @@ export class PairMatchItemVm {
     onColBTextChange(text: string) {
         this.colBText = text;
     }
+
+    setCorrectRowUid(rowUid: string | null) {
+        this.correctRowUid = rowUid;
+    }
+
 };

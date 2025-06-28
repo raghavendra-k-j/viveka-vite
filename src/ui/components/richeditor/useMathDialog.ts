@@ -20,7 +20,15 @@ export function useMathDialog(
             props: {
                 expr: new LaTexExpr({ latex }),
                 onDone: (expr: LaTexExpr) => {
-                    const content = `<span class="latex" contenteditable="false" data-latex="${expr.latex}">${expr.latex}</span>`;
+                    let content = '';
+                    if (expr.isInline) {
+                        console.log('rendering inline latex', expr.latex);
+                        content = `<span data-tag-ilatex="${expr.latex}">${expr.latex}</span>`;
+                    }
+                    else {
+                        console.log('rendering block latex', expr.latex);
+                        content = `<div data-tag-blatex="${expr.latex}">${expr.latex}</div>`;
+                    }
                     if (targetNode) {
                         editorRef.current?.dom.setOuterHTML(targetNode as HTMLElement, content);
                     } else {
@@ -44,7 +52,10 @@ export function useMathDialog(
 
 
 export function renderLatexElements(container: HTMLElement) {
-    const nodes = container.querySelectorAll('[data-latex]');
+    const nodes = container.querySelectorAll('[data-tag-ilatex], [data-tag-blatex]');
+    if (nodes.length === 0) {
+        return;
+    }
     nodes.forEach((node) => {
         renderKaTexElement(node as HTMLElement);
     });
@@ -52,8 +63,12 @@ export function renderLatexElements(container: HTMLElement) {
 
 
 export function renderKaTexElement(element: HTMLElement) {
-    const latex = element.getAttribute('data-latex');
-    const isBlock = element.getAttribute('display-mode') === 'block';
+    let isInline = true;
+    let latex = element.getAttribute('data-tag-ilatex');
+    if (!latex) {
+        latex = element.getAttribute('data-tag-blatex');
+        isInline = false;
+    }
     if (!latex) {
         element.textContent = '';
         return;
@@ -62,11 +77,10 @@ export function renderKaTexElement(element: HTMLElement) {
         const htmlLaTex = katex.renderToString(latex, {
             throwOnError: false,
             output: 'html',
-            displayMode: isBlock,
+            displayMode: !isInline,
         });
         element.innerHTML = htmlLaTex;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     catch (e) {
         element.textContent = latex;
         return;

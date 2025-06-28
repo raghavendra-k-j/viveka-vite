@@ -10,49 +10,53 @@ import { Trash2 } from "lucide-react";
 export function PairMatchEnAView(vm: PairMatchEnAVm) {
     return (
         <div className="overflow-x-auto">
-            <table className="min-w-full border border-secondary rounded-md">
-                <TableHeader />
-                <tbody>
-                    <Observer>
-                        {() => (
-                            <>
-                                {vm.items.map((item) => (
-                                    <PairMatchRowItem
-                                        key={item.uid}
-                                        vm={vm}
-                                        item={item}
-                                        onRemove={() => vm.removeRow(item)}
-                                    />
-                                ))}
-                            </>
-                        )}
-                    </Observer>
-                </tbody>
-            </table>
+            <PairMatchTable vm={vm} />
             <div className="mt-2 flex justify-end">
-                <OutlinedButton size="sm" onClick={() => vm.addRow()}>Add Row</OutlinedButton>
+                <OutlinedButton size="sm" onClick={() => vm.addRow()}>
+                    Add Row
+                </OutlinedButton>
             </div>
         </div>
     );
 }
 
+function PairMatchTable({ vm }: { vm: PairMatchEnAVm }) {
+    return (
+        <table className="min-w-full border border-secondary rounded-md">
+            <TableHeader />
+            <tbody>
+                <Observer>
+                    {() => (
+                        <>
+                            {vm.items.map((item) => (
+                                <PairMatchRowItem
+                                    key={item.rowUid}
+                                    vm={vm}
+                                    item={item}
+                                    onRemove={() => vm.removeRow(item)}
+                                />
+                            ))}
+                        </>
+                    )}
+                </Observer>
+            </tbody>
+        </table>
+    );
+}
+
 function TableHeader() {
-    const headers = ["#", "Column A", "Column B", "Correct Match"];
+    const headers = ["#", "Column A", "Column B", "Correct Match", "Action"];
     return (
         <thead className="bg-gray-100">
             <tr>
-                {headers.map((title, idx) => (
+                {headers.map((title) => (
                     <th
                         key={title}
-                        className={
-                            `px-3 py-2 border border-default text-left text-xs font-medium` +
-                            (idx !== headers.length - 1 ? ' border-default' : '')
-                        }
+                        className="px-3 py-2 border border-default text-left text-xs font-medium"
                     >
                         {title}
                     </th>
                 ))}
-                <th className="px-3 py-2 border border-default text-left text-xs font-medium">Action</th>
             </tr>
         </thead>
     );
@@ -65,61 +69,37 @@ type PairMatchRowItemProps = {
 };
 
 function PairMatchRowItem({ item, vm, onRemove }: PairMatchRowItemProps) {
-    const rowIndex = vm.items.findIndex((i) => i.uid === item.uid) + 1;
+    const rowIndex = vm.items.findIndex((i) => i.rowUid === item.rowUid) + 1;
+
     return (
-        <tr className="hover:bg-gray-50">
+        <tr>
             <td className="border border-default px-3 py-2 text-center w-10">{rowIndex}</td>
             <Observer>
-                {() => (
-                    <InputCell
-                        placeholder="Enter Column A Text"
-                        value={item.colAText}
-                        refObj={item.colARef}
-                        onChange={(v) => item.onColATextChange(v)}
-                        className="border-default"
-                    />
-                )}
+                {() => <ColumnInputCell value={item.colAText} refObj={item.colARef} onChange={(e) => item.onColATextChange(e)} />}
             </Observer>
             <Observer>
-                {() => (
-                    <InputCell
-                        placeholder="Enter Column B Text"
-                        value={item.colBText}
-                        refObj={item.colBRef}
-                        onChange={(v) => item.onColBTextChange(v)}
-                        className="border-default"
-                    />
-                )}
+                {() => <ColumnInputCell value={item.colBText} refObj={item.colBRef} onChange={(e) => item.onColBTextChange(e)} />}
             </Observer>
-            <Observer>
-                {() => (
-                    <SelectCorrectMatch
-                        vm={vm}
-                        item={item}
-                        className="border-default"
-                    />
-                )}
-            </Observer>
+            <CorrectMatchSelect vm={vm} item={item} />
             <td className="border border-default px-3 py-2 text-center">
-                <RemoveRowButton onRemove={onRemove} />
+                <RemoveRowButton onRemove={() => onRemove()} />
             </td>
         </tr>
     );
 }
 
-type InputCellProps = {
-    placeholder: string;
+type ColumnInputCellProps = {
     value: string;
     refObj: React.RefObject<HTMLInputElement | null>;
     onChange: (text: string) => void;
 };
 
-function InputCell({ placeholder, value, refObj, onChange, className = '' }: InputCellProps & { className?: string }) {
+function ColumnInputCell({ value, refObj, onChange }: ColumnInputCellProps) {
     return (
-        <td className={`px-3 py-2 border border-default ${className}`}>
+        <td className="px-3 py-2 border border-default">
             <FInput
                 inputSize="sm"
-                placeholder={placeholder}
+                placeholder="Enter Text"
                 value={value}
                 ref={refObj}
                 onChange={(e) => onChange(e.target.value)}
@@ -128,30 +108,30 @@ function InputCell({ placeholder, value, refObj, onChange, className = '' }: Inp
     );
 }
 
-type SelectCorrectMatchProps = {
+type CorrectMatchSelectProps = {
     vm: PairMatchEnAVm;
     item: PairMatchItemVm;
 };
 
-function SelectCorrectMatch({ vm, item, className = '' }: SelectCorrectMatchProps & { className?: string }) {
+function CorrectMatchSelect({ vm, item }: CorrectMatchSelectProps) {
     return (
-        <td className={`px-3 py-2 ${className}`}>
-            <FSelect inputSize="sm">
-                <option value="">Select Correct Match</option>
-                {vm.items.map((optItem, idx) => (
-                    <Observer key={optItem.uid}>
-                        {() => (
-                            <option
-                                key={optItem.uid}
-                                value={optItem.rowId}
-                                selected={item.correctRowId === optItem.rowId}
-                            >
-                                {optItem.colBText && optItem.colBText.trim() !== '' ? optItem.colBText : `Row ${idx + 1}`}
+        <td className="px-3 py-2 border border-default">
+            <Observer>
+                {() => (
+                    <FSelect
+                        inputSize="sm"
+                        value={item.correctRowUid ?? ""}
+                        onChange={(e) => item.setCorrectRowUid(e.target.value)}
+                    >
+                        <option value="">Select Correct Match</option>
+                        {vm.items.map((optItem, idx) => (
+                            <option key={optItem.rowUid} value={optItem.rowUid}>
+                                {optItem.colBText?.trim() || `Row ${idx + 1}`}
                             </option>
-                        )}
-                    </Observer>
-                ))}
-            </FSelect>
+                        ))}
+                    </FSelect>
+                )}
+            </Observer>
         </td>
     );
 }

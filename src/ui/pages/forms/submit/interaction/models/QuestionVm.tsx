@@ -20,8 +20,7 @@ export type QuestionVmProps = {
 
 export abstract class QuestionVm {
 
-
-    static readonly DEFAULT_REQUIRED_ERROR_MESSAGE = "This question is required.";
+    static readonly DEFAULT_REQUIRED_ERROR_MESSAGE = "This question must be answered.";
 
     public base: QuestionVmBase;
     public instanceId = InstanceId.generate("QuestionVm");
@@ -46,9 +45,6 @@ export abstract class QuestionVm {
     abstract validateQuestion(): string | undefined;
 
     constructor(vmProps: QuestionVmProps) {
-        if (vmProps.question.type.isTextBox) {
-            logger.debug("Creating QuestionVm with instance id: ", this.instanceId, "and parent store: ", vmProps.store.parentStore.instanceId);
-        }
         this.base = new QuestionVmBase({
             question: vmProps.question,
             store: vmProps.store,

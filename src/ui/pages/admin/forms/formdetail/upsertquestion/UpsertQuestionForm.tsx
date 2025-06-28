@@ -13,6 +13,7 @@ import { RichPmEditor } from "~/ui/components/richpmeditor/RichPmEditor";
 import { blockSchema } from "~/ui/components/richpmeditor/pm/schema";
 import { Node as ProseMirrorNode } from "prosemirror-model";
 import { FReqMark } from "~/ui/widgets/form/FReqMark";
+import { QuestionTextOptions } from "./QuestionTextOptions";
 
 
 export function UpsertQuestionForm() {
@@ -51,8 +52,8 @@ function QuestionDetailsSection() {
             <QuestionSection />
             <MarksAndLevelSection />
             <EnaSection />
-            <HintAndExplanationSection />
             <RequiredCheckbox />
+            <HintAndExplanationSection />
         </div>
     );
 }
@@ -104,8 +105,9 @@ function QuestionSection() {
                     maxHeight="120px"
                 />
                 <FError />
+                <QuestionTextOptions/>
             </FFieldContainer>
-            {store.vm.questionOptionsVm ? store.vm.questionOptionsVm.render() : null}
+            
         </div>
     );
 }
@@ -132,7 +134,7 @@ function MarksAndLevelSection() {
                         />
                         <FTextField
                             label="Marks"
-                            required
+                            required={true}
                             placeholder="Enter Marks"
                             field={store.vm.marks}
                             type="number"
@@ -187,7 +189,6 @@ function HintAndExplanationSection() {
                                 schema={blockSchema}
                                 stt={store.stt}
                                 initialContent={store.vm.ansHintNode}
-                                minHeight="80px"
                                 maxHeight="100px"
                             />
                             <FError />
@@ -215,12 +216,17 @@ function HintAndExplanationSection() {
 function RequiredCheckbox() {
     const store = useUpsertQuestionStore();
     return store.vm.isRequired.value.isNotNone ? (
-        <div>
+        <div className="bg-surface mt-5 rounded-sm border border-default px-3 py-2 shadow-xs">
             <Observer>
                 {() => (
                     <FCheckbox
                         onChange={(value) => store.vm.onRequiredChange(value)}
-                        label="Required"
+                        label={<div className="ms-1">
+                            <div>Make this question required</div>
+                            <div className="text-xs text-secondary">
+                                Users won’t be able to submit the form without answering this question.
+                            </div>
+                        </div>}
                         value={store.vm.isRequired.value.boolValue!}
                     />
                 )}

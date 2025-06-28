@@ -1,6 +1,7 @@
 import { JsonObj } from "~/core/types/Json";
 import { QuestionType } from "../question/QuestionType";
 import { QExtras } from "../question/QExtras";
+import { logger } from "~/core/utils/logger";
 
 export abstract class Answer {
   constructor() { }
@@ -152,6 +153,7 @@ export class FillBlanksAnswer extends Answer {
   }
 
   toIdMap() {
+    logger.debug("FillBlanksAnswer.toIdMap", this.answers);
     const map: Record<number, string> = {};
     for (const answer of this.answers) {
       map[answer.id] = answer.answer;
@@ -160,7 +162,9 @@ export class FillBlanksAnswer extends Answer {
   }
 
   static fromMap(map: JsonObj): FillBlanksAnswer {
-    return new FillBlanksAnswer({ answers: map[FillBlanksAnswer.keyAnswers].map((e: JsonObj) => FillBlankInputAnswer.fromMap(e)) });
+    return new FillBlanksAnswer({ 
+      answers: map[FillBlanksAnswer.keyAnswers].map((e: JsonObj) => FillBlankInputAnswer.fromMap(e)) 
+    });
   }
 }
 

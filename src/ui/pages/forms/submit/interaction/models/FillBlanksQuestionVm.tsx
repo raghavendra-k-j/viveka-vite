@@ -1,23 +1,61 @@
-import { makeObservable, observable, runInAction } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 import { QuestionVm, type QuestionVmProps, type QuestionRendererProps } from "./QuestionVm";
 import type { JSX } from "react";
 import type { FillBlankInput, FillBlanksQExtras } from "~/domain/forms/models/question/QExtras";
 import { FillBlanksQuestionView } from "../comp/FillBlanksQuestionView";
 import { Answer, FillBlankInputAnswer, FillBlanksAnswer } from "~/domain/forms/models/answer/Answer";
+import { Node as ProseMirrorNode } from 'prosemirror-model';
+import { PmConverter } from "~/ui/components/richpmeditor/utils/PmConverter";
+import { inlineSchema } from "~/ui/components/richpmeditor/pm/schema";
+import { FormQuestionConst } from "~/domain/forms/const/FormQuestionConst";
 
 export class FillBlankItemVm {
     input: FillBlankInput;
-    ansStr: string = "";
+    ansNode: ProseMirrorNode | null = null;
+    error: string | undefined = undefined;
 
     constructor(input: FillBlankInput) {
         this.input = input;
         makeObservable(this, {
-            ansStr: observable,
+            ansNode: observable,
+            error: observable,
         });
     }
 
     get isAnswered() {
-        return this.ansStr.length > 0;
+        if (this.ansNode === null) {
+            return false;
+        }
+        const html = PmConverter.toTextOrEmpty({
+            doc: this.ansNode,
+            schema: inlineSchema
+        });
+        return html.length > 0;
+    }
+
+    get ansStr(): string {
+        if (this.ansNode === null) {
+            return '';
+        }
+        return PmConverter.toTextOrEmpty({
+            doc: this.ansNode,
+            schema: inlineSchema
+        });
+    }
+
+    onAnsChanged(value: ProseMirrorNode | null) {
+        this.ansNode = value;
+        this.validateField();
+    }
+
+    validateField(): string | undefined {
+        const ansString = this.ansStr;
+        if (ansString.length > FormQuestionConst.FILL_BLANKS_ANSWER_MAX_LENGTH) {
+            this.error = `Fill up ` + this.input.id + ` answer exceeds the maximum length of ` + FormQuestionConst.FILL_BLANKS_ANSWER_MAX_LENGTH + ` characters.`;
+            return this.error;
+        }
+        this.error = undefined;
+        return undefined;
     }
 }
 
@@ -30,6 +68,7 @@ export class FillBlanksQuestionVm extends QuestionVm {
         this.items = qExtras.inputs.map(input => new FillBlankItemVm(input));
         makeObservable(this, {
             items: observable,
+            onAnsStrChanged: action,
         });
     }
 
@@ -45,18 +84,21 @@ export class FillBlanksQuestionVm extends QuestionVm {
 
     validateQuestion(): string | undefined {
         if (this.base.isRequired.isTrue && !this.isAnswered) {
-            return "This question is required.";
+            return QuestionVm.DEFAULT_REQUIRED_ERROR_MESSAGE;
+        }
+        for (const item of this.items) {
+            const err = item.validateField();
+            if (err) {
+                return err;
+            }
         }
         return undefined;
     }
 
-    onAnsStrChanged(item: FillBlankItemVm, value: string) {
-        runInAction(() => {
-            item.ansStr = value;
-        });
+    onAnsStrChanged(item: FillBlankItemVm, value: ProseMirrorNode | null) {
+        item.onAnsChanged(value);
         this.validate();
     }
-
 
     render(props: QuestionRendererProps): JSX.Element {
         return <FillBlanksQuestionView vm={this} parentVm={props.parentVm} />;
@@ -66,10 +108,24 @@ export class FillBlanksQuestionVm extends QuestionVm {
         if (!this.isAnswered) {
             return undefined;
         }
-        const answers = this.items.map(item => new FillBlankInputAnswer({
-            id: item.input.id,
-            answer: item.ansStr
-        }));
+        const answers: FillBlankInputAnswer[] = [];
+        for (const item of this.items) {
+            if (item.ansNode === null) {
+                continue;
+            }
+            const ansString = PmConverter.toTextOrEmpty({
+                doc: item.ansNode,
+                schema: inlineSchema
+            });
+            if (ansString.length === 0) {
+                continue;
+            }
+            answers.push(new FillBlankInputAnswer({
+                id: item.input.id,
+                answer: ansString
+            }));
+        }
+
         return new FillBlanksAnswer({ answers });
     }
 

@@ -1,26 +1,38 @@
-import { ReactNode, useEffect, useMemo } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { STT } from "~/infra/utils/stt/STT"
 import { AiSTTDialogContext } from "./AiSTTDialogContext";
-import { AiSTTDialogStore } from "./AiSTTDialogStore";
+import { AiSTTDialogStore, ContentTypeOptions } from "./AiSTTDialogStore";
 import { AiSTTService } from "~/domain/aistt/services/AiSTTService";
-import { Content } from "~/domain/aistt/models/Content";
+import { AiSTTContent, AiSTTContentType } from "~/domain/aistt/models/AiSTTContent";
 
 
 export type AiSTTDialogProviderProps = {
+    contentType: AiSTTContentType;
+    contentTypeProps: ContentTypeOptions,
     children: ReactNode;
     stt: STT;
-    onDone: (content: Content) => void;
+    onDone: (content: AiSTTContent) => void;
     onCancel: () => void;
-    allowAi: boolean;
-    enableAi: boolean;
 }
 
 
-export function AiSTTDialogProvider({ children, stt, onDone, onCancel, allowAi, enableAi }: AiSTTDialogProviderProps) {
-    const store = useMemo(() => {
-        const aiService = new AiSTTService();
-        return new AiSTTDialogStore({ stt, aiService, onDone, onCancel, allowAi, enableAi });
-    }, [stt, onDone, onCancel, allowAi, enableAi]);
+export function AiSTTDialogProvider(props: AiSTTDialogProviderProps) {
+    const aiSttServiceRef = useRef<AiSTTService | null>(null);
+    if (!aiSttServiceRef.current) {
+        aiSttServiceRef.current = new AiSTTService();
+    }
+    const aiSttStoreRef = useRef<AiSTTDialogStore | null>(null);
+    if (!aiSttStoreRef.current) {
+        aiSttStoreRef.current = new AiSTTDialogStore({
+            contentType: props.contentType,
+            contentTypeProps: props.contentTypeProps,
+            stt: props.stt,
+            aiService: aiSttServiceRef.current,
+            onDone: props.onDone,
+            onCancel: props.onCancel,
+        });
+    }
+    const store = aiSttStoreRef.current;
 
     useEffect(() => {
         store.addSTTListeners();
@@ -36,7 +48,7 @@ export function AiSTTDialogProvider({ children, stt, onDone, onCancel, allowAi, 
 
     return (
         <AiSTTDialogContext.Provider value={store}>
-            {children}
+            {props.children}
         </AiSTTDialogContext.Provider>
     );
 }

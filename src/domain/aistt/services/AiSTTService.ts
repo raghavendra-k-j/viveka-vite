@@ -26,7 +26,10 @@ export class AiSTTService {
             }
 
             // Parse the markdown content from the response
-            const contentModel = ModelResponseParser.parse(rawContent);
+            const contentModel = ModelResponseParser.parse({
+                rawContent: rawContent,
+                contentType: req.contentType,
+            });
 
             // Parse token usage details
             const tokenUsage = this.parseTokenUsage(modelResponse.usage);

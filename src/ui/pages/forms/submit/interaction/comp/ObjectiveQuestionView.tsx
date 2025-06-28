@@ -18,7 +18,7 @@ type ObjectiveQuestionViewProps = {
 export function ObjectiveQuestionView(props: ObjectiveQuestionViewProps) {
     return (
         <QuestionCardView parent={props.parentVm}>
-            <QuestionHeaderView vm={props.vm} />
+            <QuestionHeaderView vm={props.vm} parentVm={props.parentVm} />
             <ChoiceList vm={props.vm} />
         </QuestionCardView>
     );
@@ -31,7 +31,7 @@ type ChoiceListProps = {
 function ChoiceList(props: ChoiceListProps) {
     const choices = props.vm.choices;
     return (
-        <div className="px-4 py-3 flex flex-col gap-1">
+        <div className="px-4 py-4 flex flex-col gap-1">
             {choices.map((choice) => (
                 <ChoiceItem key={choice.id} vm={props.vm} choice={choice} />
             ))}
@@ -65,7 +65,7 @@ export const ChoiceItem = observer(function ChoiceItem({ vm, choice }: ChoiceIte
     return (
         <button
             onClick={handleClick}
-            className={`w-full text-sm text-left text-default flex items-center gap-3 px-4 py-2 rounded-sm transition-colors duration-150 cursor-pointer 
+            className={`w-full text-base-m text-left text-default flex items-center gap-3 px-4 py-2 rounded-sm transition-colors duration-150 cursor-pointer 
             ${isSelected ? "bg-primary-50" : ""}`}
         >
             <Icon size={20} color={iconColor} />

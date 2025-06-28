@@ -14,24 +14,50 @@ function UserInfoItem({ label, value }: { label: string; value: string }) {
 
 export function UserDetailsView() {
     const { formDetail } = useResponseViewStore();
-    const userInfo = {
-        id: formDetail?.formResponse?.user?.id ?? formDetail?.formResponse?.guest?.id ?? 0,
-        name: formDetail?.formResponse?.user?.name ?? formDetail?.formResponse?.guest?.name ?? "Anonymous",
-        email: formDetail?.formResponse?.user?.email ?? formDetail?.formResponse?.guest?.email ?? "N/A",
-        mobile: formDetail?.formResponse?.user?.mobile ?? formDetail?.formResponse?.guest?.mobile ?? "N/A",
+
+
+    const response = formDetail?.formResponse;
+
+    let userInfo: {
+        id: number;
+        name: string;
+        email: string | null;
+        mobile: string | null;
     };
+
+    if (response?.user) {
+        const user = response.user;
+        userInfo = {
+            id: user.id,
+            name: user.name,
+            email: user.email ?? null,
+            mobile: user.mobile ?? null,
+        };
+    }
+    else {
+        const guest = response!.guest!;
+        userInfo = {
+            id: guest.id,
+            name: guest.name,
+            email: guest.email ?? null,
+            mobile: guest.mobile ?? null,
+        };
+    }
 
     const [expanded, setExpanded] = useState(false);
 
     return (
-        <div className="border border-slate-200 rounded-sm bg-surface shadow-xs">
+        <div className="border border-default rounded-sm bg-surface shadow-xs">
             {/* Entire header is clickable */}
             <div
                 className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-muted/40 transition-colors"
                 onClick={() => setExpanded((prev) => !prev)}
                 aria-label="Toggle user details"
             >
-                <AvatarView fontSize={28} id={userInfo.id} name={userInfo.name} />
+
+                <div className="w-6 h-6">
+                    <AvatarView fontSize={14} id={userInfo.id} name={userInfo.name} />
+                </div>
                 <div className="flex-1">
                     <div className="text-sm font-medium text-default">{userInfo.name}</div>
                 </div>
@@ -39,9 +65,9 @@ export function UserDetailsView() {
             </div>
 
             {expanded && (
-                <div className="text-sm text-default divide-y divide-slate-200 border-t border-slate-200">
-                    <UserInfoItem label="Email" value={userInfo.email} />
-                    <UserInfoItem label="Mobile" value={userInfo.mobile} />
+                <div className="text-sm text-default divide-y divide-default border-t border-default">
+                    <UserInfoItem label="Email" value={userInfo.email ?? "N/A"} />
+                    <UserInfoItem label="Mobile" value={userInfo.mobile ?? "N/A"} />
                 </div>
             )}
         </div>

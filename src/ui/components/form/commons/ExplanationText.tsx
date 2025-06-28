@@ -10,17 +10,19 @@ export function QuestionExplanationView(props: QuestionExplanationViewProps) {
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
-        <div className="px-4 py-2">
-            <button
-                type="button"
-                onClick={() => setIsExpanded((prev) => !prev)}
-                className="text-sm underline font-medium text-teal-800 hover:underline"
-            >
-                {isExpanded ? "Hide Explanation" : "Show Explanation"}
-            </button>
+        <div className={`flex flex-col gap-1 ${props.className}`}>
+            <div>
+                <button
+                    type="button"
+                    onClick={() => setIsExpanded((prev) => !prev)}
+                    className="text-base-m underline font-medium text-teal-700 hover:underline"
+                >
+                    {isExpanded ? "Hide Explanation" : "Show Explanation"}
+                </button>
+            </div>
 
             {isExpanded && (
-                <div className="pt-1 pb-2 text-sm text-default">
+                <div>
                     <ExplanationText text={props.explanation} />
                 </div>
             )}

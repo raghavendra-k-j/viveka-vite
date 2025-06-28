@@ -9,6 +9,7 @@ import type { FormType } from "~/domain/forms/models/FormType";
 import type { STT } from "~/infra/utils/stt/STT";
 import type { AdminFormsService } from "~/domain/forms/admin/services/AdminFormsService";
 import { UpsertQuestionForm } from "./UpsertQuestionForm";
+import { AppStore } from "~/ui/pages/_layout/AppStore";
 
 export type UpsertQuestionDialogProps = {
     id: number | null;
@@ -19,6 +20,7 @@ export type UpsertQuestionDialogProps = {
     adminFormsService: AdminFormsService;
     dialogManager: DialogManagerStore;
     onClose: () => void;
+    appStore: AppStore;
 };
 
 export function UpsertQuestionDialog(props: UpsertQuestionDialogProps) {

@@ -1,5 +1,6 @@
 import { Node as ProseMirrorNode } from 'prosemirror-model';
 import { EditorView, NodeView } from 'prosemirror-view';
+import { FormQuestionConst } from '~/domain/forms/const/FormQuestionConst';
 
 type FillBlankNodeViewProps = {
     node: ProseMirrorNode;
@@ -15,8 +16,8 @@ export class FillBlankNodeView implements NodeView {
     constructor(props: FillBlankNodeViewProps) {
         this.node = props.node;
         this.dom = document.createElement('span');
-        this.dom.setAttribute('data-fill-blank', '');
-        this.dom.textContent = '_____';
+        this.dom.setAttribute('data-tag-fill-blank', '');
+        this.dom.textContent = '_'.repeat(FormQuestionConst.FILL_BLANKS_UNDERLINE_LENGTH);
     }
 
     public update(node: ProseMirrorNode): boolean {

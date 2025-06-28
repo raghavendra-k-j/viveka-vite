@@ -79,6 +79,7 @@ export class UpsertQuestionVmFactory {
             text: props.question.question,
             schema: blockSchema,
         });
+        const mediaFiles = props.question.mediaFiles.map(m => m.toTile());
 
         const scorable = new FValue<Bool3>(Bool3.N);
         const marksField = new FValue<string>("");
@@ -90,13 +91,14 @@ export class UpsertQuestionVmFactory {
             const marksPolicy = questionType.assmntMarksPolicy;
             if (marksPolicy.isRequired || marksPolicy.isOptional) {
                 if (props.question.marks) {
+                    scorable.set(Bool3.T);
                     marksField.set(props.question.marks.toString());
                     level.set(props.question.level);
-                    ansExplanationNode = PmConverter.toNodeOrEmpty({
+                    ansExplanationNode = PmConverter.toNode({
                         text: props.question.ansExplanation,
                         schema: blockSchema,
                     });
-                    ansHintNode = PmConverter.toNodeOrEmpty({
+                    ansHintNode = PmConverter.toNode({
                         text: props.question.ansHint,
                         schema: blockSchema,
                     });
@@ -120,6 +122,7 @@ export class UpsertQuestionVmFactory {
             ansHintNode: ansHintNode,
             ansExplanationNode: ansExplanationNode,
             isRequired: isRequired,
+            mediaFiles: mediaFiles,
         });
     }
 }

@@ -1,6 +1,7 @@
-import { Content } from "./Content";
+import { AiSTTContent, AiSTTContentType } from "./AiSTTContent";
 
 export type AiSTTReqProps = {
+    contentType: AiSTTContentType,
     transcription: string;
     previousContext: string;
 }
@@ -8,40 +9,29 @@ export type AiSTTReqProps = {
 export class AiSTTReq {
     public transcription: string;
     public previousContext: string;
+    public contentType: AiSTTContentType;
 
     constructor(props: AiSTTReqProps) {
         this.transcription = props.transcription;
         this.previousContext = props.previousContext;
+        this.contentType = props.contentType;
     }
 }
 
 export type AiSTTResProps = {
-    content: Content;
+    content: AiSTTContent;
     usage: TokenUsage;
 }
 
 export class AiSTTRes {
-    public content: Content;
+    public content: AiSTTContent;
     public usage: TokenUsage;
 
     constructor(props: AiSTTResProps) {
         this.content = props.content;
         this.usage = props.usage;
     }
-
-    static empty(): AiSTTRes {
-        const content = new Content();
-        return new AiSTTRes({
-            content: content,
-            usage: new TokenUsage({
-                prompt: 0,
-                response: 0,
-                total: 0,
-            }),
-        });
-    }
 }
-
 
 export class TokenUsage {
     public readonly prompt: number;

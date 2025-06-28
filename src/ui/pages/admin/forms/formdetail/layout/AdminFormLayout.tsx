@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Link, Outlet, useParams } from "react-router";
+import { Outlet, useParams } from "react-router";
 import { AdminFormProvider } from "./AdminFormProvider";
 import { AdminFormStore } from "./AdminFormStore";
 import { Observer } from "mobx-react-lite";
@@ -60,13 +60,5 @@ export function Body() {
 }
 
 function Main() {
-    const store = useAdminFormStore();
-    return (
-        <div>
-            <h1>{store.fd.title}</h1>
-            <Link to={`/admin/forms/${store.permalink}/questions`}>Questions</Link>
-            <Link to={`/admin/forms/${store.permalink}/settings`}>Settings</Link>
-            <Outlet />
-        </div>
-    );
+    return (<Outlet />);
 }

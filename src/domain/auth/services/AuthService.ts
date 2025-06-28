@@ -6,6 +6,7 @@ import Cookies from 'js-cookie'
 import { AuthConst } from "~/core/const/AuthConst";
 import { EmailOtpStatus } from "~/domain/common/models/EmailOtpStatus";
 import { AppUserType } from "~/domain/common/models/AppUserType";
+import { AutoLoginRes } from "../models/AutoLoginRes";
 
 export class AuthService {
 
@@ -40,6 +41,11 @@ export class AuthService {
     async checkAuthEmailOTPStatus(otpId: number): Promise<ResEither<ApiError, EmailOtpStatus | undefined>> {
         return this.authRepo.checkAuthEmailOTPStatus(otpId);
     }
+
+    async autoLogin({ tempAuthToken, userId }: { tempAuthToken: string, userId: number }): Promise<ResEither<ApiError, AutoLoginRes>> {
+        return this.authRepo.autoLogin({ tempAuthToken, userId });
+    }
+
 
     async clearTokenLocally() {
         Cookies.remove(AuthConst.keyAccessToken);

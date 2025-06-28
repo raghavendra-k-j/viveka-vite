@@ -1,5 +1,11 @@
-import { Input } from "~/ui/widgets/form/input/FInput";
+import { FInput } from "~/ui/widgets/form/input/FInput";
+import { useResponseViewStore } from "../../ResponseViewContext";
 
 export function SearchBar() {
-    return (<Input placeholder="Search Questions" type="search" />);
+    const store = useResponseViewStore();
+    return (<FInput
+        placeholder="Search Questions"
+        type="search"
+        onChange={(e) => store.onSearchQueryChanged(e.target.value)}
+    />);
 }

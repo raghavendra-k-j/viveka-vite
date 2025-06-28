@@ -13,16 +13,17 @@ export function InteractionProvider({ children }: InteractionProviderProps) {
     const parentStore = useSubmitStore();
     const sttRef = useRef<STT | null>(null);
     const dialogManager = useDialogManager();
-
-    const store = useMemo<InteractionStore>(() => {
-        const store = new InteractionStore({
+    const storeRef = useRef<InteractionStore | null>(null);
+    if (!storeRef.current) {
+        storeRef.current = new InteractionStore({
             parentStore,
             dialogManager,
         });
-        return store;
-    }, [parentStore, dialogManager]);
+    }
+    const store = storeRef.current;
 
     useEffect(() => {
+        store.loadQuestions();
         if (!sttRef.current) {
             sttRef.current = new STT();
             store.stt = sttRef.current;
@@ -31,6 +32,7 @@ export function InteractionProvider({ children }: InteractionProviderProps) {
             if (sttRef.current) {
                 sttRef.current.dispose();
                 sttRef.current = null;
+                store.dispose();
             }
         }
     });

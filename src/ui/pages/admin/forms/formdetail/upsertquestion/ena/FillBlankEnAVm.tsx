@@ -117,6 +117,7 @@ export class FillBlankEnAVm extends EnAVm {
     static fromQuestion(props: { question: Question; storeRef: UpsertQuestionStore; }): EnAVm | null {
         const qExtras = props.question.qExtras as FillBlanksQExtras;
         const answer = props.question.answer as FillBlanksAnswer;
+
         const vm = new FillBlankEnAVm({
             storeRef: props.storeRef,
         });
@@ -125,15 +126,16 @@ export class FillBlankEnAVm extends EnAVm {
         const answerToIdMap = answer.toIdMap();
 
         for (const input of qExtras.inputs) {
+            const node = PmConverter.toNode({
+                text: answerToIdMap[input.id]!,
+                schema: inlineSchema,
+            });
             const item = new FillBlankEnAVmItem({
-                node: PmConverter.toNode({
-                    text: answerToIdMap[input.id]!,
-                    schema: inlineSchema,
-                }),
+                node: node,
             });
             inputs.push(item);
         }
-
+        vm.items = inputs;
         return vm;
     }
 

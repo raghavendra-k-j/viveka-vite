@@ -1,10 +1,10 @@
 import type { FillBlanksQuestionVm } from "../models/FillBlanksQuestionVm";
 import { FillBlankItemVm } from "../models/FillBlanksQuestionVm";
 import { QuestionHeaderView } from "./QuestionHeaderView";
-import { ListenButton } from "./ListenButton";
 import { QuestionCardView } from "./QuestionCardView";
 import { GroupQuestionVm } from "../models/GroupQuestionVm";
-import { Observer } from "mobx-react-lite";
+import { RichPmEditor } from "~/ui/components/richpmeditor/RichPmEditor";
+import { inlineSchema } from "~/ui/components/richpmeditor/pm/schema";
 
 type FillBlanksQuestionViewProps = {
     vm: FillBlanksQuestionVm;
@@ -14,7 +14,7 @@ type FillBlanksQuestionViewProps = {
 export const FillBlanksQuestionView = ({ vm, parentVm }: FillBlanksQuestionViewProps) => {
     return (
         <QuestionCardView parent={parentVm}>
-            <QuestionHeaderView vm={vm} />
+            <QuestionHeaderView vm={vm} parentVm={parentVm} />
             <div className="space-y-4 px-4 py-4">
                 {vm.items.map((item, index) =>
                     index > 10 ? null : (
@@ -22,8 +22,7 @@ export const FillBlanksQuestionView = ({ vm, parentVm }: FillBlanksQuestionViewP
                             key={item.input.id}
                             vm={vm}
                             itemVm={item}
-                            total={vm.items.length}
-                            index={index + 1}
+                            position={index + 1}
                         />
                     )
                 )}
@@ -35,28 +34,18 @@ export const FillBlanksQuestionView = ({ vm, parentVm }: FillBlanksQuestionViewP
 type InputProps = {
     vm: FillBlanksQuestionVm;
     itemVm: FillBlankItemVm;
-    total: number;
-    index: number;
+    position: number;
 };
 
-const FillBlankInputView = ({ vm, itemVm, total, index }: InputProps) => {
+const FillBlankInputView = ({ vm, itemVm, position: index }: InputProps) => {
     return (
         <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
-                <Observer>
-                    {() => (
-                        <input
-                            type="text"
-                            className="flex-1 text-base w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-primary textdefault placeholder-gray-400"
-                            placeholder={`Answer ${index} of ${total}`}
-                            value={itemVm.ansStr}
-                            onChange={(e) => vm.onAnsStrChanged(itemVm, e.target.value)}
-                        />
-                    )}
-                </Observer>
-                <ListenButton
+                <RichPmEditor
+                    schema={inlineSchema}
+                    onChange={(node) => vm.onAnsStrChanged(itemVm, node)}
+                    placeholder={`Fill up answer ${index}`}
                     stt={vm.base.store.parentStore.stt}
-                    onResult={(str) => vm.onAnsStrChanged(itemVm, str)}
                 />
             </div>
         </div>

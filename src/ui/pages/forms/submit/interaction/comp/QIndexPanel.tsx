@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import styles from "./../styles.module.css";
 import clsx from "clsx";
 import { QNumberUtil } from "~/domain/forms/utils/QNumberUtil";
+import { logger } from "~/core/utils/logger";
 
 
 function QuestionIndexItem({
@@ -81,7 +82,9 @@ export const QIndexPanel = (props: QIndexPanelProps) => {
             <Legend />
             <div className={styles.qIndexPanelContent}>
                 {acutalQuestions.map(({ vm, parentVm }) => (
-                    <QuestionIndexItem onClick={props.onClickQuestion} key={vm.base.id} vm={vm} parentVm={parentVm} />
+                    <QuestionIndexItem onClick={() => {
+                        return props.onClickQuestion(vm);
+                    }} key={vm.base.id} vm={vm} parentVm={parentVm} />
                 ))}
             </div>
         </div>
@@ -101,10 +104,6 @@ const Legend = () => {
                 className={clsx(styles.qIndexLegendItemBox, styles.Unanswered)}
                 label="Unanswered"
             />
-            {/* <LegendItem
-                className={clsx(styles.qIndexLegendItemBox, styles.Error)}
-                label="Error"
-            /> */}
         </div>
     );
 };
